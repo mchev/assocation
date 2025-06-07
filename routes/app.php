@@ -10,7 +10,7 @@ use App\Http\Controllers\App\CalendarController;
 use App\Http\Controllers\App\ProfileController;
 
 Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('organizations', OrganizationController::class);
     Route::resource('organizations.equipments', EquipmentController::class);
     Route::resource('equipments', EquipmentController::class);

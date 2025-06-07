@@ -79,8 +79,6 @@ class OrganizationFactory extends Factory
             'website' => $this->generateWebsite($name),
             'logo_path' => null,
             'is_active' => true,
-            'subscription_type' => $this->faker->randomElement(['free', 'basic', 'premium']),
-            'subscription_ends_at' => $this->faker->optional(0.7)->dateTimeBetween('now', '+1 year'),
         ];
     }
 
