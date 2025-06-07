@@ -130,32 +130,32 @@
                   <h3 class="text-lg font-medium text-gray-900">Actions</h3>
                   <div class="mt-4 space-y-4">
                     <form @submit.prevent="approve" class="inline-block">
-                      <PrimaryButton type="submit">
+                      <Button type="submit">
                         Approuver
-                      </PrimaryButton>
+                      </Button>
                     </form>
 
                     <form @submit.prevent="reject" class="inline-block ml-4">
-                      <DangerButton type="submit">
+                      <Button type="submit">
                         Rejeter
-                      </DangerButton>
+                      </Button>
                     </form>
                   </div>
                 </div>
 
                 <div v-if="can.update && ['pending', 'approved'].includes(reservation.status)" class="bg-gray-50 p-6 rounded-lg">
                   <form @submit.prevent="cancel" class="inline-block">
-                    <SecondaryButton type="submit">
+                    <Button type="submit">
                       Annuler la réservation
-                    </SecondaryButton>
+                    </Button>
                   </form>
                 </div>
 
                 <div v-if="can.delete" class="bg-gray-50 p-6 rounded-lg">
                   <form @submit.prevent="destroy" class="inline-block">
-                    <DangerButton type="submit">
+                    <Button type="submit">
                       Supprimer la réservation
-                    </DangerButton>
+                    </Button>
                   </form>
                 </div>
               </div>
@@ -170,9 +170,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
-import PrimaryButton from '@/components/PrimaryButton.vue'
-import SecondaryButton from '@/components/SecondaryButton.vue'
-import DangerButton from '@/components/DangerButton.vue'
+import { Button } from '@/components/ui/button'
 import { Link } from '@inertiajs/vue3'
 
 const props = defineProps({

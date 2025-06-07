@@ -5,249 +5,319 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           Modifier {{ equipment.name }}
         </h2>
-        <div class="flex items-center space-x-4">
-          <Link
-            :href="route('organizations.equipment.show', [organization, equipment])"
-            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
-          >
-            Annuler
-          </Link>
-        </div>
+        <Link
+          :href="route('app.organizations.equipments.index', organization)"
+          class="inline-flex items-center px-4 py-2 bg-background hover:bg-accent hover:text-accent-foreground h-10 py-2 px-4 transition-colors"
+        >
+          <ArrowLeft class="w-4 h-4 mr-2" />
+          Retour à la liste
+        </Link>
       </div>
     </template>
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <form @submit.prevent="submit" class="p-6">
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <!-- Nom -->
-              <div>
-                <InputLabel for="name" value="Nom" />
-                <TextInput
-                  id="name"
-                  v-model="form.name"
-                  type="text"
-                  class="mt-1 block w-full"
-                  required
-                  autofocus
-                />
-                <InputError :message="form.errors.name" class="mt-2" />
+        <Card>
+          <CardContent class="p-8">
+            <form @submit.prevent="submit">
+              <!-- Informations générales -->
+              <div class="space-y-6">
+                <CardHeader class="px-0 pt-0">
+                  <CardTitle>Informations générales</CardTitle>
+                  <CardDescription>Informations de base du matériel</CardDescription>
+                </CardHeader>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <!-- Nom -->
+                  <div class="space-y-2">
+                    <Label required>
+                      Nom <span class="text-destructive">*</span>
+                    </Label>
+                    <Input 
+                      v-model="form.name"
+                      type="text" 
+                      required 
+                      autofocus
+                      placeholder="Ex: Perceuse Bosch Professional"
+                    />
+                    <p class="text-xs text-muted-foreground">Nom complet du matériel avec sa marque si possible</p>
+                    <p v-if="form.errors.name" class="text-sm text-destructive">{{ form.errors.name }}</p>
+                  </div>
+
+                  <!-- Catégorie -->
+                  <div class="space-y-2">
+                    <Label>
+                      Catégorie <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="form.category_id" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
+                          {{ category.name }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.category_id" class="text-sm text-destructive">{{ form.errors.category_id }}</p>
+                  </div>
+
+                  <!-- Description -->
+                  <div class="sm:col-span-2 space-y-2">
+                    <Label>
+                      Description
+                    </Label>
+                    <Textarea 
+                      v-model="form.description"
+                      rows="3"
+                      placeholder="Décrivez les caractéristiques principales du matériel..."
+                    />
+                    <p class="text-xs text-muted-foreground">Une description détaillée aidera les utilisateurs à mieux comprendre le matériel</p>
+                    <p v-if="form.errors.description" class="text-sm text-destructive">{{ form.errors.description }}</p>
+                  </div>
+                </div>
               </div>
 
-              <!-- Catégorie -->
-              <div>
-                <InputLabel for="category" value="Catégorie" />
-                <TextInput
-                  id="category"
-                  v-model="form.category"
-                  type="text"
-                  class="mt-1 block w-full"
-                  required
-                />
-                <InputError :message="form.errors.category" class="mt-2" />
+              <!-- État et stockage -->
+              <div class="space-y-6 mt-8">
+                <CardHeader class="px-0">
+                  <CardTitle>État et stockage</CardTitle>
+                  <CardDescription>Informations sur l'état et le lieu de stockage</CardDescription>
+                </CardHeader>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <!-- État -->
+                  <div class="space-y-2">
+                    <Label>
+                      État <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="form.condition">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez l'état" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="new">
+                          <div class="flex items-center">
+                            <Sparkles class="w-4 h-4 mr-2 text-green-500" />
+                            <span>Neuf</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="good">
+                          <div class="flex items-center">
+                            <CheckCircle class="w-4 h-4 mr-2 text-blue-500" />
+                            <span>Bon</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="fair">
+                          <div class="flex items-center">
+                            <AlertCircle class="w-4 h-4 mr-2 text-yellow-500" />
+                            <span>Moyen</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="poor">
+                          <div class="flex items-center">
+                            <XCircle class="w-4 h-4 mr-2 text-red-500" />
+                            <span>Mauvais</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.condition" class="text-sm text-destructive">{{ form.errors.condition }}</p>
+                  </div>
+
+                  <!-- Lieu de stockage -->
+                  <div class="space-y-2">
+                    <Label>
+                      Lieu de stockage <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="form.depot_id" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez un lieu de stockage" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="depot in depots" :key="depot.id" :value="depot.id">
+                          {{ depot.name }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.depot_id" class="text-sm text-destructive">{{ form.errors.depot_id }}</p>
+                  </div>
+                </div>
               </div>
 
-              <!-- Description -->
-              <div class="sm:col-span-2">
-                <InputLabel for="description" value="Description" />
-                <TextArea
-                  id="description"
-                  v-model="form.description"
-                  class="mt-1 block w-full"
-                  rows="3"
-                />
-                <InputError :message="form.errors.description" class="mt-2" />
+              <!-- Tarification -->
+              <div class="space-y-6 mt-8">
+                <CardHeader class="px-0">
+                  <CardTitle>Tarification</CardTitle>
+                  <CardDescription>Définissez les prix et conditions de location</CardDescription>
+                </CardHeader>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                  <!-- Prix d'achat -->
+                  <div class="space-y-2">
+                    <Label>
+                      Prix d'achat
+                    </Label>
+                    <div class="relative">
+                      <Input
+                        v-model="form.purchase_price"
+                        type="text"
+                        inputmode="decimal"
+                        class="pl-7"
+                        @input="e => handlePriceInput(e, 'purchase_price')"
+                      />
+                      <span class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
+                    </div>
+                    <p v-if="form.errors.purchase_price" class="text-sm text-destructive">{{ form.errors.purchase_price }}</p>
+                  </div>
+
+                  <!-- Prix de location -->
+                  <div class="space-y-2">
+                    <Label>
+                      Prix de location
+                    </Label>
+                    <div class="relative">
+                      <Input
+                        v-model="form.rental_price"
+                        type="text"
+                        inputmode="decimal"
+                        class="pl-7"
+                        @input="e => handlePriceInput(e, 'rental_price')"
+                      />
+                      <span class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
+                    </div>
+                    <p class="text-xs text-muted-foreground">Prix par jour</p>
+                    <p v-if="form.errors.rental_price" class="text-sm text-destructive">{{ form.errors.rental_price }}</p>
+                  </div>
+
+                  <!-- Montant de la caution -->
+                  <div class="space-y-2">
+                    <Label>
+                      Montant de la caution
+                    </Label>
+                    <div class="relative">
+                      <Input
+                        v-model="form.deposit_amount"
+                        type="text"
+                        inputmode="decimal"
+                        class="pl-7"
+                        :disabled="!form.requires_deposit"
+                        @input="e => handlePriceInput(e, 'deposit_amount')"
+                      />
+                      <span class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
+                    </div>
+                    <p v-if="form.errors.deposit_amount" class="text-sm text-destructive">{{ form.errors.deposit_amount }}</p>
+                  </div>
+                </div>
+
+                <!-- Options -->
+                <div class="space-y-4 mt-4">
+                  <label class="flex items-center space-x-2">
+                    <Switch v-model="form.is_available" />
+                    <div>
+                      <span class="text-sm font-medium leading-none">Disponible</span>
+                      <p class="text-xs text-muted-foreground">Le matériel peut être réservé</p>
+                    </div>
+                  </label>
+
+                  <label class="flex items-center space-x-2">
+                    <Switch v-model="form.requires_deposit" />
+                    <div>
+                      <span class="text-sm font-medium leading-none">Nécessite une caution</span>
+                      <p class="text-xs text-muted-foreground">Une caution sera demandée pour la location</p>
+                    </div>
+                  </label>
+
+                  <label class="flex items-center space-x-2">
+                    <Switch v-model="form.is_rentable" />
+                    <div>
+                      <span class="text-sm font-medium leading-none">Louable</span>
+                      <p class="text-xs text-muted-foreground">Le matériel peut être loué</p>
+                    </div>
+                  </label>
+                </div>
               </div>
 
-              <!-- État -->
-              <div>
-                <InputLabel for="condition" value="État" />
-                <SelectInput
-                  id="condition"
-                  v-model="form.condition"
-                  class="mt-1 block w-full"
-                  required
+              <!-- Maintenance -->
+              <div class="space-y-6 mt-8">
+                <CardHeader class="px-0">
+                  <CardTitle>Maintenance</CardTitle>
+                  <CardDescription>Suivi des maintenances du matériel</CardDescription>
+                </CardHeader>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <!-- Dernière maintenance -->
+                  <div class="space-y-2">
+                    <Label>
+                      Dernière maintenance
+                    </Label>
+                    <Input
+                      v-model="form.last_maintenance_date"
+                      type="date"
+                    />
+                    <p class="text-xs text-muted-foreground">Date de la dernière maintenance effectuée</p>
+                    <p v-if="form.errors.last_maintenance_date" class="text-sm text-destructive">{{ form.errors.last_maintenance_date }}</p>
+                  </div>
+
+                  <!-- Prochaine maintenance -->
+                  <div class="space-y-2">
+                    <Label>
+                      Prochaine maintenance
+                    </Label>
+                    <Input
+                      v-model="form.next_maintenance_date"
+                      type="date"
+                    />
+                    <p class="text-xs text-muted-foreground">Date de la prochaine maintenance prévue</p>
+                    <p v-if="form.errors.next_maintenance_date" class="text-sm text-destructive">{{ form.errors.next_maintenance_date }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="mt-8 flex items-center justify-end gap-x-6 border-t pt-6">
+                <Link
+                  :href="route('app.organizations.equipments.index', organization)"
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
                 >
-                  <option value="new">Neuf</option>
-                  <option value="good">Bon</option>
-                  <option value="fair">Moyen</option>
-                  <option value="poor">Mauvais</option>
-                </SelectInput>
-                <InputError :message="form.errors.condition" class="mt-2" />
+                  Annuler
+                </Link>
+                <Button
+                  type="submit"
+                  :disabled="form.processing"
+                  :class="{ 'opacity-25': form.processing }"
+                >
+                  <Spinner v-if="form.processing" class="w-4 h-4 mr-2" />
+                  {{ form.processing ? 'Modification en cours...' : 'Enregistrer les modifications' }}
+                </Button>
               </div>
-
-              <!-- Prix d'achat -->
-              <div>
-                <InputLabel for="purchase_price" value="Prix d'achat" />
-                <TextInput
-                  id="purchase_price"
-                  v-model="form.purchase_price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="mt-1 block w-full"
-                />
-                <InputError :message="form.errors.purchase_price" class="mt-2" />
-              </div>
-
-              <!-- Prix de location -->
-              <div>
-                <InputLabel for="rental_price" value="Prix de location" />
-                <TextInput
-                  id="rental_price"
-                  v-model="form.rental_price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="mt-1 block w-full"
-                />
-                <InputError :message="form.errors.rental_price" class="mt-2" />
-              </div>
-
-              <!-- Montant de la caution -->
-              <div>
-                <InputLabel for="deposit_amount" value="Montant de la caution" />
-                <TextInput
-                  id="deposit_amount"
-                  v-model="form.deposit_amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="mt-1 block w-full"
-                />
-                <InputError :message="form.errors.deposit_amount" class="mt-2" />
-              </div>
-
-              <!-- Options -->
-              <div class="sm:col-span-2">
-                <div class="flex items-center space-x-6">
-                  <label class="flex items-center">
-                    <Checkbox
-                      v-model:checked="form.is_available"
-                      name="is_available"
-                    />
-                    <span class="ml-2 text-sm text-gray-600">Disponible</span>
-                  </label>
-
-                  <label class="flex items-center">
-                    <Checkbox
-                      v-model:checked="form.requires_deposit"
-                      name="requires_deposit"
-                    />
-                    <span class="ml-2 text-sm text-gray-600">Nécessite une caution</span>
-                  </label>
-
-                  <label class="flex items-center">
-                    <Checkbox
-                      v-model:checked="form.is_rentable"
-                      name="is_rentable"
-                    />
-                    <span class="ml-2 text-sm text-gray-600">Louable</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Dernière maintenance -->
-              <div>
-                <InputLabel for="last_maintenance_date" value="Dernière maintenance" />
-                <TextInput
-                  id="last_maintenance_date"
-                  v-model="form.last_maintenance_date"
-                  type="date"
-                  class="mt-1 block w-full"
-                />
-                <InputError :message="form.errors.last_maintenance_date" class="mt-2" />
-              </div>
-
-              <!-- Prochaine maintenance -->
-              <div>
-                <InputLabel for="next_maintenance_date" value="Prochaine maintenance" />
-                <TextInput
-                  id="next_maintenance_date"
-                  v-model="form.next_maintenance_date"
-                  type="date"
-                  class="mt-1 block w-full"
-                />
-                <InputError :message="form.errors.next_maintenance_date" class="mt-2" />
-              </div>
-
-              <!-- Spécifications -->
-              <div class="sm:col-span-2">
-                <InputLabel value="Spécifications" />
-                <div class="mt-2 space-y-4">
-                  <div
-                    v-for="(value, key) in form.specifications"
-                    :key="key"
-                    class="flex items-center space-x-4"
-                  >
-                    <TextInput
-                      v-model="form.specifications[key]"
-                      type="text"
-                      class="block w-full"
-                      :placeholder="key"
-                    />
-                    <button
-                      type="button"
-                      @click="removeSpecification(key)"
-                      class="text-red-600 hover:text-red-900"
-                    >
-                      Supprimer
-                    </button>
-                  </div>
-                  <div class="flex items-center space-x-4">
-                    <TextInput
-                      v-model="newSpecificationKey"
-                      type="text"
-                      class="block w-full"
-                      placeholder="Nouvelle spécification"
-                    />
-                    <button
-                      type="button"
-                      @click="addSpecification"
-                      class="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Ajouter
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-6 flex items-center justify-end gap-x-6">
-              <Link
-                :href="route('organizations.equipment.show', [organization, equipment])"
-                class="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Annuler
-              </Link>
-              <PrimaryButton
-                type="submit"
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-              >
-                Enregistrer les modifications
-              </PrimaryButton>
-            </div>
-          </form>
-        </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import AppLayout from '@/layouts/AppLayout.vue'
-import InputError from '@/components/InputError.vue'
-import InputLabel from '@/components/InputLabel.vue'
-import PrimaryButton from '@/components/PrimaryButton.vue'
-import TextInput from '@/components/TextInput.vue'
-import TextArea from '@/components/TextArea.vue'
-import SelectInput from '@/components/SelectInput.vue'
-import Checkbox from '@/components/Checkbox.vue'
 import { Link } from '@inertiajs/vue3'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { 
+  ArrowLeft,
+  Sparkles,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+} from 'lucide-vue-next'
+import Spinner from '@/components/ui/spinner.vue'
 
 const props = defineProps({
   organization: {
@@ -257,40 +327,57 @@ const props = defineProps({
   equipment: {
     type: Object,
     required: true
+  },
+  categories: {
+    type: Array,
+    required: true
+  },
+  depots: {
+    type: Array,
+    required: true
   }
 })
-
-const newSpecificationKey = ref('')
 
 const form = useForm({
   name: props.equipment.name,
   description: props.equipment.description,
-  category: props.equipment.category,
+  category_id: props.equipment.category_id,
+  depot_id: props.equipment.depot_id,
   condition: props.equipment.condition,
-  purchase_price: props.equipment.purchase_price,
-  rental_price: props.equipment.rental_price,
-  deposit_amount: props.equipment.deposit_amount,
+  purchase_price: props.equipment.purchase_price?.toString().replace('.', ',') || '0,00',
+  rental_price: props.equipment.rental_price?.toString().replace('.', ',') || '0,00',
+  deposit_amount: props.equipment.deposit_amount?.toString().replace('.', ',') || '0,00',
   is_available: props.equipment.is_available,
   requires_deposit: props.equipment.requires_deposit,
   is_rentable: props.equipment.is_rentable,
-  specifications: { ...props.equipment.specifications },
   last_maintenance_date: props.equipment.last_maintenance_date,
-  next_maintenance_date: props.equipment.next_maintenance_date
+  next_maintenance_date: props.equipment.next_maintenance_date,
 })
 
-const addSpecification = () => {
-  if (newSpecificationKey.value && !form.specifications[newSpecificationKey.value]) {
-    form.specifications[newSpecificationKey.value] = ''
-    newSpecificationKey.value = ''
+const handlePriceInput = (e, field) => {
+  let value = e.target.value
+  
+  // Replace commas with dots for standardization
+  value = value.replace(',', '.')
+  
+  // Remove any non-numeric characters except dots
+  value = value.replace(/[^\d.]/g, '')
+  
+  // Ensure only one decimal point
+  const parts = value.split('.')
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('')
   }
-}
-
-const removeSpecification = (key) => {
-  const { [key]: removed, ...rest } = form.specifications
-  form.specifications = rest
+  
+  // Format the display value with comma
+  const displayValue = value ? value.replace('.', ',') : '0,00'
+  
+  // Store the raw value
+  form[field] = value || '0.00'
+  e.target.value = displayValue
 }
 
 const submit = () => {
-  form.put(route('organizations.equipment.update', [props.organization, props.equipment]))
+  form.put(route('app.organizations.equipments.update', [props.organization, props.equipment]))
 }
 </script> 

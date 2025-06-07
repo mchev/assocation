@@ -161,12 +161,15 @@ class EquipmentController extends Controller
             ->with('success', 'Matériel créé avec succès.');
     }
 
-    public function edit(Equipment $equipment)
+    public function edit(Organization $organization, Equipment $equipment)
     {
         $this->authorize('update', $equipment);
 
         return Inertia::render('App/Organizations/Equipments/Edit', [
             'equipment' => $equipment,
+            'organization' => $organization,
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'depots' => $organization->depots()->orderBy('name')->get(['id', 'name', 'city']),
         ]);
     }
 
