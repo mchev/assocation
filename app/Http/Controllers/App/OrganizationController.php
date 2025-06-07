@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organization;
 use App\Http\Requests\Organization\StoreRequest;
 use App\Http\Requests\Organization\UpdateRequest;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\Organization;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Inertia\Inertia;
 
 class OrganizationController extends Controller
 {
@@ -117,7 +116,7 @@ class OrganizationController extends Controller
         $user = auth()->user();
 
         // Check if user is a member of the organization
-        if (!$user->organizations->contains($organization)) {
+        if (! $user->organizations->contains($organization)) {
             return back()->with('error', 'Vous n\'êtes pas membre de cette organisation.');
         }
 
@@ -126,4 +125,4 @@ class OrganizationController extends Controller
 
         return back()->with('success', 'Organisation principale mise à jour avec succès.');
     }
-} 
+}

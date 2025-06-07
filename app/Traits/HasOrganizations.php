@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Models\Organization;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\DB;
 
 trait HasOrganizations
 {
@@ -52,11 +51,12 @@ trait HasOrganizations
      */
     public function setPrimaryOrganization(Organization $organization): bool
     {
-        if (!$this->isMemberOf($organization)) {
+        if (! $this->isMemberOf($organization)) {
             return false;
         }
 
         $this->update(['current_organization_id' => $organization->id]);
+
         return true;
     }
 
@@ -67,13 +67,14 @@ trait HasOrganizations
     {
         // If user has no current organization but has existing organizations,
         // set the first one as current
-        if (!$this->current_organization_id && $this->organizations()->exists()) {
+        if (! $this->current_organization_id && $this->organizations()->exists()) {
             $this->update(['current_organization_id' => $this->organizations()->first()->id]);
+
             return;
         }
 
         // If user has no organizations at all, create a new one
-        if (!$this->organizations()->exists()) {
+        if (! $this->organizations()->exists()) {
             $organization = Organization::create([
                 'name' => "Organisation de {$this->name}",
                 'email' => $this->email,
@@ -83,4 +84,4 @@ trait HasOrganizations
             $this->update(['current_organization_id' => $organization->id]);
         }
     }
-} 
+}

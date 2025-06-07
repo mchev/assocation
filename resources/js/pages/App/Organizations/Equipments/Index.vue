@@ -3,11 +3,12 @@
     <template #header>
       <div class="flex justify-between items-center">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          Matériel
+          Inventaire du matériel de {{ organization.name }} ({{ equipments.total }})
         </h2>
         <Button
           v-if="can.create"
-          :href="route('organizations.equipment.create', organization)"
+          as="a"
+          :href="route('app.organizations.equipments.create', organization)"
           variant="default"
           size="default"
         >
@@ -20,42 +21,43 @@
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Filtres -->
         <Card class="mb-6">
-          <CardContent class="p-6">
-            <form @submit.prevent="filter" class="space-y-4">
-              <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <div class="space-y-2">
-                  <Label for="search">Rechercher</Label>
+          <CardContent class="p-4">
+            <form @submit.prevent="filter">
+              <div class="flex flex-wrap items-end gap-6">
+                <div>
+                  <Label for="search" class="text-sm">Rechercher</Label>
                   <Input
                     id="search"
                     v-model="filters.search"
                     type="text"
                     placeholder="Nom, catégorie..."
+                    @input="filter"
                   />
                 </div>
 
-                <div class="space-y-2">
-                  <Label for="category">Catégorie</Label>
-                  <Select v-model="filters.category">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Toutes les catégories" />
+                <div>
+                  <Label for="category" class="text-sm">Catégorie</Label>
+                  <Select v-model="filters.category" @update:modelValue="filter">
+                    <SelectTrigger class="h-9">
+                      <SelectValue placeholder="Toutes" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Toutes les catégories</SelectItem>
-                      <SelectItem v-for="category in categories" :key="category" :value="category">
-                        {{ category }}
+                      <SelectItem :value="null">Toutes les catégories</SelectItem>
+                      <SelectItem v-for="category in allCategories" :key="category.id" :value="category.name">
+                        {{ category.name }}
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div class="space-y-2">
-                  <Label for="condition">État</Label>
-                  <Select v-model="filters.condition">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tous les états" />
+                <div>
+                  <Label for="condition" class="text-sm">État</Label>
+                  <Select v-model="filters.condition" @update:modelValue="filter">
+                    <SelectTrigger class="h-9">
+                      <SelectValue placeholder="Tous" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous les états</SelectItem>
+                      <SelectItem :value="null">Tous les états</SelectItem>
                       <SelectItem value="new">Neuf</SelectItem>
                       <SelectItem value="good">Bon</SelectItem>
                       <SelectItem value="fair">Moyen</SelectItem>
@@ -64,25 +66,39 @@
                   </Select>
                 </div>
 
-                <div class="space-y-2">
-                  <Label for="availability">Disponibilité</Label>
-                  <Select v-model="filters.availability">
-                    <SelectTrigger>
+                <div>
+                  <Label for="availability" class="text-sm">Disponibilité</Label>
+                  <Select v-model="filters.availability" @update:modelValue="filter">
+                    <SelectTrigger class="h-9">
                       <SelectValue placeholder="Tous" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous</SelectItem>
+                      <SelectItem :value="null">Tous</SelectItem>
                       <SelectItem value="available">Disponible</SelectItem>
                       <SelectItem value="unavailable">Non disponible</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div class="flex justify-end">
-                <Button type="submit" variant="default">
-                  Filtrer
-                </Button>
+                <div class="flex gap-2 ml-auto">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    @click="resetFilters"
+                    size="sm"
+                    class="h-9"
+                  >
+                    Réinitialiser
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    variant="default"
+                    size="sm"
+                    class="h-9"
+                  >
+                    Filtrer
+                  </Button>
+                </div>
               </div>
             </form>
           </CardContent>
@@ -91,13 +107,14 @@
         <!-- Liste du matériel -->
         <Card>
           <CardContent class="p-6">
-            <div v-if="equipment.length === 0" class="text-center py-12">
+            <div v-if="equipments.data.length === 0" class="text-center py-12">
               <p class="text-muted-foreground text-lg">
                 Aucun matériel trouvé
               </p>
               <Button
                 v-if="can.create"
-                :href="route('organizations.equipment.create', organization)"
+                as="a"
+                :href="route('app.organizations.equipments.create', organization)"
                 variant="default"
                 class="mt-4"
               >
@@ -105,30 +122,83 @@
               </Button>
             </div>
 
-            <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <Card v-for="item in equipment" :key="item.id" class="overflow-hidden">
-                <CardContent class="p-6">
-                  <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium">
-                      {{ item.name }}
-                    </h3>
-                    <Badge
-                      :variant="item.is_available ? 'success' : 'destructive'"
+            <div v-else>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead 
+                      class="cursor-pointer hover:bg-muted/50"
+                      @click="sort('name')"
                     >
-                      {{ item.is_available ? 'Disponible' : 'Non disponible' }}
-                    </Badge>
-                  </div>
-
-                  <p class="mt-2 text-sm text-muted-foreground">
-                    {{ item.category }}
-                  </p>
-
-                  <p class="mt-2 text-sm line-clamp-2">
-                    {{ item.description }}
-                  </p>
-
-                  <div class="mt-4 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
+                      <div class="flex items-center space-x-2">
+                        <span>Nom</span>
+                        <component
+                          :is="getSortIcon('name')"
+                          class="w-4 h-4"
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      class="cursor-pointer hover:bg-muted/50"
+                      @click="sort('category')"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <span>Catégorie</span>
+                        <component
+                          :is="getSortIcon('category')"
+                          class="w-4 h-4"
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      class="cursor-pointer hover:bg-muted/50"
+                      @click="sort('condition')"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <span>État</span>
+                        <component
+                          :is="getSortIcon('condition')"
+                          class="w-4 h-4"
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      class="cursor-pointer hover:bg-muted/50"
+                      @click="sort('is_available')"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <span>Disponibilité</span>
+                        <component
+                          :is="getSortIcon('is_available')"
+                          class="w-4 h-4"
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      class="cursor-pointer hover:bg-muted/50"
+                      @click="sort('rental_price')"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <span>Prix/jour</span>
+                        <component
+                          :is="getSortIcon('rental_price')"
+                          class="w-4 h-4"
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead class="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow v-for="item in equipments.data" :key="item.id">
+                    <TableCell class="font-medium">
+                      <Link :href="route('app.organizations.equipments.show', [organization, item])">{{ item.name }}</Link>
+                      <p class="text-sm text-muted-foreground truncate max-w-60">
+                        {{ item.description }}
+                      </p>
+                    </TableCell>
+                    <TableCell>{{ item.category.name }}</TableCell>
+                    <TableCell>
                       <Badge
                         :variant="{
                           new: 'default',
@@ -144,36 +214,45 @@
                           poor: 'Mauvais'
                         }[item.condition] }}
                       </Badge>
-
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        :variant="item.is_available ? 'success' : 'destructive'"
+                      >
+                        {{ item.is_available ? 'Disponible' : 'Non disponible' }}
+                      </Badge>
                       <Badge
                         v-if="item.is_rentable"
                         variant="secondary"
+                        class="ml-2"
                       >
                         Louable
                       </Badge>
-                    </div>
+                    </TableCell>
+                    <TableCell>{{ item.rental_price }}€</TableCell>
+                    <TableCell class="text-right">
+                      <div class="flex items-center justify-end space-x-2">
+                        <Button
+                          as="a"
+                          :href="route('app.organizations.equipments.show', [organization, item])"
+                          size="sm"
+                        >
+                          Voir
+                        </Button>
 
-                    <div class="flex items-center space-x-2">
-                      <Button
-                        :href="route('organizations.equipment.show', [organization, item])"
-                        variant="ghost"
-                        size="sm"
-                      >
-                        Voir
-                      </Button>
-
-                      <Button
-                        v-if="can.update"
-                        :href="route('organizations.equipment.edit', [organization, item])"
-                        variant="ghost"
-                        size="sm"
-                      >
-                        Modifier
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                        <Button
+                          v-if="can.update"
+                          as="a"
+                          :href="route('app.organizations.equipments.edit', [organization, item])"
+                          size="sm"
+                        >
+                          Modifier
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
@@ -184,7 +263,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -192,24 +271,37 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
 
 const props = defineProps({
   organization: {
     type: Object,
     required: true
   },
-  equipment: {
-    type: Array,
+  equipments: {
+    type: Object,
     required: true
   },
   filters: {
     type: Object,
+    required: true
+  },
+  allCategories: {
+    type: Array,
     required: true
   },
   can: {
@@ -218,21 +310,44 @@ const props = defineProps({
   }
 })
 
-const categories = computed(() => {
-  return [...new Set(props.equipment.map(item => item.category))]
-})
-
 const filters = useForm({
   search: props.filters?.search ?? '',
-  category: props.filters?.category ?? '',
-  condition: props.filters?.condition ?? '',
-  availability: props.filters?.availability ?? ''
+  category: props.filters?.category ?? null,
+  condition: props.filters?.condition ?? null,
+  availability: props.filters?.availability ?? null,
+  sort: props.filters?.sort ?? 'name',
+  direction: props.filters?.direction ?? 'asc'
 })
 
 const filter = () => {
-  filters.get(route('organizations.equipment.index', props.organization), {
+  filters.get(route('app.organizations.equipments.index', props.organization), {
     preserveState: true,
     preserveScroll: true
   })
+}
+
+const resetFilters = () => {
+  filters.search = ''
+  filters.category = null
+  filters.condition = null
+  filters.availability = null
+  filters.sort = 'name'
+  filters.direction = 'asc'
+  filter()
+}
+
+const sort = (column) => {
+  if (filters.sort === column) {
+    filters.direction = filters.direction === 'asc' ? 'desc' : 'asc'
+  } else {
+    filters.sort = column
+    filters.direction = 'asc'
+  }
+  filter()
+}
+
+const getSortIcon = (column) => {
+  if (filters.sort !== column) return ArrowUpDown
+  return filters.direction === 'asc' ? ArrowUp : ArrowDown
 }
 </script> 

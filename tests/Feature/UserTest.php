@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\Organization;
+use App\Models\User;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -15,10 +15,10 @@ test('user automatically gets a current organization on creation', function () {
 test('user can set a different current organization', function () {
     $user = User::factory()->withOrganization()->create();
     $newOrg = Organization::factory()->create();
-    
+
     // Attach user to new organization
     $user->organizations()->attach($newOrg->id, [
-        'role' => 'member'
+        'role' => 'member',
     ]);
 
     // Set new organization as current
@@ -50,4 +50,4 @@ test('user always has a current organization', function () {
 
     // Check that a current organization was set
     expect($user->currentOrganization)->not->toBeNull();
-}); 
+});

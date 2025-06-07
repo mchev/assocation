@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
 {
@@ -17,6 +17,7 @@ class Equipment extends Model
         'name',
         'description',
         'category_id',
+        'depot_id',
         'condition',
         'purchase_price',
         'rental_price',
@@ -32,14 +33,14 @@ class Equipment extends Model
     ];
 
     protected $casts = [
+        'purchase_price' => \App\Casts\PriceCast::class,
+        'rental_price' => \App\Casts\PriceCast::class,
+        'deposit_amount' => \App\Casts\PriceCast::class,
         'is_available' => 'boolean',
         'requires_deposit' => 'boolean',
         'is_rentable' => 'boolean',
         'specifications' => 'array',
         'images' => 'array',
-        'purchase_price' => 'decimal:2',
-        'rental_price' => 'decimal:2',
-        'deposit_amount' => 'decimal:2',
         'last_maintenance_date' => 'date',
         'next_maintenance_date' => 'date',
     ];
@@ -53,7 +54,7 @@ class Equipment extends Model
 
     public function reservations()
     {
-        return $this->hasMany(Reservation::class);
+        return $this->hasManyThrough(Reservation::class, ReservationItem::class, 'equipment_id', 'id', 'id');
     }
 
     public function contracts()

@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\ReservationItemStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Enums\ReservationItemStatus;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReservationItem extends Model
 {
@@ -99,11 +99,11 @@ class ReservationItem extends Model
 
     public function getFormattedPriceAttribute(): string
     {
-        return number_format($this->price / 100, 2, ',', ' ') . ' €';
+        return number_format($this->price / 100, 2, ',', ' ').' €';
     }
 
     public function getFormattedTotalPriceAttribute(): string
     {
-        return number_format($this->total_price / 100, 2, ',', ' ') . ' €';
+        return number_format($this->total_price / 100, 2, ',', ' ').' €';
     }
-} 
+}

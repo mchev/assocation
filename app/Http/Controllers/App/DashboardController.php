@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organization;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -20,7 +19,7 @@ class DashboardController extends Controller
                 'depots_count' => $organization->depots()->count(),
             ],
             'lentReservations' => $organization->lentReservations()
-                ->with(['borrowerOrganization', 'items' => function($query) {
+                ->with(['borrowerOrganization', 'items' => function ($query) {
                     $query->select('id', 'reservation_id', 'equipment_id', 'quantity', 'status')
                         ->with(['equipment:id,name']);
                 }])
@@ -41,7 +40,7 @@ class DashboardController extends Controller
                     ]);
                 }),
             'borrowedReservations' => $organization->borrowedReservations()
-                ->with(['lenderOrganization', 'items' => function($query) {
+                ->with(['lenderOrganization', 'items' => function ($query) {
                     $query->select('id', 'reservation_id', 'equipment_id', 'quantity', 'status')
                         ->with(['equipment:id,name']);
                 }])
@@ -73,4 +72,4 @@ class DashboardController extends Controller
                 ->get(),
         ]);
     }
-} 
+}

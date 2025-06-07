@@ -49,11 +49,11 @@ class ReservationItemFactory extends Factory
     public function returned(): static
     {
         $pickedUpAt = fake()->dateTimeBetween('-1 month', '-1 week');
-        
+
         return $this->state(fn (array $attributes) => [
             'status' => ReservationItemStatus::RETURNED,
             'picked_up_at' => $pickedUpAt,
             'returned_at' => fake()->dateTimeBetween($pickedUpAt, 'now'),
         ]);
     }
-} 
+}

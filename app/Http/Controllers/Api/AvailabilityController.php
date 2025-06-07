@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
-use App\Models\Availability;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AvailabilityController extends Controller
 {
@@ -29,7 +28,7 @@ class AvailabilityController extends Controller
         // Générer toutes les dates du mois
         $dates = collect();
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate <= $endDate) {
             $dateString = $currentDate->format('Y-m-d');
             $dates[$dateString] = $availabilities->get($dateString, true); // Par défaut, disponible
@@ -39,7 +38,7 @@ class AvailabilityController extends Controller
         return response()->json([
             'month' => $month,
             'year' => $year,
-            'availabilities' => $dates
+            'availabilities' => $dates,
         ]);
     }
 
@@ -48,7 +47,7 @@ class AvailabilityController extends Controller
         $request->validate([
             'date' => 'required|date',
             'is_available' => 'required|boolean',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
         ]);
 
         $availability = $equipment->availabilities()
@@ -56,7 +55,7 @@ class AvailabilityController extends Controller
                 ['date' => $request->date],
                 [
                     'is_available' => $request->is_available,
-                    'notes' => $request->notes
+                    'notes' => $request->notes,
                 ]
             );
 

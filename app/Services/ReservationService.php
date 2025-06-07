@@ -22,16 +22,17 @@ class ReservationService
             $query->where('id', '!=', $excludeReservation->id);
         }
 
-        return !$query->exists();
+        return ! $query->exists();
     }
 
     public function calculateTotalPrice(Equipment $equipment, Carbon $startDate, Carbon $endDate)
     {
-        if (!$equipment->rental_price) {
+        if (! $equipment->rental_price) {
             return 0;
         }
 
         $days = $startDate->diffInDays($endDate) + 1;
+
         return $equipment->rental_price * $days;
     }
 
@@ -40,7 +41,7 @@ class ReservationService
         $startDate = Carbon::parse($data['start_date']);
         $endDate = Carbon::parse($data['end_date']);
 
-        if (!$this->isEquipmentAvailable($equipment, $startDate, $endDate)) {
+        if (! $this->isEquipmentAvailable($equipment, $startDate, $endDate)) {
             throw new \Exception('L\'équipement n\'est pas disponible pour ces dates.');
         }
 
@@ -62,7 +63,7 @@ class ReservationService
             $startDate = Carbon::parse($data['start_date']);
             $endDate = Carbon::parse($data['end_date']);
 
-            if (!$this->isEquipmentAvailable($reservation->equipment, $startDate, $endDate, $reservation)) {
+            if (! $this->isEquipmentAvailable($reservation->equipment, $startDate, $endDate, $reservation)) {
                 throw new \Exception('L\'équipement n\'est pas disponible pour ces dates.');
             }
 
@@ -70,6 +71,7 @@ class ReservationService
         }
 
         $reservation->update($data);
+
         return $reservation;
     }
 
@@ -80,6 +82,7 @@ class ReservationService
         }
 
         $reservation->update(['status' => 'approved']);
+
         return $reservation;
     }
 
@@ -90,12 +93,13 @@ class ReservationService
         }
 
         $reservation->update(['status' => 'rejected']);
+
         return $reservation;
     }
 
     public function cancelReservation(Reservation $reservation, string $reason)
     {
-        if (!in_array($reservation->status, ['pending', 'approved'])) {
+        if (! in_array($reservation->status, ['pending', 'approved'])) {
             throw new \Exception('Seules les réservations en attente ou approuvées peuvent être annulées.');
         }
 
@@ -167,4 +171,4 @@ class ReservationService
             throw new \Exception("Not enough equipment available for the selected dates. Only {$availableQuantity} items available.");
         }
     }
-} 
+}

@@ -83,4 +83,4 @@ class ReservationFactory extends Factory
             'status' => ReservationStatus::REJECTED,
         ]);
     }
-} 
+}

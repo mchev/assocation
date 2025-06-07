@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -63,7 +62,7 @@ class CategorySeeder extends Seeder
             foreach ($subCategories as $index => $subCategory) {
                 Category::create([
                     'name' => $subCategory,
-                    'slug' => Str::slug($mainCategory . '-' . $subCategory),
+                    'slug' => Str::slug($mainCategory.'-'.$subCategory),
                     'description' => "Équipements de {$subCategory}",
                     'parent_id' => $parent->id,
                     'order' => $index,

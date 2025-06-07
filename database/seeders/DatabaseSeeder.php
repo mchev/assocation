@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ReservationStatus;
 use App\Enums\ReservationItemStatus;
+use App\Enums\ReservationStatus;
 use App\Models\Category;
 use App\Models\Depot;
 use App\Models\Equipment;
@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
                 ])
                 ->each(function ($reservation) {
                     // Statut des items cohérent avec la réservation
-                    $itemStatus = match($reservation->status) {
+                    $itemStatus = match ($reservation->status) {
                         ReservationStatus::PENDING => ReservationItemStatus::PENDING,
                         ReservationStatus::CONFIRMED => ReservationItemStatus::PICKED_UP,
                         ReservationStatus::COMPLETED => ReservationItemStatus::RETURNED,
@@ -129,7 +129,7 @@ class DatabaseSeeder extends Seeder
                 ])
                 ->each(function ($reservation) {
                     // Statut des items cohérent avec la réservation
-                    $itemStatus = match($reservation->status) {
+                    $itemStatus = match ($reservation->status) {
                         ReservationStatus::PENDING => ReservationItemStatus::PENDING,
                         ReservationStatus::CONFIRMED => ReservationItemStatus::PICKED_UP,
                         ReservationStatus::COMPLETED => ReservationItemStatus::RETURNED,

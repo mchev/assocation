@@ -22,13 +22,13 @@ class CartController extends Controller
                     'start_date' => $item['start_date'],
                     'end_date' => $item['end_date'],
                     'quantity' => $item['quantity'],
-                    'notes' => $item['notes'] ?? null
+                    'notes' => $item['notes'] ?? null,
                 ];
             }
         }
 
         return Inertia::render('Public/Cart/Index', [
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -37,11 +37,11 @@ class CartController extends Controller
         $validated = $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
         ]);
 
         $cart = session()->get('cart', []);
-        $key = $equipment->id . '-' . $validated['start_date'] . '-' . $validated['end_date'];
+        $key = $equipment->id.'-'.$validated['start_date'].'-'.$validated['end_date'];
 
         if (isset($cart[$key])) {
             $cart[$key]['quantity']++;
@@ -51,7 +51,7 @@ class CartController extends Controller
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date'],
                 'quantity' => 1,
-                'notes' => $validated['notes'] ?? null
+                'notes' => $validated['notes'] ?? null,
             ];
         }
 
@@ -72,7 +72,7 @@ class CartController extends Controller
     public function update(Request $request, $key)
     {
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
         $cart = session()->get('cart', []);
@@ -87,6 +87,7 @@ class CartController extends Controller
     public function clear()
     {
         session()->forget('cart');
+
         return back();
     }
-} 
+}

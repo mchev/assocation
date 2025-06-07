@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Organization;
+use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Providers\RouteServiceProvider;
 
 class RegisteredUserController extends Controller
 {
@@ -46,13 +46,13 @@ class RegisteredUserController extends Controller
 
         // Create organization for the user
         $organization = Organization::create([
-            'name' => $user->name . "'s Organization",
+            'name' => $user->name."'s Organization",
             'email' => $user->email,
         ]);
 
         // Attach user to organization as admin
         $user->organizations()->attach($organization->id, ['role' => 'admin']);
-        
+
         // Set as current organization
         $user->update(['current_organization_id' => $organization->id]);
 

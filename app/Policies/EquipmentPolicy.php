@@ -3,9 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Equipment;
-use App\Models\User;
 use App\Models\Organization;
-use Illuminate\Auth\Access\Response;
+use App\Models\User;
 
 class EquipmentPolicy
 {

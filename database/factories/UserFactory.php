@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -47,7 +47,7 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $organization = Organization::factory()->create([
-                'name' => $user->name . "'s Organization",
+                'name' => $user->name."'s Organization",
                 'email' => $user->email,
             ]);
 

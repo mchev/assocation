@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_available')->default(true);
             $table->boolean('is_rentable')->default(true);
             $table->integer('requires_deposit')->default(0);
+            $table->integer('purchase_price')->default(0);
             $table->integer('rental_price')->default(0);
             $table->integer('deposit_amount')->default(0);
             $table->string('condition')->default('new');
@@ -51,4 +52,4 @@ return new class extends Migration
         Schema::dropIfExists('availabilities');
         Schema::dropIfExists('equipments');
     }
-}; 
+};

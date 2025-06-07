@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\Reservation;
 use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -56,4 +55,4 @@ class CheckoutController extends Controller
     {
         return Inertia::render('Public/Checkout/Success');
     }
-} 
+}

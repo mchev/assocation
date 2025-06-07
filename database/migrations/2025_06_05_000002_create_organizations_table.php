@@ -31,7 +31,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('role')->default('member');
             $table->timestamps();
-            
+
             $table->unique(['organization_id', 'user_id']);
         });
     }
@@ -41,4 +41,4 @@ return new class extends Migration
         Schema::dropIfExists('organization_user');
         Schema::dropIfExists('organizations');
     }
-}; 
+};

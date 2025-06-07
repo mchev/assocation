@@ -22,7 +22,7 @@ class CategoryController extends Controller
             ->get();
 
         return Inertia::render('Admin/Categories/Index', [
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -60,7 +60,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         return Inertia::render('Admin/Categories/Edit', [
-            'category' => $category->load(['children', 'parent'])
+            'category' => $category->load(['children', 'parent']),
         ]);
     }
 
@@ -108,4 +108,4 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category deleted successfully.');
     }
-} 
+}

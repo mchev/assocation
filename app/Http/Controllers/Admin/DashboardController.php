@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Organization;
 use App\Models\Equipment;
+use App\Models\Organization;
+use App\Models\User;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -27,4 +27,4 @@ class DashboardController extends Controller
                 ->get(),
         ]);
     }
-} 
+}

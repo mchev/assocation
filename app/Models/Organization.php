@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Organization extends Model
 {
@@ -66,6 +66,7 @@ class Organization extends Model
 
     /**
      * Alias for backward compatibility
+     *
      * @deprecated Use lentReservations() instead
      */
     public function outgoingReservations(): HasMany
@@ -75,6 +76,7 @@ class Organization extends Model
 
     /**
      * Alias for backward compatibility
+     *
      * @deprecated Use borrowedReservations() instead
      */
     public function incomingReservations(): HasMany
@@ -89,7 +91,7 @@ class Organization extends Model
     {
         return Reservation::where(function ($query) {
             $query->where('from_organization_id', $this->id)
-                  ->orWhere('to_organization_id', $this->id);
+                ->orWhere('to_organization_id', $this->id);
         });
     }
 }

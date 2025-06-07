@@ -16,7 +16,7 @@ class SearchController extends Controller
 
         Log::info('Search request', [
             'query' => $query,
-            'page' => $request->input('page', 1)
+            'page' => $request->input('page', 1),
         ]);
 
         if (empty($query)) {
@@ -25,7 +25,7 @@ class SearchController extends Controller
                 'current_page' => 1,
                 'last_page' => 1,
                 'per_page' => $perPage,
-                'total' => 0
+                'total' => 0,
             ]);
         }
 
@@ -36,15 +36,15 @@ class SearchController extends Controller
             ->paginate($perPage);
 
         $response = response()->json($equipment);
-        
+
         Log::info('Search response', [
             'total' => $equipment->total(),
             'current_page' => $equipment->currentPage(),
             'last_page' => $equipment->lastPage(),
             'per_page' => $equipment->perPage(),
-            'items_count' => count($equipment->items())
+            'items_count' => count($equipment->items()),
         ]);
 
         return $response;
     }
-} 
+}

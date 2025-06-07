@@ -30,7 +30,7 @@ class ReservationController extends Controller
     public function create(Request $request)
     {
         $organization = $request->user()->organization;
-        
+
         return Inertia::render('App/Reservations/Create', [
             'organizations' => Organization::where('id', '!=', $organization->id)->get(),
             'equipment' => Equipment::with('depot')->get(),
@@ -51,7 +51,7 @@ class ReservationController extends Controller
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.price' => ['required', 'integer', 'min:0'],
             'items.*.notes' => ['nullable', 'string'],
-            'discount_type' => ['nullable', 'string', 'in:' . implode(',', array_keys(Reservation::discountTypes()))],
+            'discount_type' => ['nullable', 'string', 'in:'.implode(',', array_keys(Reservation::discountTypes()))],
             'discount_value' => ['nullable', 'required_with:discount_type', 'integer', 'min:0'],
             'discount_reason' => ['nullable', 'string'],
         ]);
@@ -96,6 +96,7 @@ class ReservationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->with('error', 'Une erreur est survenue lors de la création de la réservation.');
         }
     }
@@ -113,7 +114,7 @@ class ReservationController extends Controller
     public function applyDiscount(Request $request, Reservation $reservation)
     {
         $validated = $request->validate([
-            'discount_type' => ['required', 'string', 'in:' . implode(',', array_keys(Reservation::discountTypes()))],
+            'discount_type' => ['required', 'string', 'in:'.implode(',', array_keys(Reservation::discountTypes()))],
             'discount_value' => ['required', 'integer', 'min:0'],
             'discount_reason' => ['nullable', 'string'],
         ]);
@@ -135,6 +136,7 @@ class ReservationController extends Controller
     {
         try {
             $reservation->removeDiscount();
+
             return back()->with('success', 'Remise supprimée avec succès.');
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur est survenue lors de la suppression de la remise.');
@@ -143,7 +145,7 @@ class ReservationController extends Controller
 
     public function confirm(Reservation $reservation)
     {
-        if (!$reservation->canBeConfirmed()) {
+        if (! $reservation->canBeConfirmed()) {
             return back()->with('error', 'Cette réservation ne peut pas être confirmée.');
         }
 
@@ -154,7 +156,7 @@ class ReservationController extends Controller
 
     public function reject(Reservation $reservation)
     {
-        if (!$reservation->canBeRejected()) {
+        if (! $reservation->canBeRejected()) {
             return back()->with('error', 'Cette réservation ne peut pas être refusée.');
         }
 
@@ -165,7 +167,7 @@ class ReservationController extends Controller
 
     public function cancel(Reservation $reservation)
     {
-        if (!$reservation->canBeCancelled()) {
+        if (! $reservation->canBeCancelled()) {
             return back()->with('error', 'Cette réservation ne peut pas être annulée.');
         }
 
@@ -176,7 +178,7 @@ class ReservationController extends Controller
 
     public function complete(Reservation $reservation)
     {
-        if (!$reservation->canBeCompleted()) {
+        if (! $reservation->canBeCompleted()) {
             return back()->with('error', 'Cette réservation ne peut pas être terminée.');
         }
 
@@ -187,7 +189,7 @@ class ReservationController extends Controller
 
     public function pickupItem(ReservationItem $item)
     {
-        if (!$item->canBePickedUp()) {
+        if (! $item->canBePickedUp()) {
             return back()->with('error', 'Cet équipement ne peut pas être récupéré.');
         }
 
@@ -201,7 +203,7 @@ class ReservationController extends Controller
 
     public function returnItem(ReservationItem $item)
     {
-        if (!$item->canBeReturned()) {
+        if (! $item->canBeReturned()) {
             return back()->with('error', 'Cet équipement ne peut pas être retourné.');
         }
 
@@ -212,4 +214,4 @@ class ReservationController extends Controller
 
         return back()->with('success', 'Équipement marqué comme retourné.');
     }
-} 
+}

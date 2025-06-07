@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Equipment;
-use App\Models\Organization;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
-use Illuminate\Http\Request;
+use App\Models\Equipment;
+use App\Models\Organization;
 use Inertia\Inertia;
 
 class EquipmentController extends Controller

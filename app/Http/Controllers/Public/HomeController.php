@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\Equipment;
 use App\Models\Category;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -27,13 +27,13 @@ class HomeController extends Controller
             ->with([
                 'category:id,name',
                 'organization:id,name',
-                'depot:id,city'
+                'depot:id,city',
             ])
             ->where('is_available', true);
 
         // Apply filters
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('category')) {
@@ -67,4 +67,4 @@ class HomeController extends Controller
             'stats' => $stats,
         ]);
     }
-} 
+}

@@ -15,7 +15,7 @@ class UserController extends Controller
             ->paginate(10);
 
         return Inertia::render('Admin/Users/Index', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -43,7 +43,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         return Inertia::render('Admin/Users/Edit', [
-            'user' => $user->load('organization')
+            'user' => $user->load('organization'),
         ]);
     }
 
@@ -51,7 +51,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'organization_id' => 'required|exists:organizations,id',
             'is_admin' => 'boolean',
         ]);
@@ -69,4 +69,4 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
     }
-} 
+}

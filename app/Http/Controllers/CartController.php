@@ -63,6 +63,7 @@ class CartController extends Controller
     public function clear()
     {
         session()->forget('cart');
+
         return back();
     }
-} 
+}

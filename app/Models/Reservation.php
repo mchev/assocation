@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Enums\ReservationStatus;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
@@ -41,6 +41,7 @@ class Reservation extends Model
 
     // Discount Types
     const DISCOUNT_TYPE_PERCENTAGE = 'percentage';
+
     const DISCOUNT_TYPE_FIXED = 'fixed';
 
     public static function discountTypes(): array
@@ -69,6 +70,7 @@ class Reservation extends Model
 
     /**
      * Alias for backward compatibility
+     *
      * @deprecated Use lenderOrganization() instead
      */
     public function fromOrganization(): BelongsTo
@@ -78,6 +80,7 @@ class Reservation extends Model
 
     /**
      * Alias for backward compatibility
+     *
      * @deprecated Use borrowerOrganization() instead
      */
     public function toOrganization(): BelongsTo
@@ -183,27 +186,27 @@ class Reservation extends Model
 
     public function getFormattedSubtotalAttribute(): string
     {
-        return number_format($this->subtotal / 100, 2, ',', ' ') . ' €';
+        return number_format($this->subtotal / 100, 2, ',', ' ').' €';
     }
 
     public function getFormattedDiscountAmountAttribute(): string
     {
-        return number_format($this->discount_amount / 100, 2, ',', ' ') . ' €';
+        return number_format($this->discount_amount / 100, 2, ',', ' ').' €';
     }
 
     public function getFormattedTotalAttribute(): string
     {
-        return number_format($this->total / 100, 2, ',', ' ') . ' €';
+        return number_format($this->total / 100, 2, ',', ' ').' €';
     }
 
     public function getDiscountTextAttribute(): string
     {
-        if (!$this->discount_type) {
+        if (! $this->discount_type) {
             return 'Aucune remise';
         }
 
         if ($this->discount_type === self::DISCOUNT_TYPE_PERCENTAGE) {
-            return $this->discount_value . '% (' . $this->formatted_discount_amount . ')';
+            return $this->discount_value.'% ('.$this->formatted_discount_amount.')';
         }
 
         return $this->formatted_discount_amount;

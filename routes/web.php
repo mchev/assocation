@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\CartController;
 use App\Http\Controllers\App\OrganizationController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Foundation\Application;
 
 Route::prefix('carts')->name('carts.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');

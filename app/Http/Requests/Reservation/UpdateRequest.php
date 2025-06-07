@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Reservation;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Carbon\Carbon;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
@@ -27,7 +27,7 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'date',
-                'after_or_equal:' . Carbon::today()->format('Y-m-d'),
+                'after_or_equal:'.Carbon::today()->format('Y-m-d'),
             ],
             'end_date' => [
                 'sometimes',

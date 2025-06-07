@@ -2,11 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
-use App\Models\Equipment;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -80,7 +79,7 @@ class HandleInertiaRequests extends Middleware
                             'is_primary' => $organization->pivot->is_primary,
                         ];
                     }),
-                    'primary_organization' => $user->primaryOrganization(),
+                    'current_organization' => $user->currentOrganization()->select('id', 'name')->first(),
                 ] : null,
             ],
             'ziggy' => [

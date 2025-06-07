@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Equipment;
-use App\Models\Depot;
 use App\Models\Category;
+use App\Models\Depot;
+use App\Models\Equipment;
 use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
@@ -28,7 +28,7 @@ class EquipmentFactory extends Factory
                     'poids' => ['12 kg', '15 kg', '18 kg', '25 kg'],
                     'connectique' => ['XLR, Jack', 'Speakon, XLR', 'XLR, RCA'],
                 ],
-                'prices' => [30, 80]
+                'prices' => [30, 80],
             ],
             'Tables de mixage' => [
                 'names' => [
@@ -42,7 +42,7 @@ class EquipmentFactory extends Factory
                     'effets' => ['Reverb, Delay', '16 effets', '24 effets'],
                     'connexions' => ['USB, XLR', 'USB, MIDI, XLR'],
                 ],
-                'prices' => [35, 120]
+                'prices' => [35, 120],
             ],
         ],
         'Éclairage' => [
@@ -58,7 +58,7 @@ class EquipmentFactory extends Factory
                     'modes' => ['DMX, Auto, Sound', 'DMX 8-16 canaux'],
                     'angle' => ['25°', '45°', '60°'],
                 ],
-                'prices' => [25, 70]
+                'prices' => [25, 70],
             ],
         ],
         'Scène' => [
@@ -74,7 +74,7 @@ class EquipmentFactory extends Factory
                     'matériau' => ['Aluminium', 'Acier'],
                     'assemblage' => ['Manchon conique', 'Goupille'],
                 ],
-                'prices' => [20, 60]
+                'prices' => [20, 60],
             ],
         ],
         'Vidéo' => [
@@ -90,7 +90,7 @@ class EquipmentFactory extends Factory
                     'résolution' => ['Full HD', '4K', 'WUXGA'],
                     'contraste' => ['2000:1', '3000:1', '5000:1'],
                 ],
-                'prices' => [50, 150]
+                'prices' => [50, 150],
             ],
         ],
     ];
@@ -99,8 +99,8 @@ class EquipmentFactory extends Factory
     {
         // Récupérer une catégorie aléatoire
         $category = Category::inRandomOrder()->first();
-        
-        if (!$category) {
+
+        if (! $category) {
             // Si aucune catégorie n'existe, en créer une par défaut
             $category = Category::create([
                 'name' => 'Matériel technique',
@@ -112,9 +112,9 @@ class EquipmentFactory extends Factory
 
         // Trouver le type d'équipement correspondant à la catégorie
         $equipmentType = $this->getEquipmentTypeForCategory($category->name);
-        
+
         // Si aucun type d'équipement ne correspond, prendre un type au hasard
-        if (!$equipmentType) {
+        if (! $equipmentType) {
             $mainCategory = Arr::random(array_keys($this->equipmentTypes));
             $equipmentType = Arr::random($this->equipmentTypes[$mainCategory]);
         }
@@ -154,15 +154,17 @@ class EquipmentFactory extends Factory
                 return $types[$categoryName];
             }
         }
+
         return null;
     }
 
     protected function generateDescription($name, $specs): string
     {
-        $description = $name . "\n\n";
+        $description = $name."\n\n";
         foreach ($specs as $key => $value) {
-            $description .= ucfirst($key) . ' : ' . $value . "\n";
+            $description .= ucfirst($key).' : '.$value."\n";
         }
+
         return $description;
     }
-} 
+}

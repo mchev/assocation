@@ -19,22 +19,22 @@ class DepotFactory extends Factory
         ['name' => 'Strasbourg', 'postal_code' => '670', 'lat' => 48.5734, 'lng' => 7.7521],
         ['name' => 'Lille', 'postal_code' => '590', 'lat' => 50.6292, 'lng' => 3.0573],
         ['name' => 'Rennes', 'postal_code' => '350', 'lat' => 48.1173, 'lng' => -1.6778],
-        ['name' => 'Montpellier', 'postal_code' => '340', 'lat' => 43.6108, 'lng' => 3.8767]
+        ['name' => 'Montpellier', 'postal_code' => '340', 'lat' => 43.6108, 'lng' => 3.8767],
     ];
 
     protected $streetTypes = [
-        'Rue', 'Avenue', 'Boulevard', 'Place', 'Allée', 'Route', 'Impasse', 'Chemin'
+        'Rue', 'Avenue', 'Boulevard', 'Place', 'Allée', 'Route', 'Impasse', 'Chemin',
     ];
 
     protected $streetNames = [
         'des Fleurs', 'de la République', 'de la Liberté', 'du Général de Gaulle',
         'Victor Hugo', 'Jean Jaurès', 'de la Paix', 'des Roses', 'du Commerce',
         'de l\'Église', 'des Écoles', 'de la Gare', 'des Lilas', 'du Moulin',
-        'Pasteur', 'des Tilleuls', 'des Acacias', 'du Stade', 'des Platanes'
+        'Pasteur', 'des Tilleuls', 'des Acacias', 'du Stade', 'des Platanes',
     ];
 
     protected $depotTypes = [
-        'Dépôt', 'Entrepôt', 'Local', 'Stockage', 'Hangar', 'Magasin'
+        'Dépôt', 'Entrepôt', 'Local', 'Stockage', 'Hangar', 'Magasin',
     ];
 
     public function definition()
@@ -44,7 +44,7 @@ class DepotFactory extends Factory
         $streetType = $this->faker->randomElement($this->streetTypes);
         $streetName = $this->faker->randomElement($this->streetNames);
         $address = "{$streetNumber} {$streetType} {$streetName}";
-        
+
         // Ajouter une variation aléatoire aux coordonnées pour éviter que tous les dépôts soient au même endroit
         $latVariation = $this->faker->randomFloat(4, -0.01, 0.01);
         $lngVariation = $this->faker->randomFloat(4, -0.01, 0.01);
@@ -57,7 +57,7 @@ class DepotFactory extends Factory
             'name' => "{$depotType} {$organizationName} - {$city['name']}",
             'address' => $address,
             'city' => $city['name'],
-            'postal_code' => $city['postal_code'] . $this->faker->numberBetween(10, 99),
+            'postal_code' => $city['postal_code'].$this->faker->numberBetween(10, 99),
             'country' => 'France',
             'phone' => $this->generateFrenchPhoneNumber(),
             'email' => $this->faker->companyEmail,
@@ -76,8 +76,9 @@ class DepotFactory extends Factory
             '03 ## ## ## ##',
             '04 ## ## ## ##',
             '05 ## ## ## ##',
-            '09 ## ## ## ##'
+            '09 ## ## ## ##',
         ];
+
         return $this->faker->numerify($this->faker->randomElement($formats));
     }
 
@@ -85,20 +86,20 @@ class DepotFactory extends Factory
     {
         $standardHours = [
             'morning' => ['09:00-12:00'],
-            'afternoon' => ['14:00-18:00']
+            'afternoon' => ['14:00-18:00'],
         ];
 
         $variations = [
             'morning' => [
                 '08:30-12:00',
                 '09:00-12:30',
-                '09:30-12:30'
+                '09:30-12:30',
             ],
             'afternoon' => [
                 '13:30-17:30',
                 '14:00-18:00',
-                '14:00-18:30'
-            ]
+                '14:00-18:30',
+            ],
         ];
 
         $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -116,7 +117,7 @@ class DepotFactory extends Factory
                 // Horaires variables
                 $hours[$day] = [
                     $this->faker->randomElement($variations['morning']),
-                    $this->faker->randomElement($variations['afternoon'])
+                    $this->faker->randomElement($variations['afternoon']),
                 ];
             }
         }
@@ -137,4 +138,4 @@ class DepotFactory extends Factory
 
         return $hours;
     }
-} 
+}

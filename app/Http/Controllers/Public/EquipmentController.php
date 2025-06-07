@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EquipmentController extends Controller
 {
@@ -17,7 +17,7 @@ class EquipmentController extends Controller
             ->paginate(12);
 
         return Inertia::render('Public/Equipments/Index', [
-            'equipment' => $equipment
+            'equipment' => $equipment,
         ]);
     }
 
@@ -29,4 +29,4 @@ class EquipmentController extends Controller
             'equipment' => $equipment,
         ]);
     }
-} 
+}

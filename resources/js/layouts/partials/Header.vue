@@ -10,6 +10,7 @@ import { PlusIcon } from 'lucide-vue-next'
 
 const page = usePage()
 const user = page.props.auth.user
+const organization = user.current_organization
 </script>
 
 <template>
@@ -29,6 +30,7 @@ const user = page.props.auth.user
 
             <!-- Call to action ajouter un equipement -->
             <Button
+                v-if="!user"
                 :href="route('app.equipments.create')"
                 variant="default"
                 size="sm"
@@ -39,9 +41,14 @@ const user = page.props.auth.user
             </Button>
             
             <NavLink v-if="user" :href="route('app.dashboard')" :active="route().current('app.dashboard')">
-              Dashboard
+              Tableau de bord
             </NavLink>
-
+            <NavLink v-if="user" :href="route('app.organizations.equipments.index', organization)" :active="route().current('app.organizations.equipments.index')">
+              Matériel
+            </NavLink>
+            <NavLink v-if="user" :href="route('app.organizations.calendar')" :active="route().current('app.organizations.calendar')">
+              Agenda
+            </NavLink>
             
           </div>
           

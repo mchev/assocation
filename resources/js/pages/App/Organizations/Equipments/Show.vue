@@ -7,18 +7,26 @@
         </h2>
         <div class="flex items-center space-x-4">
           <Link
-            :href="route('organizations.equipment.index', organization)"
+            :href="route('app.organizations.equipments.index', organization)"
             class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
           >
             Retour à la liste
           </Link>
           <Link
             v-if="can.update"
-            :href="route('organizations.equipment.edit', [organization, equipment])"
-            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+            :href="route('app.organizations.equipments.edit', [organization, equipment])"
+            class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/90 focus:bg-primary/90 active:bg-primary/95 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 transition ease-in-out duration-150"
           >
             Modifier
           </Link>
+          <Button
+            v-if="can.delete"
+            type="button"
+            @click="deleteEquipment"
+            variant="destructive"
+          >
+            Supprimer
+          </Button>
         </div>
       </div>
     </template>
@@ -38,7 +46,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <h3 class="text-lg font-medium text-gray-900">Catégorie</h3>
-                    <p class="mt-2 text-gray-600">{{ equipment.category }}</p>
+                    <p class="mt-2 text-gray-600">{{ equipment.category.name }}</p>
                   </div>
 
                   <div>
@@ -156,15 +164,63 @@
                   </div>
                 </div>
 
-                <div v-if="equipment.is_rentable && equipment.is_available" class="bg-gray-50 p-6 rounded-lg">
-                  <h3 class="text-lg font-medium text-gray-900">Actions</h3>
-                  <div class="mt-4 space-y-4">
-                    <Link
-                      :href="route('organizations.equipment.reserve', [organization, equipment])"
-                      class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                <!-- Emplacement actuel -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                  <h3 class="text-lg font-medium text-gray-900">Emplacement actuel</h3>
+                  <div class="mt-4">
+                    <div v-if="equipment.depot" class="space-y-2">
+                      <p class="text-sm text-gray-900 font-medium">{{ equipment.depot.name }}</p>
+                      <p v-if="equipment.depot.address" class="text-sm text-gray-600">
+                        {{ equipment.depot.address }}<br>
+                        {{ equipment.depot.city }} {{ equipment.depot.zip_code }}
+                      </p>
+                    </div>
+                    <p v-else class="text-sm text-gray-500 italic">
+                      Aucun emplacement spécifié
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Réservations -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                  <h3 class="text-lg font-medium text-gray-900">Réservations</h3>
+                  <div class="mt-4">
+                    <div v-if="equipment.current_rental" class="mb-4">
+                      <h4 class="text-sm font-medium text-gray-900">Location en cours</h4>
+                      <div class="mt-2 p-3 bg-white rounded border border-gray-200">
+                        <p class="text-sm text-gray-600">
+                          {{ equipment.current_rental.renter.name }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Du {{ equipment.current_rental.start_date }} au {{ equipment.current_rental.end_date }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div v-if="equipment.upcoming_rentals && equipment.upcoming_rentals.length > 0">
+                      <h4 class="text-sm font-medium text-gray-900">Prochaines réservations</h4>
+                      <div class="mt-2 space-y-2">
+                        <div
+                          v-for="rental in equipment.upcoming_rentals"
+                          :key="rental.id"
+                          class="p-3 bg-white rounded border border-gray-200"
+                        >
+                          <p class="text-sm text-gray-600">
+                            {{ rental.renter.name }}
+                          </p>
+                          <p class="text-xs text-gray-500">
+                            Du {{ rental.start_date }} au {{ rental.end_date }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p
+                      v-if="(!equipment.current_rental && (!equipment.upcoming_rentals || equipment.upcoming_rentals.length === 0))"
+                      class="text-sm text-gray-500 italic"
                     >
-                      Réserver
-                    </Link>
+                      Aucune réservation en cours ou à venir
+                    </p>
                   </div>
                 </div>
               </div>
@@ -178,9 +234,10 @@
 
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
+import { Button } from '@/components/ui/button'
 
-defineProps({
+const props = defineProps({
   organization: {
     type: Object,
     required: true
@@ -194,4 +251,10 @@ defineProps({
     required: true
   }
 })
+
+const deleteEquipment = () => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer ce matériel ?')) {
+    router.delete(route('app.organizations.equipments.destroy', [props.organization, props.equipment]))
+  }
+}
 </script> 

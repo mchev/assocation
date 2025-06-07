@@ -53,7 +53,7 @@ import { CheckIcon, ChevronDownIcon, PlusIcon } from '@heroicons/vue/24/outline'
 
 const page = usePage()
 const organizations = computed(() => page.props.auth.user?.organizations)
-const currentOrganization = computed(() => page.props.auth.user?.primary_organization)
+const currentOrganization = computed(() => page.props.auth.user?.current_organization)
 
 const switchOrganization = (organization) => {
   router.post(route('organizations.switch', organization), {}, {
