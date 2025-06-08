@@ -10,4 +10,5 @@ alwaysApply: true
 - Use the Laravel, Inertia, Vuejs, Tailwindcss stack (always latest version)
 - Use <script setup> composition api for vuejs. No Typescript
 - Always use shadcn vue components when possible
+- Use lucide icons
 - If you think there might not be a correct answer, you say so. If you do not know the answer, say so instead of guessing.

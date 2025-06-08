@@ -30,7 +30,19 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    avatar_path?: string;
+    email_verified_at?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    city?: string | null;
+    postal_code?: string | null;
+    country: string;
+    avatar_path?: string | null;
+    is_active: boolean;
+    is_admin: boolean;
+    last_login_at?: string | null;
+    preferred_language: string;
+    preferences: Record<string, any>;
+    current_organization_id?: number | null;
 }
 
 export interface PageProps {

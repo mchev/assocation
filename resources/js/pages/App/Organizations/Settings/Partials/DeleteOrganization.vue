@@ -1,8 +1,6 @@
-<script setup lang="ts">
+<script setup>
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-
-// Components
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -19,16 +17,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const passwordInput = ref<HTMLInputElement | null>(null);
+const passwordInput = ref(null);
 
 const form = useForm({
     password: '',
 });
 
-const deleteUser = (e: Event) => {
+const deleteOrganization = (e) => {
     e.preventDefault();
 
-    form.delete(route('profile.destroy'), {
+    form.delete(route('organizations.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
         onError: () => passwordInput.value?.focus(),
@@ -44,39 +42,49 @@ const closeModal = () => {
 
 <template>
     <div class="space-y-6">
-        <HeadingSmall title="Supprimer le compte" description="Supprimez votre compte et toutes ses ressources" />
+        <HeadingSmall
+            title="Supprimer l'organisation"
+            description="Supprimez définitivement votre organisation et toutes ses ressources"
+        />
         <div class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
                 <p class="font-medium">Attention</p>
                 <p class="text-sm">Veuillez procéder avec prudence, cette action est irréversible.</p>
             </div>
             <Dialog>
-                <DialogTrigger as-child>
-                    <Button variant="destructive">Supprimer le compte</Button>
+                <DialogTrigger asChild>
+                    <Button variant="destructive">Supprimer l'organisation</Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <form class="space-y-6" @submit="deleteUser">
+                    <form class="space-y-6" @submit="deleteOrganization">
                         <DialogHeader class="space-y-3">
-                            <DialogTitle>Êtes-vous sûr de vouloir supprimer votre compte ?</DialogTitle>
+                            <DialogTitle>Êtes-vous sûr de vouloir supprimer cette organisation ?</DialogTitle>
                             <DialogDescription>
-                                Une fois votre compte supprimé, toutes ses ressources et données seront définitivement effacées. Veuillez saisir votre
-                                mot de passe pour confirmer que vous souhaitez supprimer définitivement votre compte.
+                                Une fois l'organisation supprimée, toutes ses ressources et données seront définitivement effacées. Veuillez saisir votre
+                                mot de passe pour confirmer que vous souhaitez supprimer définitivement l'organisation.
                             </DialogDescription>
                         </DialogHeader>
 
                         <div class="grid gap-2">
                             <Label for="password" class="sr-only">Mot de passe</Label>
-                            <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Mot de passe" />
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref="passwordInput"
+                                v-model="form.password"
+                                placeholder="Mot de passe"
+                            />
                             <InputError :message="form.errors.password" />
                         </div>
 
                         <DialogFooter class="gap-2">
-                            <DialogClose as-child>
+                            <DialogClose asChild>
                                 <Button variant="secondary" @click="closeModal">Annuler</Button>
                             </DialogClose>
 
                             <Button variant="destructive" :disabled="form.processing">
-                                <button type="submit">Supprimer le compte</button>
+                                <button type="submit">Supprimer l'organisation</button>
                             </Button>
                         </DialogFooter>
                     </form>
@@ -84,4 +92,4 @@ const closeModal = () => {
             </Dialog>
         </div>
     </div>
-</template>
+</template> 

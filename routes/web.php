@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\App\OrganizationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -19,13 +18,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-
-    // Organization routes
-    Route::post('/organizations/{organization}/switch', [OrganizationController::class, 'switch'])
-        ->name('organizations.switch');
-    Route::resource('organizations', OrganizationController::class);
-
-    // ... other routes ...
 });
 
 Route::controller(PageController::class)->group(function () {
@@ -33,9 +25,3 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/decouvrir', 'discover')->name('discover');
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
 });
-
-require __DIR__.'/public.php';
-require __DIR__.'/app.php';
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
-require __DIR__.'/admin.php';

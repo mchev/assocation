@@ -23,12 +23,12 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'description' => ['sometimes', 'required', 'string'],
+            'description' => ['sometimes', 'nullable', 'string'],
             'category' => ['sometimes', 'required', 'string', 'max:255'],
             'condition' => ['sometimes', 'required', 'string', 'in:new,good,fair,poor'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-            'rental_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-            'deposit_amount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'purchase_price' => ['required', 'numeric'],
+            'rental_price' => ['required', 'numeric'],
+            'deposit_amount' => ['required', 'numeric'],
             'is_available' => ['sometimes', 'boolean'],
             'requires_deposit' => ['sometimes', 'boolean'],
             'is_rentable' => ['sometimes', 'boolean'],

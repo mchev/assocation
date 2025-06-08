@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Equipment\StoreRequest;
+use App\Http\Requests\Equipment\UpdateRequest;
 use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\Organization;
@@ -138,24 +140,11 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function store(Request $request, Organization $organization)
+    public function store(StoreRequest $request, Organization $organization)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-            'depot_id' => 'required|exists:depots,id',
-            'is_available' => 'boolean',
-            'purchase_price' => 'required|numeric',
-            'rental_price' => 'required|numeric',
-            'deposit_amount' => 'required|numeric',
-            'is_rentable' => 'boolean',
-            'requires_deposit' => 'boolean',
-            'last_maintenance_date' => 'nullable|date',
-            'next_maintenance_date' => 'nullable|date',
-        ]);
+        $this->authorize('create', [Equipment::class, $organization]);
 
-        $organization->equipments()->create($validated);
+        $organization->equipments()->create($request->validated());
 
         return redirect()->route('app.organizations.equipments.index', $organization)
             ->with('success', 'Matériel créé avec succès.');
@@ -173,19 +162,11 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function update(Request $request, Organization $organization, Equipment $equipment)
+    public function update(UpdateRequest $request, Organization $organization, Equipment $equipment)
     {
         $this->authorize('update', $equipment);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'depot_id' => 'required|exists:depots,id',
-            'is_available' => 'boolean',
-        ]);
-
-        $equipment->update($validated);
+        $equipment->update($request->validated());
 
         return redirect()->route('app.organizations.equipments.index', $organization)
             ->with('success', 'Matériel modifié avec succès.');

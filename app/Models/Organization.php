@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -24,6 +26,7 @@ class Organization extends Model
         'is_active',
         'subscription_type',
         'subscription_ends_at',
+        'owner_id',
     ];
 
     protected $casts = [
@@ -31,18 +34,41 @@ class Organization extends Model
         'subscription_ends_at' => 'datetime',
     ];
 
-    public function equipments(): HasMany
+    public function owner(): BelongsTo
     {
-        return $this->hasMany(Equipment::class);
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot('role')
             ->withTimestamps();
     }
 
+    public function roles(): HasMany
+    {
+        return $this->hasMany(Role::class);
+    }
+
+    public function permissions(): HasMany
+    {
+        return $this->hasMany(Permission::class);
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(OrganizationInvitation::class);
+    }
+
+    public function equipments(): HasMany
+    {
+        return $this->hasMany(Equipment::class);
+    }
+
+    /**
+     * Get the depots for the organization.
+     */
     public function depots(): HasMany
     {
         return $this->hasMany(Depot::class);

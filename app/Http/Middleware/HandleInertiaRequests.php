@@ -71,6 +71,12 @@ class HandleInertiaRequests extends Middleware
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'phone' => $user->phone,
+                    'address' => $user->address,
+                    'city' => $user->city,
+                    'postal_code' => $user->postal_code,
+                    'country' => $user->country,
+                    'preferred_language' => $user->preferred_language,
                     'organizations' => $user->organizations->map(function ($organization) {
                         return [
                             'id' => $organization->id,
@@ -88,6 +94,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cart' => $cartItems,
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'message' => $request->session()->get('message'),
+            ],
         ];
     }
 }

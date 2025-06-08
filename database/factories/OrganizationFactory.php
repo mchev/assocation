@@ -79,6 +79,7 @@ class OrganizationFactory extends Factory
             'website' => $this->generateWebsite($name),
             'logo_path' => null,
             'is_active' => true,
+            'owner_id' => null, // Will be set when creating the organization
         ];
     }
 

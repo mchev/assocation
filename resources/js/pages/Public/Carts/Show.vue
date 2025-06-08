@@ -1,11 +1,5 @@
 <template>
     <PublicLayout>
-        <template #header>
-            <AppHeader>
-                <template #title>Votre Camion</template>
-            </AppHeader>
-        </template>
-
         <div class="container py-6">
             <!-- Empty cart state -->
             <div v-if="items.length === 0" class="flex flex-col items-center justify-center py-12">

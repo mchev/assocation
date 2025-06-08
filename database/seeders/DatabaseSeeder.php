@@ -25,22 +25,25 @@ class DatabaseSeeder extends Seeder
         // Création des catégories
         $categories = Category::factory(5)->create();
 
-        // Création de l'organisation de Martin (Pégase)
-        $pegase = Organization::factory()->create([
-            'name' => 'Pégase',
-            'description' => 'Organisation de Martin',
-            'email' => 'contact@pegase.io',
-            'website' => 'https://pegase.io',
-        ]);
-
         // Création de Martin comme admin
         $martin = User::factory()->create([
             'name' => 'Martin',
             'email' => 'martin@pegase.io',
             'password' => Hash::make('password'),
             'is_admin' => true,
-            'current_organization_id' => $pegase->id,
         ]);
+
+        // Création de l'organisation de Martin (Pégase)
+        $pegase = Organization::factory()->create([
+            'name' => 'Pégase',
+            'description' => 'Organisation de Martin',
+            'email' => 'contact@pegase.io',
+            'website' => 'https://pegase.io',
+            'owner_id' => $martin->id,
+        ]);
+
+        // Mettre à jour l'organisation courante de Martin
+        $martin->update(['current_organization_id' => $pegase->id]);
 
         // Attacher Martin à son organisation
         $martin->organizations()->attach($pegase->id, ['role' => 'admin']);
@@ -59,22 +62,39 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Création des autres organisations
-        $organizations = Organization::factory(5)->create()->each(function ($org) use ($categories) {
+        // Création des autres organisations avec leurs propriétaires
+        $organizations = collect();
+        for ($i = 0; $i < 5; $i++) {
+            // Créer un utilisateur propriétaire
+            $owner = User::factory()->create();
+
+            // Créer l'organisation avec le propriétaire
+            $organization = Organization::factory()->create([
+                'owner_id' => $owner->id,
+            ]);
+
+            // Mettre à jour l'organisation courante du propriétaire
+            $owner->update(['current_organization_id' => $organization->id]);
+
+            // Attacher le propriétaire à son organisation
+            $owner->organizations()->attach($organization->id, ['role' => 'admin']);
+
             // Création des dépôts
             $depots = Depot::factory(2)->create([
-                'organization_id' => $org->id,
+                'organization_id' => $organization->id,
             ]);
 
             // Création des équipements (répartis dans les catégories)
             foreach ($categories as $category) {
                 Equipment::factory(3)->create([
-                    'organization_id' => $org->id,
+                    'organization_id' => $organization->id,
                     'category_id' => $category->id,
                     'depot_id' => $depots->random()->id,
                 ]);
             }
-        });
+
+            $organizations->push($organization);
+        }
 
         // Création des réservations
         $organizations->each(function ($org) use ($pegase) {
@@ -105,14 +125,18 @@ class DatabaseSeeder extends Seeder
                         ->get();
 
                     foreach ($equipment as $item) {
-                        ReservationItem::factory()
-                            ->create([
-                                'reservation_id' => $reservation->id,
-                                'equipment_id' => $item->id,
-                                'depot_id' => $item->depot_id,
-                                'status' => $itemStatus,
-                                'price' => $item->rental_price,
-                            ]);
+                        $quantity = fake()->numberBetween(1, 3);
+                        $price = (int) (str_replace(',', '.', $item->rental_price) * 100);
+
+                        ReservationItem::factory()->create([
+                            'reservation_id' => $reservation->id,
+                            'equipment_id' => $item->id,
+                            'depot_id' => $item->depot_id,
+                            'status' => $itemStatus,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                            'total_price' => $price * $quantity,
+                        ]);
                     }
                 });
 
@@ -143,14 +167,18 @@ class DatabaseSeeder extends Seeder
                         ->get();
 
                     foreach ($equipment as $item) {
-                        ReservationItem::factory()
-                            ->create([
-                                'reservation_id' => $reservation->id,
-                                'equipment_id' => $item->id,
-                                'depot_id' => $item->depot_id,
-                                'status' => $itemStatus,
-                                'price' => $item->rental_price,
-                            ]);
+                        $quantity = fake()->numberBetween(1, 3);
+                        $price = (int) (str_replace(',', '.', $item->rental_price) * 100);
+
+                        ReservationItem::factory()->create([
+                            'reservation_id' => $reservation->id,
+                            'equipment_id' => $item->id,
+                            'depot_id' => $item->depot_id,
+                            'status' => $itemStatus,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                            'total_price' => $price * $quantity,
+                        ]);
                     }
                 });
         });

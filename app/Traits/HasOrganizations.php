@@ -78,6 +78,7 @@ trait HasOrganizations
             $organization = Organization::create([
                 'name' => "Organisation de {$this->name}",
                 'email' => $this->email,
+                'owner_id' => $this->id,
             ]);
 
             $this->organizations()->attach($organization->id, ['role' => 'admin']);

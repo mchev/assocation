@@ -1,86 +1,228 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 import NavLink from '@/components/NavLink.vue'
-import OrganizationDropdown from '@/components/OrganizationDropdown.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 import CartMenu from '@/components/CartMenu.vue'
 import SearchInput from '@/components/Home/SearchInput.vue'
 import { Button } from '@/components/ui/button'
-import { PlusIcon } from 'lucide-vue-next'
+import { 
+  Plus,
+  LayoutDashboard,
+  Box,
+  Calendar,
+  Menu,
+  X,
+  User,
+  Settings,
+  LogOut
+} from 'lucide-vue-next'
 
 const page = usePage()
-const user = page.props.auth.user
-const organization = user.current_organization
+const user = computed(() => page.props.auth.user)
+const organization = computed(() => user.value?.current_organization)
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false)
+
+// Navigation items
+const navigationItems = computed(() => [
+  {
+    name: 'Tableau de bord',
+    href: route('app.dashboard'),
+    active: route().current('app.dashboard'),
+    icon: LayoutDashboard,
+    show: !!user.value
+  },
+  {
+    name: 'Matériel',
+    href: route('app.organizations.equipments.index', organization.value),
+    active: route().current('app.organizations.equipments.index'),
+    icon: Box,
+    show: !!user.value
+  },
+  {
+    name: 'Agenda',
+    href: route('app.organizations.calendar'),
+    active: route().current('app.organizations.calendar'),
+    icon: Calendar,
+    show: !!user.value
+  }
+])
 </script>
 
 <template>
-<nav class="border-b border-gray-300">
+  <nav class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between py-2">
+      <div class="flex justify-between h-16">
         <div class="flex items-center">
           <!-- Logo -->
-          <div class="shrink-0 flex items-center">
-            <Link :href="route('home')">
-              <h1 class="text-4xl font-bold font-title text-blue-500">assodepot</h1>
-            </Link>
-          </div>
+          <Link :href="route('home')" class="flex-shrink-0 flex items-center">
+            <h1 class="text-3xl font-bold font-title bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+              assodepot
+            </h1>
+          </Link>
 
-          <!-- App Navigation Links -->
-          <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
-
-            <!-- Call to action ajouter un equipement -->
+          <!-- Desktop Navigation -->
+          <div class="hidden md:ml-8 md:flex md:space-x-6">
             <Button
-                v-if="!user"
-                :href="route('app.equipments.create')"
-                variant="default"
-                size="sm"
-                class="gap-2"
+              v-if="!user"
+              :href="route('app.equipments.create')"
+              variant="default"
+              size="sm"
+              class="gap-2"
             >
-                <PlusIcon class="h-4 w-4" />
-                Ajouter votre matériel
+              <Plus class="h-4 w-4" />
+              Ajouter votre matériel
             </Button>
-            
-            <NavLink v-if="user" :href="route('app.dashboard')" :active="route().current('app.dashboard')">
-              Tableau de bord
+
+            <NavLink
+              v-for="item in navigationItems"
+              v-show="item.show"
+              :key="item.href"
+              :href="item.href"
+              :active="item.active"
+              :icon="item.icon"
+            >
+              {{ item.name }}
             </NavLink>
-            <NavLink v-if="user" :href="route('app.organizations.equipments.index', organization)" :active="route().current('app.organizations.equipments.index')">
-              Matériel
-            </NavLink>
-            <NavLink v-if="user" :href="route('app.organizations.calendar')" :active="route().current('app.organizations.calendar')">
-              Agenda
-            </NavLink>
-            
           </div>
-          
         </div>
 
-        <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
-          <!-- Organization Switcher -->
-          <div class="relative" v-if="user">
-            <OrganizationDropdown
-              :user="user"
-            />
-          </div>
+        <!-- Desktop Right Section -->
+        <div class="hidden md:flex md:items-center md:space-x-4">
+          <!-- Search (if needed) -->
+          <SearchInput v-if="$slots.search" class="w-72" />
+          
+          <!-- Auth Navigation -->
+          <template v-if="user">
+            <UserDropdown />
+          </template>
+          <template v-else>
+            <NavLink :href="route('login')" size="sm">
+              Connexion
+            </NavLink>
+            <Button :href="route('register')" variant="default" size="sm">
+              Inscription
+            </Button>
+          </template>
 
-          <!-- User Dropdown -->
-          <div class="relative" v-if="user">
-            <UserDropdown 
-              :user="user" 
-            />
-          </div>
-          <div class="space-x-8 sm:-my-px sm:ml-10 sm:flex" v-else>
-              <NavLink :href="route('login')">
-                  Connexion
-              </NavLink>
-              <NavLink :href="route('register')">
-                  Inscription
-              </NavLink>
-          </div>
+          <!-- Cart -->
+          <CartMenu />
+        </div>
 
-          <!-- Cart Menu -->
-          <div class="relative">
-            <CartMenu />
+        <!-- Mobile header actions -->
+        <div class="flex items-center space-x-2 md:hidden">
+          <!-- Cart for mobile -->
+          <CartMenu />
+          
+          <!-- Mobile menu button -->
+          <button
+            @click="isMobileMenuOpen = !isMobileMenuOpen"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+          >
+            <span class="sr-only">{{ isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu' }}</span>
+            <Menu v-if="!isMobileMenuOpen" class="h-6 w-6" />
+            <X v-else class="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      v-show="isMobileMenuOpen"
+      class="md:hidden border-t border-gray-200"
+    >
+      <!-- User info section for mobile -->
+      <div v-if="user" class="px-4 py-3 bg-gray-50">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+              <span class="text-primary-700 font-medium">
+                {{ user.name.charAt(0).toUpperCase() }}
+              </span>
+            </div>
           </div>
+          <div class="ml-3">
+            <div class="text-base font-medium text-gray-800">{{ user.name }}</div>
+            <div class="text-sm font-medium text-gray-500">{{ user.email }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 pb-3 space-y-1">
+        <Button
+          v-if="!user"
+          :href="route('app.equipments.create')"
+          variant="default"
+          size="sm"
+          class="w-full justify-start gap-2 mx-2"
+        >
+          <Plus class="h-4 w-4" />
+          Ajouter votre matériel
+        </Button>
+
+        <a
+          v-for="item in navigationItems"
+          v-show="item.show"
+          :key="item.href"
+          :href="item.href"
+          class="flex items-center gap-2 px-4 py-2 text-base font-medium transition duration-150 ease-in-out"
+          :class="[
+            item.active
+              ? 'text-primary-700 bg-primary-50'
+              : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+          ]"
+        >
+          <component :is="item.icon" class="h-5 w-5" />
+          {{ item.name }}
+        </a>
+      </div>
+
+      <!-- Mobile auth navigation -->
+      <div class="pt-4 pb-3 border-t border-gray-200">
+        <div class="space-y-1">
+          <template v-if="user">
+            <!-- User specific actions -->
+            <Link
+              :href="route('profile.edit')"
+              class="flex items-center gap-2 px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              <User class="h-5 w-5" />
+              Mon profil
+            </Link>
+            <Link
+              :href="route('app.organizations.settings')"
+              class="flex items-center gap-2 px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              <Settings class="h-5 w-5" />
+              Paramètres de l'organisation
+            </Link>
+            <Link
+              :href="route('logout')"
+              method="post"
+              as="button"
+              class="flex items-center gap-2 w-full px-4 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <LogOut class="h-5 w-5" />
+              Se déconnecter
+            </Link>
+          </template>
+          <template v-else>
+            <Link
+              :href="route('login')"
+              class="block px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              Connexion
+            </Link>
+            <Link
+              :href="route('register')"
+              class="block px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              Inscription
+            </Link>
+          </template>
         </div>
       </div>
     </div>
