@@ -1,14 +1,18 @@
 <template>
   <AppLayout :title="'Réservations - ' + organization.name">
+    <Head title="Réservations" />
     <template #header>
       <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          Réservations de {{ organization.name }} ({{ reservations.total }})
-        </h2>
+        <div>
+          <h2 class="font-semibold text-xl leading-tight">
+            Réservations ({{ reservations.total }})
+          </h2>
+          <p class="text-sm text-muted-foreground">Matériel que vous louez ou prêtez à d'autres organisations</p>
+        </div>
         <Button
           v-if="can.create"
           as="a"
-          :href="route('organizations.reservations.create', organization)"
+          :href="route('app.organizations.reservations.create', organization)"
           variant="default"
           size="default"
         >
@@ -43,10 +47,9 @@
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem :value="null">Tous les statuts</SelectItem>
-                      <SelectItem value="pending">En attente</SelectItem>
-                      <SelectItem value="approved">Approuvée</SelectItem>
-                      <SelectItem value="rejected">Rejetée</SelectItem>
-                      <SelectItem value="cancelled">Annulée</SelectItem>
+                      <SelectItem v-for="status in statuses" :key="status.value" :value="status.value">
+                        {{ status.label }}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -105,7 +108,7 @@
               <Button
                 v-if="can.create"
                 as="a"
-                :href="route('organizations.reservations.create', organization)"
+                :href="route('app.organizations.reservations.create', organization)"
                 variant="default"
                 class="mt-4"
               >
@@ -119,12 +122,12 @@
                   <TableRow>
                     <TableHead 
                       class="cursor-pointer hover:bg-muted/50"
-                      @click="sort('equipment.name')"
+                      @click="sort('borrower_organization.name')"
                     >
                       <div class="flex items-center space-x-2">
-                        <span>Matériel</span>
+                        <span>Destinataire</span>
                         <component
-                          :is="getSortIcon('equipment.name')"
+                          :is="getSortIcon('borrower_organization.name')"
                           class="w-4 h-4"
                         />
                       </div>
@@ -134,7 +137,7 @@
                       @click="sort('user.name')"
                     >
                       <div class="flex items-center space-x-2">
-                        <span>Utilisateur</span>
+                        <span>Contact</span>
                         <component
                           :is="getSortIcon('user.name')"
                           class="w-4 h-4"
@@ -171,46 +174,41 @@
                 <TableBody>
                   <TableRow v-for="reservation in reservations.data" :key="reservation.id">
                     <TableCell class="font-medium">
-                      <Link :href="route('organizations.reservations.show', [organization, reservation])">
-                        {{ reservation.equipment.name }}
+                      <Link :href="route('app.organizations.reservations.show', [organization, reservation])">
+                        {{ reservation.borrower_organization.name }}
                       </Link>
                     </TableCell>
-                    <TableCell>{{ reservation.user.name }}</TableCell>
+                    <TableCell>
+                      {{ reservation.user.name }}<br>
+                      <span class="text-xs text-gray-500">
+                        {{ reservation.user.phone }}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       Du {{ formatDate(reservation.start_date) }}<br>
                       au {{ formatDate(reservation.end_date) }}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        :variant="{
-                          pending: 'warning',
-                          approved: 'success',
-                          rejected: 'destructive',
-                          cancelled: 'secondary'
-                        }[reservation.status]"
-                      >
-                        {{ {
-                          pending: 'En attente',
-                          approved: 'Approuvée',
-                          rejected: 'Rejetée',
-                          cancelled: 'Annulée'
-                        }[reservation.status] }}
-                      </Badge>
+                      <span :class="[
+                        reservation.status_color,
+                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
+                      ]">
+                        {{ reservation.status_label }}
+                      </span>
                     </TableCell>
                     <TableCell class="text-right">
                       <div class="flex items-center justify-end space-x-2">
-                        <Button
-                          as="a"
-                          :href="route('organizations.reservations.show', [organization, reservation])"
-                          size="sm"
-                        >
-                          Voir
+                        <Button asChild>
+                          <Link :href="route('app.organizations.reservations.show', [reservation])">
+                            <Eye class="w-4 h-4 mr-2" />
+                            Détails
+                          </Link>
                         </Button>
 
                         <Button
                           v-if="can.update"
                           as="a"
-                          :href="route('organizations.reservations.edit', [organization, reservation])"
+                          :href="route('app.organizations.reservations.edit', [organization, reservation])"
                           size="sm"
                         >
                           Modifier
@@ -237,14 +235,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Link, useForm } from '@inertiajs/vue3'
+import { Link, useForm, Head } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -260,7 +256,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-vue-next'
 import Pagination from '@/components/Pagination.vue'
 
 const props = defineProps({
@@ -279,6 +275,10 @@ const props = defineProps({
   can: {
     type: Object,
     required: true
+  },
+  statuses: {
+    type: Array,
+    required: true
   }
 })
 
@@ -292,7 +292,7 @@ const filters = useForm({
 })
 
 const filter = () => {
-  filters.get(route('organizations.reservations.index', props.organization), {
+  filters.get(route('app.organizations.reservations.index', props.organization), {
     preserveState: true,
     preserveScroll: true
   })

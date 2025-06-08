@@ -1,0 +1,88 @@
+/* Calendar event styles */
+.fc-event {
+    @apply cursor-pointer rounded-md shadow-sm border-0;
+    padding: 2px 6px;
+  }
+  
+  /* Calendar header styles */
+  .fc-toolbar-title {
+    @apply text-lg font-semibold capitalize;
+  }
+  
+  .fc-header-toolbar {
+    @apply mb-6;
+  }
+  
+  /* Calendar button styles */
+  .fc-button-primary {
+    @apply bg-background text-foreground border border-input shadow-none hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .fc-button-active {
+    @apply bg-accent text-accent-foreground;
+  }
+  
+  /* Calendar grid styles */
+  .fc-day-today {
+    @apply bg-muted/50;
+  }
+  
+  .fc-theme-standard td,
+  .fc-theme-standard th,
+  .fc-scrollgrid {
+    @apply border-border;
+  }
+  
+  /* Calendar wrapper */
+  .calendar-wrapper {
+    @apply bg-background rounded-lg;
+  }
+  
+  /* Calendar header cells */
+  .fc th {
+    @apply p-3 font-medium text-muted-foreground border-b;
+  }
+  
+  /* Calendar day cells */
+  .fc td {
+    @apply p-1;
+  }
+  
+  /* More link styles */
+  .fc-daygrid-day-bottom a {
+    @apply text-sm text-muted-foreground hover:text-foreground;
+  }
+  
+  /* Today button */
+  .fc-today-button {
+    @apply text-sm;
+  }
+  
+  /* Month navigation buttons */
+  .fc-prev-button,
+  .fc-next-button {
+    @apply p-2;
+  }
+
+  /* Important overrides */
+  .fc-button-primary {
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+    border-color: var(--input) !important;
+  }
+
+  .fc-button-active {
+    background-color: var(--accent) !important;
+    color: var(--accent-foreground) !important;
+  }
+
+  .fc-day-today {
+    background-color: var(--muted) !important;
+    opacity: 0.5 !important;
+  }
+
+  .fc-theme-standard td,
+  .fc-theme-standard th,
+  .fc-scrollgrid {
+    border-color: var(--border) !important;
+  }

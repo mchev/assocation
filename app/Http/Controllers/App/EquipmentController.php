@@ -13,9 +13,10 @@ use Inertia\Inertia;
 
 class EquipmentController extends Controller
 {
-    public function index(Request $request, Organization $organization)
+    public function index(Request $request)
     {
         $user = $request->user();
+        $organization = $user->currentOrganization;
 
         if (! $organization) {
             return redirect()->route('app.organizations.create')
@@ -72,11 +73,6 @@ class EquipmentController extends Controller
             'equipments' => $equipments,
             'allCategories' => $categories,
             'filters' => $request->only(['search', 'category', 'condition', 'availability', 'sort', 'direction']),
-            'can' => [
-                'create' => $user->can('create', [Equipment::class, $organization]),
-                'update' => $user->can('update', $organization->equipments()->first() ?: new Equipment(['organization_id' => $organization->id])),
-                'delete' => $user->can('delete', $organization->equipments()->first() ?: new Equipment(['organization_id' => $organization->id])),
-            ],
         ]);
     }
 
@@ -129,8 +125,9 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function create(Request $request, Organization $organization)
+    public function create(Request $request)
     {
+        $organization = $request->user()->currentOrganization;
         $this->authorize('create', [Equipment::class, $organization]);
 
         return Inertia::render('App/Organizations/Equipments/Create', [

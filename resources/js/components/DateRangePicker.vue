@@ -65,7 +65,7 @@ const buttonClasses = computed(() => {
       <RangeCalendar 
         v-model="value" 
         initial-focus 
-        :number-of-months="2" 
+        :number-of-months="1" 
         @update:modelValue="(newValue) => {
           value.start = newValue.start;
           value.end = newValue.end;

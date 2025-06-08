@@ -2,216 +2,325 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Reservations\CreateCalendarReservation;
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Equipment;
-use App\Models\Organization;
 use App\Models\Reservation;
 use App\Models\ReservationItem;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ReservationController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        $organization = $request->user()->organization;
+        $organization = $request->user()->currentOrganization;
 
-        $reservations = $organization->allReservations()
-            ->with(['fromOrganization', 'toOrganization', 'items.equipment', 'items.depot'])
-            ->latest()
-            ->paginate();
+        $this->authorize('viewAny', Reservation::class);
 
-        return Inertia::render('App/Reservations/Index', [
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', new Enum(ReservationStatus::class)],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'sort' => ['nullable', 'string', 'in:start_date,end_date,status,created_at'],
+            'direction' => ['nullable', 'string', 'in:asc,desc'],
+        ]);
+
+        $query = $organization->lentReservations()
+            ->with(['borrowerOrganization', 'items.equipment', 'items.depot', 'user']);
+
+        if ($filters['search'] ?? null) {
+            $query->where(function ($query) use ($filters) {
+                $query->whereHas('borrowerOrganization', function ($query) use ($filters) {
+                    $query->where('name', 'like', "%{$filters['search']}%");
+                })->orWhereHas('user', function ($query) use ($filters) {
+                    $query->where('name', 'like', "%{$filters['search']}%");
+                });
+            });
+        }
+
+        if ($filters['status'] ?? null) {
+            $query->where('status', $filters['status']);
+        }
+
+        if ($filters['start_date'] ?? null) {
+            $query->where('start_date', '>=', $filters['start_date']);
+        }
+
+        if ($filters['end_date'] ?? null) {
+            $query->where('end_date', '<=', $filters['end_date']);
+        }
+
+        $sort = $filters['sort'] ?? 'created_at';
+        $direction = $filters['direction'] ?? 'desc';
+        $query->orderBy($sort, $direction);
+
+        $reservations = $query->paginate()->through(function ($reservation) {
+            $reservation->status_label = $reservation->status->label();
+            $reservation->status_color = $reservation->status->color();
+
+            return $reservation;
+        })->withQueryString();
+
+        return Inertia::render('App/Organizations/Reservations/Index', [
+            'organization' => $organization,
             'reservations' => $reservations,
+            'filters' => $filters,
+            'statuses' => collect(ReservationStatus::cases())->map(fn ($status) => [
+                'value' => $status->value,
+                'label' => $status->label(),
+            ]),
+            'can' => [
+                'create' => $request->user()->can('create', [Reservation::class, $organization]),
+                'viewAny' => $request->user()->can('viewAny', Reservation::class),
+            ],
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): Response
     {
-        $organization = $request->user()->organization;
+        $organization = $request->user()->currentOrganization;
 
-        return Inertia::render('App/Reservations/Create', [
-            'organizations' => Organization::where('id', '!=', $organization->id)->get(),
-            'equipment' => Equipment::with('depot')->get(),
-            'discountTypes' => Reservation::discountTypes(),
+        $this->authorize('create', [Reservation::class, $organization]);
+
+        return Inertia::render('App/Organizations/Reservations/Create', [
+            'organization' => $organization,
+            'start_date' => $request->date('start_date'),
+            'end_date' => $request->date('end_date'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, CreateCalendarReservation $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'to_organization_id' => ['required', 'exists:organizations,id'],
-            'start_date' => ['required', 'date', 'after:now'],
-            'end_date' => ['required', 'date', 'after:start_date'],
-            'notes' => ['nullable', 'string'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.equipment_id' => ['required', 'exists:equipment,id'],
-            'items.*.depot_id' => ['required', 'exists:depots,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.price' => ['required', 'integer', 'min:0'],
-            'items.*.notes' => ['nullable', 'string'],
-            'discount_type' => ['nullable', 'string', 'in:'.implode(',', array_keys(Reservation::discountTypes()))],
-            'discount_value' => ['nullable', 'required_with:discount_type', 'integer', 'min:0'],
-            'discount_reason' => ['nullable', 'string'],
-        ]);
+        $organization = $request->user()->currentOrganization;
 
-        $organization = $request->user()->organization;
+        $this->authorize('create', [Reservation::class, $organization]);
 
         try {
-            DB::beginTransaction();
-
-            $reservation = Reservation::create([
-                'from_organization_id' => $organization->id,
-                'to_organization_id' => $validated['to_organization_id'],
-                'created_by_user_id' => $request->user()->id,
-                'start_date' => $validated['start_date'],
-                'end_date' => $validated['end_date'],
-                'notes' => $validated['notes'],
+            $validated = $request->validate([
+                'to_organization_id' => ['required', 'exists:organizations,id'],
+                'start_date' => ['required', 'date'],
+                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+                'notes' => ['nullable', 'string'],
+                'items' => ['required', 'array', 'min:1'],
+                'items.*.equipment_id' => ['required', 'exists:equipments,id'],
+                'items.*.depot_id' => ['required', 'exists:depots,id'],
+                'items.*.quantity' => ['required', 'integer', 'min:1'],
+                'items.*.price' => ['nullable', 'numeric', 'min:0'],
+                'items.*.notes' => ['nullable', 'string', 'max:1000'],
             ]);
 
-            foreach ($validated['items'] as $item) {
-                $reservation->items()->create([
-                    'equipment_id' => $item['equipment_id'],
-                    'depot_id' => $item['depot_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'notes' => $item['notes'] ?? null,
-                ]);
-            }
+            $reservation = DB::transaction(function () use ($action, $validated, $organization) {
+                return $action->handle($validated, $organization);
+            });
 
-            // Appliquer la remise si elle existe
-            if (isset($validated['discount_type'])) {
+            return redirect()
+                ->route('app.organizations.reservations.show', $reservation)
+                ->with('success', 'Réservation créée avec succès.');
+
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la création de la réservation.']);
+        }
+    }
+
+    public function show(Request $request, Reservation $reservation): Response
+    {
+        $this->authorize('view', $reservation);
+
+        $reservation->load(['borrowerOrganization', 'items.equipment', 'items.depot', 'user']);
+
+        return Inertia::render('App/Organizations/Reservations/Show', [
+            'organization' => $request->user()->currentOrganization,
+            'reservation' => $reservation,
+            'discountTypes' => Reservation::discountTypes(),
+            'can' => [
+                'confirm' => $reservation->canBeConfirmed(),
+                'reject' => $reservation->canBeRejected(),
+                'cancel' => $reservation->canBeCancelled(),
+                'complete' => $reservation->canBeCompleted(),
+            ],
+        ]);
+    }
+
+    public function applyDiscount(Request $request, Reservation $reservation): RedirectResponse
+    {
+        $this->authorize('update', $reservation);
+
+        try {
+            $validated = $request->validate([
+                'discount_type' => ['required', 'string', 'in:'.implode(',', array_keys(Reservation::discountTypes()))],
+                'discount_value' => ['required', 'numeric', 'min:0'],
+                'discount_reason' => ['nullable', 'string', 'max:1000'],
+            ]);
+
+            DB::transaction(function () use ($reservation, $validated) {
                 $reservation->applyDiscount(
                     $validated['discount_type'],
                     $validated['discount_value'],
                     $validated['discount_reason'] ?? null
                 );
-            }
-
-            DB::commit();
-
-            return redirect()->route('app.reservations.show', $reservation)
-                ->with('success', 'Réservation créée avec succès.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()->with('error', 'Une erreur est survenue lors de la création de la réservation.');
-        }
-    }
-
-    public function show(Reservation $reservation)
-    {
-        $reservation->load(['fromOrganization', 'toOrganization', 'items.equipment', 'items.depot', 'createdByUser']);
-
-        return Inertia::render('App/Reservations/Show', [
-            'reservation' => $reservation,
-            'discountTypes' => Reservation::discountTypes(),
-        ]);
-    }
-
-    public function applyDiscount(Request $request, Reservation $reservation)
-    {
-        $validated = $request->validate([
-            'discount_type' => ['required', 'string', 'in:'.implode(',', array_keys(Reservation::discountTypes()))],
-            'discount_value' => ['required', 'integer', 'min:0'],
-            'discount_reason' => ['nullable', 'string'],
-        ]);
-
-        try {
-            $reservation->applyDiscount(
-                $validated['discount_type'],
-                $validated['discount_value'],
-                $validated['discount_reason'] ?? null
-            );
+            });
 
             return back()->with('success', 'Remise appliquée avec succès.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Une erreur est survenue lors de l\'application de la remise.');
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de l\'application de la remise.']);
         }
     }
 
-    public function removeDiscount(Reservation $reservation)
+    public function removeDiscount(Reservation $reservation): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         try {
-            $reservation->removeDiscount();
+            DB::transaction(fn () => $reservation->removeDiscount());
 
             return back()->with('success', 'Remise supprimée avec succès.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Une erreur est survenue lors de la suppression de la remise.');
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la suppression de la remise.']);
         }
     }
 
-    public function confirm(Reservation $reservation)
+    public function confirm(Reservation $reservation): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $reservation->canBeConfirmed()) {
-            return back()->with('error', 'Cette réservation ne peut pas être confirmée.');
+            return back()->withErrors(['error' => 'Cette réservation ne peut pas être confirmée.']);
         }
 
-        $reservation->update(['status' => Reservation::STATUS_CONFIRMED]);
+        try {
+            DB::transaction(fn () => $reservation->confirm());
 
-        return back()->with('success', 'Réservation confirmée avec succès.');
+            return back()->with('success', 'Réservation confirmée avec succès.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la confirmation de la réservation.']);
+        }
     }
 
-    public function reject(Reservation $reservation)
+    public function reject(Reservation $reservation): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $reservation->canBeRejected()) {
-            return back()->with('error', 'Cette réservation ne peut pas être refusée.');
+            return back()->withErrors(['error' => 'Cette réservation ne peut pas être refusée.']);
         }
 
-        $reservation->update(['status' => Reservation::STATUS_REJECTED]);
+        try {
+            DB::transaction(fn () => $reservation->reject());
 
-        return back()->with('success', 'Réservation refusée.');
+            return back()->with('success', 'Réservation refusée.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors du refus de la réservation.']);
+        }
     }
 
-    public function cancel(Reservation $reservation)
+    public function cancel(Request $request, Reservation $reservation): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $reservation->canBeCancelled()) {
-            return back()->with('error', 'Cette réservation ne peut pas être annulée.');
+            return back()->withErrors(['error' => 'Cette réservation ne peut pas être annulée.']);
         }
 
-        $reservation->update(['status' => Reservation::STATUS_CANCELLED]);
+        try {
+            $validated = $request->validate([
+                'reason' => ['required', 'string', 'max:1000'],
+            ]);
 
-        return back()->with('success', 'Réservation annulée.');
+            DB::transaction(fn () => $reservation->cancel($validated['reason']));
+
+            return back()->with('success', 'Réservation annulée.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de l\'annulation de la réservation.']);
+        }
     }
 
-    public function complete(Reservation $reservation)
+    public function complete(Reservation $reservation): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $reservation->canBeCompleted()) {
-            return back()->with('error', 'Cette réservation ne peut pas être terminée.');
+            return back()->withErrors(['error' => 'Cette réservation ne peut pas être terminée.']);
         }
 
-        $reservation->update(['status' => Reservation::STATUS_COMPLETED]);
+        try {
+            DB::transaction(function () use ($reservation) {
+                $reservation->update(['status' => ReservationStatus::COMPLETED]);
+            });
 
-        return back()->with('success', 'Réservation terminée.');
+            return back()->with('success', 'Réservation terminée.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la complétion de la réservation.']);
+        }
     }
 
-    public function pickupItem(ReservationItem $item)
+    public function pickupItem(Reservation $reservation, ReservationItem $item): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $item->canBePickedUp()) {
-            return back()->with('error', 'Cet équipement ne peut pas être récupéré.');
+            return back()->withErrors(['error' => 'Cet équipement ne peut pas être récupéré.']);
         }
 
-        $item->update([
-            'status' => ReservationItem::STATUS_PICKED_UP,
-            'picked_up_at' => now(),
-        ]);
+        try {
+            DB::transaction(function () use ($item) {
+                $item->update([
+                    'status' => ReservationItem::STATUS_PICKED_UP,
+                    'picked_up_at' => now(),
+                ]);
+            });
 
-        return back()->with('success', 'Équipement marqué comme récupéré.');
+            return back()->with('success', 'Équipement marqué comme récupéré.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors du marquage de l\'équipement comme récupéré.']);
+        }
     }
 
-    public function returnItem(ReservationItem $item)
+    public function returnItem(Reservation $reservation, ReservationItem $item): RedirectResponse
     {
+        $this->authorize('update', $reservation);
+
         if (! $item->canBeReturned()) {
-            return back()->with('error', 'Cet équipement ne peut pas être retourné.');
+            return back()->withErrors(['error' => 'Cet équipement ne peut pas être retourné.']);
         }
 
-        $item->update([
-            'status' => ReservationItem::STATUS_RETURNED,
-            'returned_at' => now(),
-        ]);
+        try {
+            DB::transaction(function () use ($item) {
+                $item->update([
+                    'status' => ReservationItem::STATUS_RETURNED,
+                    'returned_at' => now(),
+                ]);
+            });
 
-        return back()->with('success', 'Équipement marqué comme retourné.');
+            return back()->with('success', 'Équipement marqué comme retourné.');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors du marquage de l\'équipement comme retourné.']);
+        }
     }
 }

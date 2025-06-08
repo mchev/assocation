@@ -1,19 +1,29 @@
-<script setup lang="ts">
+<script setup>
 import { Link } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
-interface Props {
-  href: string
-  active?: boolean
-  icon?: any
-  external?: boolean
-  size?: 'sm' | 'md' | 'lg'
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  active: false,
-  external: false,
-  size: 'md'
+const props = defineProps({
+  href: {
+    type: String,
+    required: true
+  },
+  active: {
+    type: Boolean,
+    default: false
+  },
+  icon: {
+    type: [Object, Function],
+    default: null
+  },
+  external: {
+    type: Boolean,
+    default: false
+  },
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['sm', 'md', 'lg'].includes(value)
+  }
 })
 
 const classes = computed(() => ({
@@ -27,19 +37,19 @@ const classes = computed(() => ({
   <Link
     v-if="!external"
     :href="href"
-    class="group inline-flex items-center gap-2 px-1 pt-1 border-b-2 font-medium leading-5 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
+    class="group inline-flex items-center gap-2 px-1 pt-1 font-medium leading-5 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
     :class="[
       classes,
       active
-        ? 'border-primary-500 text-primary-700'
-        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ? 'opacity-100'
+        : 'opacity-70 hover:opacity-100'
     ]"
   >
     <component
       v-if="icon"
       :is="icon"
       class="h-4 w-4"
-      :class="active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'"
+      :class="active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'"
     />
     <slot />
   </Link>
@@ -49,19 +59,19 @@ const classes = computed(() => ({
     :href="href"
     target="_blank"
     rel="noopener noreferrer"
-    class="group inline-flex items-center gap-2 px-1 pt-1 border-b-2 font-medium leading-5 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
+    class="group inline-flex items-center gap-2 px-1 pt-1 font-medium leading-5 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
     :class="[
       classes,
       active
-        ? 'border-primary-500 text-primary-700'
-        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ? 'opacity-100'
+        : 'opacity-70 hover:opacity-100'
     ]"
   >
     <component
       v-if="icon"
       :is="icon"
       class="h-4 w-4"
-      :class="active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'"
+      :class="active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'"
     />
     <slot />
   </a>

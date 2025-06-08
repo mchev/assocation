@@ -48,13 +48,16 @@ const advantages = [
         <section 
             v-if="isVisible" 
             aria-labelledby="hero-heading"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4"
+            class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4"
         >
-            <Card class="relative border-none bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900/50 dark:via-gray-900 dark:to-gray-900/50">
+            <!-- Background with gradient -->
+            <div class="absolute inset-0  rounded-2xl" />
+            
+            <Card class="relative border-none bg-gradient-to-br from-gray-200 via-gray-50 to-background">
                 <Button 
                     variant="ghost" 
                     size="icon"
-                    class="absolute right-3 top-3 hover:bg-white/20 dark:hover:bg-gray-800/50" 
+                    class="absolute right-3 top-3 hover:bg-gray-100/80" 
                     @click="closeHero"
                 >
                     <XIcon class="h-4 w-4" />
@@ -67,19 +70,19 @@ const advantages = [
                             <div class="space-y-4">
                                 <h1 
                                     id="hero-heading" 
-                                    class="text-2xl sm:text-3xl font-bold font-title text-foreground/90 leading-tight"
+                                    class="text-2xl sm:text-3xl font-bold font-title text-gray-900 leading-tight"
                                 >
                                     <span class="inline-block">
                                         Location et prêt de matériel 
                                         <span class="text-primary whitespace-nowrap">événementiel</span>
                                     </span>
-                                    <span class="block text-lg sm:text-xl mt-2 text-foreground/80 font-medium">
+                                    <span class="block text-lg sm:text-xl mt-2 text-gray-600 font-medium">
                                         entre associations et particuliers
                                     </span>
                                 </h1>
                                 
-                                <p class="text-base text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                                    <strong class="text-foreground/90">Assodépôt</strong> facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
+                                <p class="text-base text-gray-500 max-w-xl mx-auto lg:mx-0">
+                                    <strong class="text-gray-700">Assodépôt</strong> facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
                                 </p>
                             </div>
 
@@ -102,11 +105,11 @@ const advantages = [
                             </div>
                         </div>
 
-                        <div class="hidden lg:block w-px h-32 bg-border self-center"></div>
+                        <div class="hidden lg:block w-px h-32 bg-gray-200 self-center"></div>
 
                         <div class="flex-shrink-0 lg:w-80">
-                            <div class="rounded-lg bg-white/50 dark:bg-gray-900/50 p-4 backdrop-blur-sm">
-                                <h2 class="text-sm font-medium text-foreground/90 mb-4">
+                            <div class="rounded-lg p-4">
+                                <h2 class="text-sm font-medium text-gray-900 mb-4">
                                     Avantages de la plateforme
                                 </h2>
                                 <ul class="grid gap-3" role="list">
@@ -125,10 +128,10 @@ const advantages = [
                                             />
                                         </div>
                                         <div>
-                                            <h3 class="text-sm font-medium text-foreground/90">
+                                            <h3 class="text-sm font-medium text-gray-900">
                                                 {{ advantage.title }}
                                             </h3>
-                                            <p class="text-xs text-muted-foreground mt-0.5">
+                                            <p class="text-xs text-gray-500 mt-0.5">
                                                 {{ advantage.description }}
                                             </p>
                                         </div>

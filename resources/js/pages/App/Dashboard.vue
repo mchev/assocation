@@ -2,7 +2,7 @@
   <AppLayout>
     <Head title="Tableau de bord" />
 
-    <div class="container space-y-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
       
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

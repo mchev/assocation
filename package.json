@@ -23,6 +23,11 @@
         "vue-tsc": "^2.2.4"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.17",
+        "@fullcalendar/daygrid": "^6.1.17",
+        "@fullcalendar/interaction": "^6.1.17",
+        "@fullcalendar/timegrid": "^6.1.17",
+        "@fullcalendar/vue3": "^6.1.17",
         "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^2.0.0",
         "@tailwindcss/vite": "^4.1.1",

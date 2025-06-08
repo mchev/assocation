@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::prefix('carts')->name('carts.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
@@ -14,14 +14,14 @@ Route::prefix('carts')->name('carts.')->group(function () {
     Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-});
-
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'home')->name('home');
     Route::get('/decouvrir', 'discover')->name('discover');
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
 });
+
+Route::get('auth/google', [GoogleController::class, 'redirect'])
+    ->name('google.login');
+
+Route::get('auth/google/callback', [GoogleController::class, 'callback'])
+    ->name('google.callback');

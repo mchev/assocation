@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\PriceCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,9 +34,9 @@ class Equipment extends Model
     ];
 
     protected $casts = [
-        'purchase_price' => \App\Casts\PriceCast::class,
-        'rental_price' => \App\Casts\PriceCast::class,
-        'deposit_amount' => \App\Casts\PriceCast::class,
+        'purchase_price' => PriceCast::class,
+        'rental_price' => PriceCast::class,
+        'deposit_amount' => PriceCast::class,
         'is_available' => 'boolean',
         'requires_deposit' => 'boolean',
         'is_rentable' => 'boolean',

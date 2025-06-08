@@ -36,9 +36,16 @@ const navigationItems = computed(() => [
   },
   {
     name: 'Matériel',
-    href: route('app.organizations.equipments.index', organization.value),
+    href: route('app.organizations.equipments.index'),
     active: route().current('app.organizations.equipments.index'),
     icon: Box,
+    show: !!user.value
+  },
+  {
+    name: 'Réservations',
+    href: route('app.organizations.reservations.index'),
+    active: route().current('app.organizations.reservations.index'),
+    icon: Calendar,
     show: !!user.value
   },
   {
@@ -52,7 +59,7 @@ const navigationItems = computed(() => [
 </script>
 
 <template>
-  <nav class="bg-white border-b border-gray-200">
+  <nav class="border-b border-gray-200 dark:border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
@@ -65,15 +72,11 @@ const navigationItems = computed(() => [
 
           <!-- Desktop Navigation -->
           <div class="hidden md:ml-8 md:flex md:space-x-6">
-            <Button
-              v-if="!user"
-              :href="route('app.equipments.create')"
-              variant="default"
-              size="sm"
-              class="gap-2"
-            >
-              <Plus class="h-4 w-4" />
-              Ajouter votre matériel
+            <Button asChild v-if="!user" size="sm">
+              <Link :href="route('app.organizations.equipments.create')" class="gap-2 flex items-center">
+                <Plus class="h-4 w-4" />
+                Ajouter votre matériel
+              </Link>
             </Button>
 
             <NavLink
@@ -102,8 +105,10 @@ const navigationItems = computed(() => [
             <NavLink :href="route('login')" size="sm">
               Connexion
             </NavLink>
-            <Button :href="route('register')" variant="default" size="sm">
-              Inscription
+            <Button asChild variant="default" size="sm">
+              <Link :href="route('register')">
+                Inscription
+              </Link>
             </Button>
           </template>
 
@@ -152,15 +157,11 @@ const navigationItems = computed(() => [
       </div>
 
       <div class="pt-2 pb-3 space-y-1">
-        <Button
-          v-if="!user"
-          :href="route('app.equipments.create')"
-          variant="default"
-          size="sm"
-          class="w-full justify-start gap-2 mx-2"
-        >
-          <Plus class="h-4 w-4" />
-          Ajouter votre matériel
+        <Button v-if="!user" asChild size="sm">
+          <Link :href="route('app.organizations.equipments.create')">
+            <Plus class="h-4 w-4" />
+            Ajouter votre matériel
+          </Link>
         </Button>
 
         <a

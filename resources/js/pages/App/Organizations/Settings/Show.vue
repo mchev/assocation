@@ -27,6 +27,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    pendingInvitations: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const sections = [
@@ -64,7 +68,7 @@ const sections = [
             </h2>
         </template>
 
-        <div class="space-y-6 p-4 sm:p-8">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div class="grid gap-6 md:grid-cols-4">
                 <!-- Navigation Sidebar -->
                 <div class="rounded-lg border bg-card p-6 text-card-foreground shadow-sm dark:border-gray-800">
@@ -93,6 +97,8 @@ const sections = [
 
                     <MembersManagement
                         v-if="section === 'members'"
+                        :organization="organization"
+                        :pendingInvitations="pendingInvitations"
                         :members="members"
                         :roles="roles"
                     />

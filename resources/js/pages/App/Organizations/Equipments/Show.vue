@@ -7,14 +7,14 @@
         </h2>
         <div class="flex items-center space-x-4">
           <Link
-            :href="route('app.organizations.equipments.index', organization)"
+            :href="route('app.organizations.equipments.index')"
             class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
           >
             Retour à la liste
           </Link>
           <Link
             v-if="can.update"
-            :href="route('app.organizations.equipments.edit', [organization, equipment])"
+            :href="route('app.organizations.equipments.edit', equipment)"
             class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/90 focus:bg-primary/90 active:bg-primary/95 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 transition ease-in-out duration-150"
           >
             Modifier

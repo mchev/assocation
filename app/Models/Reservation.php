@@ -211,4 +211,61 @@ class Reservation extends Model
 
         return $this->formatted_discount_amount;
     }
+
+    public function confirm(): void
+    {
+        if (! $this->canBeConfirmed()) {
+            throw new \Exception('Cette réservation ne peut pas être confirmée.');
+        }
+
+        $this->update(['status' => ReservationStatus::CONFIRMED]);
+    }
+
+    public function reject(): void
+    {
+        if (! $this->canBeRejected()) {
+            throw new \Exception('Cette réservation ne peut pas être refusée.');
+        }
+
+        $this->update(['status' => ReservationStatus::REJECTED]);
+    }
+
+    public function cancel(string $reason): void
+    {
+        if (! $this->canBeCancelled()) {
+            throw new \Exception('Cette réservation ne peut pas être annulée.');
+        }
+
+        $this->update([
+            'status' => ReservationStatus::CANCELLED,
+            'cancellation_reason' => $reason,
+        ]);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($reservation) {
+            // Notifier l'organisation prêteuse d'une nouvelle réservation
+            $reservation->lenderOrganization->notify(new \App\Notifications\NewReservationNotification($reservation));
+        });
+
+        static::updating(function ($reservation) {
+            // Si le statut change, sauvegarder l'ancien statut pour la notification
+            if ($reservation->isDirty('status')) {
+                $reservation->previousStatus = $reservation->getOriginal('status');
+            }
+        });
+
+        static::updated(function ($reservation) {
+            // Si le statut a changé, notifier l'organisation emprunteuse
+            if ($reservation->wasChanged('status')) {
+                $reservation->borrowerOrganization->notify(
+                    new \App\Notifications\ReservationStatusChangedNotification(
+                        $reservation,
+                        $reservation->previousStatus
+                    )
+                );
+            }
+        });
+    }
 }

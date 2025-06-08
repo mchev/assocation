@@ -1,18 +1,17 @@
 <template>
-  <AppLayout :title="'Matériel - ' + organization.name">
+  <AppLayout title="Matériel" description="Liste du matériel de l'organisation">
     <template #header>
       <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl leading-tight">
           Inventaire du matériel de {{ organization.name }} ({{ equipments.total }})
         </h2>
         <Button
-          v-if="can.create"
-          as="a"
-          :href="route('app.organizations.equipments.create', organization)"
-          variant="default"
-          size="default"
+          v-if="can.equipments.create"
+          asChild
         >
-          Ajouter du matériel
+          <Link :href="route('app.organizations.equipments.create')">
+              Ajouter du matériel
+          </Link>
         </Button>
       </div>
     </template>
@@ -112,7 +111,7 @@
                 Aucun matériel trouvé
               </p>
               <Button
-                v-if="can.create"
+                v-if="can.equipments.create"
                 as="a"
                 :href="route('app.organizations.equipments.create', organization)"
                 variant="default"
@@ -234,16 +233,16 @@
                       <div class="flex items-center justify-end space-x-2">
                         <Button
                           as="a"
-                          :href="route('app.organizations.equipments.show', [organization, item])"
+                          :href="route('app.organizations.equipments.show', item)"
                           size="sm"
                         >
                           Voir
                         </Button>
 
                         <Button
-                          v-if="can.update"
+                          v-if="can.equipments.update"
                           as="a"
-                          :href="route('app.organizations.equipments.edit', [organization, item])"
+                          :href="route('app.organizations.equipments.edit', item)"
                           size="sm"
                         >
                           Modifier
@@ -263,7 +262,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Link, useForm } from '@inertiajs/vue3'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -303,12 +302,10 @@ const props = defineProps({
   allCategories: {
     type: Array,
     required: true
-  },
-  can: {
-    type: Object,
-    required: true
   }
 })
+
+const can = computed(() => usePage().props.auth.user.can)
 
 const filters = useForm({
   search: props.filters?.search ?? '',
@@ -320,7 +317,7 @@ const filters = useForm({
 })
 
 const filter = () => {
-  filters.get(route('app.organizations.equipments.index', props.organization), {
+  filters.get(route('app.organizations.equipments.index'), {
     preserveState: true,
     preserveScroll: true
   })

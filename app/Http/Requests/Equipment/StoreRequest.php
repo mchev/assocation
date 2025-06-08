@@ -23,12 +23,12 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
             'category' => ['required', 'string', 'max:255'],
             'condition' => ['required', 'string', 'in:new,good,fair,poor'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-            'rental_price' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-            'deposit_amount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'purchase_price' => ['required', 'numeric', 'min:0'],
+            'rental_price' => ['required', 'numeric', 'min:0'],
+            'deposit_amount' => ['required', 'numeric', 'min:0'],
             'is_available' => ['boolean'],
             'requires_deposit' => ['boolean'],
             'is_rentable' => ['boolean'],

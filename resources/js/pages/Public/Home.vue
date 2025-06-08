@@ -1,18 +1,34 @@
 <template>
-  <PublicLayout>
-    <div>
-      <HeroSection />
-      <SearchSection
-        :filters="filters"
-        :stats="stats"
-        @search="search"
-      />
-      <ResultsSection
-        :equipment="equipment"
-        :start-date="form.start_date"
-        :end-date="form.end_date"
-      />
-    </div>
+  <PublicLayout title="Location et prêt de matériel événementiel" description="Assodépôt facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements. ">
+    <main class="min-h-screen bg-background">
+      <!-- Hero Section -->
+      <section class="relative pb-12">
+        <HeroSection />
+      </section>
+
+      <!-- Search Section -->
+      <section class="relative -mt-8">
+        <SearchSection
+          :filters="filters"
+          :stats="stats"
+          :is-searching="isSearching"
+          @search="search"
+        />
+      </section>
+
+      <!-- Results Section -->
+      <section 
+        class="relative py-12 bg-gradient-to-b from-background via-background/50 to-background"
+        :class="{ 'mt-8': equipment.data.length > 0 }"
+      >
+        <ResultsSection
+          :equipment="equipment"
+          :start-date="form.start_date"
+          :end-date="form.end_date"
+          :is-searching="isSearching"
+        />
+      </section>
+    </main>
   </PublicLayout>
 </template>
 
@@ -55,11 +71,16 @@ const form = ref({
   end_date: props.filters.end_date || ''
 });
 
-const search = (searchForm) => {
-  router.get(route('home'), searchForm, {
+const isSearching = ref(false);
+
+const search = (filters) => {
+  isSearching.value = true;
+  router.get(route('home'), filters, {
     preserveState: true,
     preserveScroll: true,
-    replace: true
+    onFinish: () => {
+      isSearching.value = false;
+    }
   });
 };
 </script> 

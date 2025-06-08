@@ -86,6 +86,14 @@ class HandleInertiaRequests extends Middleware
                         ];
                     }),
                     'current_organization' => $user->currentOrganization()->select('id', 'name')->first(),
+                    'can' => $user ? [
+                        'equipments' => [
+                            'create' => $user->can('create', [Equipment::class, $user->currentOrganization]),
+                            'update' => $user->can('update', new Equipment(['organization_id' => $user->currentOrganization->id])),
+                            'delete' => $user->can('delete', new Equipment(['organization_id' => $user->currentOrganization->id])),
+                        ],
+                        // Add other resource permissions here as needed
+                    ] : [],
                 ] : null,
             ],
             'ziggy' => [
