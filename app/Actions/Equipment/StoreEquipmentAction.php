@@ -59,7 +59,7 @@ class StoreEquipmentAction
 
             // Process image
             $processedImage = $this->manager->read($image)
-                ->scaleDown(width: 800)
+                ->scaleDown(width: 1024)
                 ->toWebp(80);
 
             // Store publicly in s3

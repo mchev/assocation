@@ -15,11 +15,11 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
 
     Route::post('organizations/switch/{organization}', [OrganizationController::class, 'switch'])->name('organizations.switch');
 
-    Route::get('organizations/settings', [OrganizationSettingsController::class, 'show'])->name('organizations.settings');
+    Route::get('organizations/settings', [OrganizationSettingsController::class, 'edit'])->name('organizations.settings.edit');
     Route::patch('organizations/settings', [OrganizationSettingsController::class, 'update'])->name('organizations.settings.update');
 
     // Members Management
-    Route::get('organizations/settings/members', [OrganizationMemberController::class, 'index'])->name('organizations.settings.members');
+    Route::get('organizations/members', [OrganizationMemberController::class, 'index'])->name('organizations.members.index');
     Route::post('organizations/members/invite', [OrganizationMemberController::class, 'invite'])->name('organizations.members.invite');
     Route::delete('organizations/members/{member}', [OrganizationMemberController::class, 'remove'])->name('organizations.members.remove');
     Route::patch('organizations/members/{member}/role', [OrganizationMemberController::class, 'updateRole'])->name('organizations.members.update-role');
@@ -28,7 +28,8 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
     // Depots Management
     Route::get('organizations/depots', [OrganizationDepotController::class, 'index'])->name('organizations.depots.index');
     Route::post('organizations/depots', [OrganizationDepotController::class, 'store'])->name('organizations.depots.store');
-    Route::get('organizations/depots/{depot}', [OrganizationDepotController::class, 'show'])->name('organizations.depots.show');
+    Route::get('organizations/depots/create', [OrganizationDepotController::class, 'create'])->name('organizations.depots.create');
+    Route::get('organizations/depots/{depot}/edit', [OrganizationDepotController::class, 'edit'])->name('organizations.depots.edit');
     Route::put('organizations/depots/{depot}', [OrganizationDepotController::class, 'update'])->name('organizations.depots.update');
     Route::delete('organizations/depots/{depot}', [OrganizationDepotController::class, 'destroy'])->name('organizations.depots.destroy');
 

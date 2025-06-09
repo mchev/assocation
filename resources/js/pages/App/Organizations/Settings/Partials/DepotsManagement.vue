@@ -1,9 +1,11 @@
 <script setup>
+import { watch, ref, nextTick } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import AddressInput from '@/components/AddressInput.vue';
 import {
     Table,
     TableBody,
@@ -31,36 +33,98 @@ const props = defineProps({
     },
 });
 
+const createDialogOpen = ref(false);
+const editDialogOpen = ref(false);
+const isInitializing = ref(false);
+
 const form = useForm({
     name: '',
     description: '',
     address: '',
     city: '',
+    latitude: '',
+    longitude: '',
     postal_code: '',
     country: 'FR',
+});
+
+const location = ref(null);
+
+const resetForm = () => {
+    form.reset();
+    form.clearErrors();
+    location.value = null;
+};
+
+watch(location, (value) => {
+    if (isInitializing.value) return;
+    
+    if (!value) {
+        form.address = '';
+        form.city = '';
+        form.postal_code = '';
+        form.latitude = '';
+        form.longitude = '';
+        return;
+    }
+
+    // Construct full address from housenumber and street
+    const addressParts = [];
+    if (value.housenumber) addressParts.push(value.housenumber);
+    if (value.street) addressParts.push(value.street);
+    
+    form.address = addressParts.join(' ');
+    form.city = value.city;
+    form.postal_code = value.postcode;
+    form.latitude = value.lat;
+    form.longitude = value.lng;
 });
 
 const createDepot = () => {
     form.post(route('app.organizations.depots.store'), {
         preserveScroll: true,
         onSuccess: () => {
-            form.reset();
+            resetForm();
+            createDialogOpen.value = false;
         },
     });
 };
 
-const editDepot = (depot) => {
+const initEditForm = (depot) => {
+    isInitializing.value = true;
+    
+    // First set the form data
     form.name = depot.name;
     form.description = depot.description;
     form.address = depot.address;
     form.city = depot.city;
+    form.latitude = depot.latitude;
+    form.longitude = depot.longitude;
     form.postal_code = depot.postal_code;
     form.country = depot.country;
     
+    // Then set the location in the next tick to avoid reactivity issues
+    nextTick(() => {
+        location.value = {
+            name: depot.address,
+            street: depot.address,
+            city: depot.city,
+            postcode: depot.postal_code,
+            lat: depot.latitude,
+            lng: depot.longitude
+        };
+        
+        // Reset the initialization flag after everything is set
+        isInitializing.value = false;
+    });
+};
+
+const editDepot = (depot) => {
     form.put(route('app.organizations.depots.update', depot.id), {
         preserveScroll: true,
         onSuccess: () => {
-            form.reset();
+            resetForm();
+            editDialogOpen.value = false;
         },
     });
 };
@@ -82,16 +146,16 @@ const deleteDepot = (depot) => {
         />
 
         <div class="space-y-4">
-            <Dialog>
+            <Dialog v-model:open="createDialogOpen">
                 <DialogTrigger asChild>
-                    <Button>Ajouter un dépôt</Button>
+                    <Button @click="resetForm">Ajouter un dépôt</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <form @submit.prevent="createDepot">
                         <DialogHeader>
                             <DialogTitle>Ajouter un nouveau dépôt</DialogTitle>
                             <DialogDescription>
-                                Créez un nouveau dépôt pour votre organisation.
+                                Créez un nouveau lieu de stockage pour votre organisation.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -118,9 +182,10 @@ const deleteDepot = (depot) => {
 
                             <div class="grid gap-2">
                                 <Label for="address">Adresse</Label>
-                                <Input
-                                    id="address"
-                                    v-model="form.address"
+                                <AddressInput
+                                    id="location"
+                                    v-model="location"
+                                    :placeholder="'Rechercher une adresse'"
                                     required
                                 />
                                 <InputError :message="form.errors.address" />
@@ -179,9 +244,16 @@ const deleteDepot = (depot) => {
                             </TableCell>
                             <TableCell>
                                 <div class="flex items-center gap-2">
-                                    <Dialog>
+                                    <Dialog v-model:open="editDialogOpen">
                                         <DialogTrigger asChild>
-                                            <Button variant="outline" size="sm">
+                                            <Button 
+                                                variant="outline" 
+                                                size="sm" 
+                                                @click.stop="() => {
+                                                    editDialogOpen = true;
+                                                    initEditForm(depot);
+                                                }"
+                                            >
                                                 Modifier
                                             </Button>
                                         </DialogTrigger>
@@ -214,34 +286,13 @@ const deleteDepot = (depot) => {
 
                                                     <div class="grid gap-2">
                                                         <Label for="edit-address">Adresse</Label>
-                                                        <Input
-                                                            id="edit-address"
-                                                            v-model="form.address"
+                                                        <AddressInput
+                                                            id="edit-location"
+                                                            v-model="location"
+                                                            :placeholder="'Rechercher une adresse'"
                                                             required
                                                         />
                                                         <InputError :message="form.errors.address" />
-                                                    </div>
-
-                                                    <div class="grid grid-cols-2 gap-4">
-                                                        <div class="grid gap-2">
-                                                            <Label for="edit-city">Ville</Label>
-                                                            <Input
-                                                                id="edit-city"
-                                                                v-model="form.city"
-                                                                required
-                                                            />
-                                                            <InputError :message="form.errors.city" />
-                                                        </div>
-
-                                                        <div class="grid gap-2">
-                                                            <Label for="edit-postal_code">Code postal</Label>
-                                                            <Input
-                                                                id="edit-postal_code"
-                                                                v-model="form.postal_code"
-                                                                required
-                                                            />
-                                                            <InputError :message="form.errors.postal_code" />
-                                                        </div>
                                                     </div>
                                                 </div>
 

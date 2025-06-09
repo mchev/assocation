@@ -1,6 +1,6 @@
 <template>
-    <PublicLayout>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PublicLayout :title="equipment.name" :description="equipment.description">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-8">
@@ -24,13 +24,7 @@
                     <Card>
                         <CardContent class="p-0">
                             <div class="relative aspect-[16/9] w-full bg-muted">
-                                <template v-if="equipment.main_image">
-                                    <img 
-                                        :src="equipment.main_image" 
-                                        :alt="equipment.name"
-                                        class="w-full h-full object-cover rounded-t-lg"
-                                    />
-                                </template>
+                                <ImageGallery v-if="equipment.images && equipment.images.length > 0" :images="equipment.images" />
                                 <template v-else>
                                     <div class="w-full h-full flex items-center justify-center rounded-t-lg">
                                         <div class="text-center space-y-2">
@@ -40,36 +34,12 @@
                                     </div>
                                 </template>
                             </div>
-                            <div v-if="equipment.images && equipment.images.length > 0" class="grid grid-cols-4 gap-2 p-4">
-                                <div v-for="(image, index) in equipment.images" :key="index" 
-                                     class="cursor-pointer hover:opacity-75 transition-opacity">
-                                    <img 
-                                        :src="image" 
-                                        :alt="`${equipment.name} - Image ${index + 1}`"
-                                        class="w-full h-20 object-cover rounded-lg"
-                                    />
-                                </div>
-                            </div>
-                            <div v-else class="p-4">
-                                <p class="text-sm text-muted-foreground text-center">Aucune image supplémentaire disponible</p>
-                            </div>
                         </CardContent>
                     </Card>
 
                     <!-- Equipment Details -->
                     <Card>
                         <CardContent class="space-y-6">
-                            <!-- Specifications -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <h4 class="text-sm font-medium text-muted-foreground">Localisation</h4>
-                                    <p class="mt-1">{{ equipment.depot?.name }}</p>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-medium text-muted-foreground">Organisation</h4>
-                                    <p class="mt-1">{{ equipment.organization?.name }}</p>
-                                </div>
-                            </div>
 
                             <!-- Specifications -->
                             <div v-if="equipment.specifications">
@@ -186,7 +156,7 @@
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { ref, computed, onMounted } from 'vue';
 import { toast } from 'vue-sonner';
-import { ShoppingCart, Truck } from 'lucide-vue-next';
+import { ShoppingCart, Truck, ArrowLeftIcon } from 'lucide-vue-next';
 import {
     Card,
     CardContent,
@@ -202,6 +172,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useForm, router } from '@inertiajs/vue3';
 import Cart from '@/components/Cart.vue';
+import ImageGallery from '@/components/ImageGallery.vue';
 import ReservationForm from '@/Components/ReservationForm.vue';
 import { MapPin, Phone, Mail, Globe, Calendar, Clock, Users, Tag } from 'lucide-vue-next';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';

@@ -23,7 +23,6 @@ const props = defineProps({
       <meta head-key="description" name="description" :content="description" />
     </Head>
     <Header />
-    <FlashMessage />
     <!-- Page Heading -->
     <header class="dark:bg-muted/50 shadow" v-if="$slots.header">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 font-title">
@@ -37,5 +36,7 @@ const props = defineProps({
     </main>
 
     <Footer />
+
+
   </div>
 </template>

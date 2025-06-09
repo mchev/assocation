@@ -50,10 +50,10 @@
       <!-- Results Count -->
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-lg font-medium text-foreground">
-          {{ equipment.total }} équipement{{ equipment.total > 1 ? 's' : '' }} trouvé{{ equipment.total > 1 ? 's' : '' }}
+          {{ equipments.total }} équipement{{ equipments.total > 1 ? 's' : '' }} trouvé{{ equipments.total > 1 ? 's' : '' }}
         </h2>
         <p class="text-sm text-muted-foreground">
-          Page {{ equipment.current_page }} sur {{ equipment.last_page }}
+          Page {{ equipments.current_page }} sur {{ equipments.last_page }}
         </p>
       </div>
 
@@ -62,7 +62,7 @@
         class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
       >
         <EquipmentCard
-          v-for="item in equipment.data"
+          v-for="item in equipments.data"
           :key="item.id"
           :equipment="item"
           :start-date="startDate"
@@ -73,7 +73,7 @@
 
       <!-- Pagination -->
       <div class="mt-12">
-        <Pagination :links="equipment.links" />
+        <Pagination :links="equipments.links" />
       </div>
     </div>
   </div>
@@ -88,7 +88,7 @@ import { Button } from '@/components/ui/button';
 import { SearchX, PackageSearch } from 'lucide-vue-next';
 
 const props = defineProps({
-  equipment: {
+  equipments: {
     type: Object,
     required: true
   },
@@ -106,6 +106,6 @@ const props = defineProps({
   }
 });
 
-const hasResults = computed(() => props.equipment.data.length > 0);
+const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
 </script> 

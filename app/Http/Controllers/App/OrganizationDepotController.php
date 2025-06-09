@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Depots\StoreRequest;
 use App\Models\Depot;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,54 +15,49 @@ class OrganizationDepotController extends Controller
      */
     public function index(Request $request)
     {
-        return Inertia::render('App/Organizations/Settings/Show', [
-            'organization' => $request->user()->currentOrganization,
-            'section' => 'depots',
-            'depots' => $request->user()->currentOrganization->depots()->latest()->get(),
+        $organization = $request->user()->currentOrganization;
+
+        return Inertia::render('App/Organizations/Settings/Depots/Index', [
+            'organization' => $organization,
+            'depots' => $organization->depots()->with('equipments:id,name,depot_id')->get(),
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('App/Organizations/Settings/Depots/Create');
     }
 
     /**
      * Store a newly created depot in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         $organization = $request->user()->currentOrganization;
         $this->authorize('create', $organization);
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'address' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country' => ['required', 'string', 'size:2'],
+        $organization->depots()->create($request->validated());
+
+        return redirect()->route('app.organizations.depots.index')->withSuccess('Le dépôt a été créé avec succès');
+    }
+
+    public function edit(Depot $depot)
+    {
+        return Inertia::render('App/Organizations/Settings/Depots/Edit', [
+            'depot' => $depot,
         ]);
-
-        $organization->depots()->create($validated);
-
-        return back()->with('status', 'depot-created');
     }
 
     /**
      * Update the specified depot in storage.
      */
-    public function update(Request $request, Depot $depot)
+    public function update(StoreRequest $request, Depot $depot)
     {
         $this->authorize('update', $depot);
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'address' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country' => ['required', 'string', 'size:2'],
-        ]);
+        $depot->update($request->validated());
 
-        $depot->update($validated);
-
-        return back()->with('status', 'depot-updated');
+        return redirect()->route('app.organizations.depots.index')->withSuccess('Le dépôt a été mis à jour avec succès');
     }
 
     /**
@@ -71,8 +67,13 @@ class OrganizationDepotController extends Controller
     {
         $this->authorize('delete', $depot);
 
+        // Load equipments count if not already loaded
+        if (! $depot->relationLoaded('equipments')) {
+            $depot->load('equipments:id,name,depot_id');
+        }
+
         $depot->delete();
 
-        return back()->with('status', 'depot-deleted');
+        return redirect()->route('app.organizations.depots.index')->withSuccess('Le dépôt a été supprimé avec succès');
     }
 }

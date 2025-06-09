@@ -65,7 +65,7 @@ class Equipment extends Model
 
     public function depot()
     {
-        return $this->belongsTo(Depot::class);
+        return $this->belongsTo(Depot::class)->withTrashed();
     }
 
     public function category(): BelongsTo

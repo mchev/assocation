@@ -27,7 +27,7 @@ return new class extends Migration
             $table->json('images')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('depot_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('depot_id');
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->date('last_maintenance_date')->nullable();
             $table->date('next_maintenance_date')->nullable();

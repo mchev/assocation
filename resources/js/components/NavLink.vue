@@ -21,7 +21,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: 'md',
+    default: 'sm',
     validator: (value) => ['sm', 'md', 'lg'].includes(value)
   }
 })
@@ -48,7 +48,7 @@ const classes = computed(() => ({
     <component
       v-if="icon"
       :is="icon"
-      class="h-4 w-4"
+      class="size-4"
       :class="active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'"
     />
     <slot />
@@ -70,7 +70,7 @@ const classes = computed(() => ({
     <component
       v-if="icon"
       :is="icon"
-      class="h-4 w-4"
+      class="size-4"
       :class="active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'"
     />
     <slot />

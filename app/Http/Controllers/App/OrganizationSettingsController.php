@@ -8,11 +8,10 @@ use Inertia\Inertia;
 
 class OrganizationSettingsController extends Controller
 {
-    public function show(Request $request)
+    public function edit(Request $request)
     {
-        return Inertia::render('App/Organizations/Settings/Show', [
+        return Inertia::render('App/Organizations/Settings/Edit', [
             'organization' => $request->user()->currentOrganization,
-            'section' => 'general',
         ]);
     }
 
@@ -32,14 +31,12 @@ class OrganizationSettingsController extends Controller
 
         $request->user()->currentOrganization->update($validated);
 
-        return back()->with('status', 'organization-updated');
+        return back()->withSuccess('Les informations de l\'organisation ont été mises à jour avec succès.');
     }
 
     public function delete(Request $request)
     {
-        return Inertia::render('App/Organizations/Settings/Show', [
-            'organization' => $request->user()->currentOrganization,
-            'section' => 'delete',
-        ]);
+        // TODO: Implement delete action
+        abort(403, 'Opération non autorisée pour le moment.');
     }
 }

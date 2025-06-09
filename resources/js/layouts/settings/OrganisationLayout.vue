@@ -7,27 +7,33 @@ import { Link, usePage } from '@inertiajs/vue3';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profil',
-        href: '/settings/profile',
+        title: 'Informations',
+        href: '/app/organizations/settings',
     },
     {
-        title: 'Mot de passe',
-        href: '/settings/password',
+        title: 'Dépôts',
+        href: '/app/organizations/depots',
     },
     {
-        title: 'Apparence',
-        href: '/settings/appearance',
-    },
+        title: 'Membres',
+        href: '/app/organizations/members',
+    }
 ];
 
 const page = usePage();
 
-const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
+// Get the current route name from Inertia page props
+const currentRoute = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
+
+// Check if a nav item is active by comparing route names
+const isActive = (href: string) => {
+    return currentRoute.includes(href);
+};
 </script>
 
 <template>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Heading title="Mon compte" description="Gérez vos paramètres de profil et de compte" />
+        <Heading title="Paramètres de l'organisation" description="Gérez les paramètres de votre organisation" />
 
         <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-x-12 lg:space-y-0">
             <aside class="w-full max-w-xl lg:w-48">
@@ -36,7 +42,7 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
                         v-for="item in sidebarNavItems"
                         :key="item.href"
                         variant="ghost"
-                        :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"
+                        :class="['w-full justify-start', { 'bg-muted': isActive(item.href) }]"
                         as-child
                     >
                         <Link :href="item.href">
@@ -49,7 +55,7 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
             <Separator class="my-6 md:hidden" />
 
             <div class="flex-1 md:max-w-2xl">
-                <section class="max-w-xl space-y-12">
+                <section class="max-w-xl space-y-12 pb-12">
                     <slot />
                 </section>
             </div>

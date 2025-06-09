@@ -23,7 +23,7 @@ class EquipmentController extends Controller
 
     public function show(Request $request, Equipment $equipment)
     {
-        $equipment->load(['category', 'depot']);
+        $equipment->load(['category', 'depot', 'images']);
 
         return Inertia::render('Public/Equipments/Show', [
             'equipment' => $equipment,

@@ -43,8 +43,8 @@
                                             <span class="font-medium">Période de location:</span><br>
                                             {{ formatDate(item.rental_start) }} - {{ formatDate(item.rental_end) }}
                                         </p>
-                                        <p>
-                                            <span class="font-medium">Quantité:</span><br>
+                                        <div class="space-y-1">
+                                            <span class="font-medium">Quantité:</span>
                                             <div class="flex items-center gap-2 mt-1">
                                                 <Button
                                                     variant="outline"
@@ -65,7 +65,7 @@
                                                     <Plus class="h-4 w-4" />
                                                 </Button>
                                             </div>
-                                        </p>
+                                        </div>
                                         <p v-if="item.notes">
                                             <span class="font-medium">Notes:</span><br>
                                             {{ item.notes }}

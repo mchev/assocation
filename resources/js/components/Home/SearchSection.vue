@@ -1,35 +1,39 @@
 <template>
-  <div class="relative">
+  <div :class="{ 'relative mt-8': user }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Search Bar Container -->
       <div class="relative rounded-xl shadow-xl border border-gray-200/60">
         <!-- Search Header -->
-        <div class="px-6 pt-6 pb-4">
+        <div v-if="!user" class="px-6 pt-6 pb-4">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Trouvez le matériel dont vous avez besoin</h2>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Recherchez parmi des milliers d'équipements disponibles près de chez vous.</p>
         </div>
 
         <!-- Main Search Bar -->
         <div class="px-6 pb-6">
-          <div class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200/60 dark:bg-gray-800 dark:border-gray-700">
-            <!-- Search Input -->
-            <div class="flex-1">
-              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Que recherchez-vous ?</Label>
-              <SearchInput 
-                v-model="form.search" 
-                placeholder="Ex: Vidéoprojecteur, Enceinte, Table..." 
-              />
-            </div>
-
+          <div class="flex flex-col md:flex-row gap-4 p-4">
+            
             <!-- Location Input -->
             <div class="flex-1">
-              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Où ?</Label>
+              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Dans quel secteur ?</Label>
               <CityInput 
                 v-model="form.city"
                 @update:modelValue="handleCity"
                 placeholder="Entrez une ville ou un code postal"
               />
             </div>
+            
+            <!-- Search Input -->
+            <div class="flex-1">
+              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Que recherchez-vous ?</Label>
+              <SearchInput 
+                v-model="form.search" 
+                placeholder="Ex: Vidéoprojecteur, Enceinte, Table..." 
+                @search:submit="handleSearch"
+              />
+            </div>
+
+
 
             <!-- Search Button -->
             <div class="flex items-end">
@@ -38,7 +42,7 @@
                 size="lg"
                 :disabled="isSearching"
                 class="w-full md:w-auto min-w-[140px] bg-primary hover:bg-primary/90 shadow-sm dark:bg-primary dark:hover:bg-primary/90"
-                @click="onSearch"
+                @click="handleSearch"
               >
                 <Search v-if="!isSearching" class="h-5 w-5 mr-2" />
                 <span v-else class="h-5 w-5 mr-2">
@@ -48,63 +52,10 @@
               </Button>
             </div>
           </div>
-
-          <!-- Quick Filters -->
-          <div class="mt-4 flex items-center gap-4">
-            <!-- Advanced Filters Toggle -->
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              @click="showAdvancedFilters = !showAdvancedFilters"
-              class="text-sm group hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary"
-            >
-              <Filter 
-                class="h-4 w-4 mr-1.5 transition-transform duration-200" 
-                :class="{ 'rotate-180': showAdvancedFilters }" 
-              />
-              {{ showAdvancedFilters ? 'Masquer les filtres' : 'Filtres avancés' }}
-              <span 
-                v-if="activeFiltersCount" 
-                class="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs dark:bg-primary/10 dark:text-primary"
-              >
-                {{ activeFiltersCount }}
-              </span>
-            </Button>
-
-            <!-- Popular Categories -->
-            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <span class="hidden sm:inline">Populaire :</span>
-              <div class="flex flex-wrap gap-2">
-                <Button
-                  v-for="category in popularCategories"
-                  :key="category.id"
-                  variant="ghost"
-                  size="sm"
-                  class="text-xs hover:text-primary dark:hover:text-primary"
-                  @click="selectCategory(category)"
-                >
-                  {{ category.name }}
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- Advanced Filters -->
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="transform -translate-y-2 opacity-0"
-          enter-to-class="transform translate-y-0 opacity-100"
-          leave-active-class="transition duration-200 ease-in"
-          leave-from-class="transform translate-y-0 opacity-100"
-          leave-to-class="transform -translate-y-2 opacity-0"
-        >
-          <div
-            v-if="showAdvancedFilters"
-            class="px-6 pb-6"
-          >
-            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200/60 dark:bg-gray-800 dark:border-gray-700">
+          <div class="px-6 pb-6">
+            <div class="">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Category Select -->
                 <div class="space-y-2">
@@ -121,7 +72,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Select v-model="form.category">
+                  <Select v-model="form.category" @update:modelValue="handleSearch">
                     <SelectTrigger id="category" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
@@ -149,7 +100,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Select v-model="form.radius">
+                  <Select v-model="form.radius" @update:modelValue="handleSearch">
                     <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Sélectionner un rayon" />
                     </SelectTrigger>
@@ -178,58 +129,9 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        class="w-full justify-start text-left font-normal bg-white dark:bg-gray-800"
-                        :class="{ 'text-muted-foreground': !dateRange.from }"
-                      >
-                        <CalendarIcon class="mr-2 h-4 w-4" />
-                        <span v-if="dateRange.from">
-                          {{ format(dateRange.from, "LLL dd, y") }}
-                          <span v-if="dateRange.to">
-                            - {{ format(dateRange.to, "LLL dd, y") }}
-                          </span>
-                        </span>
-                        <span v-else>Sélectionner une période</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent class="w-auto p-0" align="start">
-                      <Calendar
-                        v-model:selected="dateRange"
-                        mode="range"
-                        :min="minDate"
-                        :max="maxDate"
-                        :numberOfMonths="2"
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <DateRangePicker v-model="dateRange" @update:modelValue="handleSearch" />
                 </div>
-
-                <!-- Availability Checkbox -->
-                <div class="flex items-start space-x-3 pt-8">
-                  <Checkbox
-                    id="available"
-                    v-model="form.available"
-                  />
-                  <div class="grid gap-1.5 leading-none">
-                    <Label 
-                      for="available" 
-                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Disponible uniquement
-                    </Label>
-                    <p class="text-xs text-muted-foreground">
-                      Afficher uniquement les équipements disponibles
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Reset Filters Button -->
-              <div v-if="activeFiltersCount > 0" class="mt-6 flex justify-end">
+                <div class="flex justify-end items-end">
                 <Button 
                   variant="outline"
                   size="sm"
@@ -239,10 +141,11 @@
                   <X class="h-4 w-4 mr-1.5" />
                   Réinitialiser les filtres
                 </Button>
+                </div>
+
               </div>
             </div>
           </div>
-        </Transition>
       </div>
     </div>
   </div>
@@ -250,18 +153,19 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { Search, Filter, HelpCircle, Calendar as CalendarIcon, X } from 'lucide-vue-next';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { Search, HelpCircle, X } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { parseDate, getLocalTimeZone } from '@internationalized/date';
 import SearchInput from './SearchInput.vue';
 import CityInput from './CityInput.vue';
+import DateRangePicker from '@/components/DateRangePicker.vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const user = page.props.auth.user;
 
 const props = defineProps({
   filters: {
@@ -271,16 +175,12 @@ const props = defineProps({
   stats: {
     type: Object,
     required: true
-  },
-  isSearching: {
-    type: Boolean,
-    default: false
   }
 });
 
-const emit = defineEmits(['search']);
+const emit = defineEmits(['searching']);
 
-const showAdvancedFilters = ref(false);
+const isSearching = ref(false);
 
 // Date range setup
 const today = new Date();
@@ -288,62 +188,48 @@ const minDate = today;
 const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
 
 const dateRange = ref({
-  from: props.filters.start_date ? new Date(props.filters.start_date) : undefined,
-  to: props.filters.end_date ? new Date(props.filters.end_date) : undefined
+  from: props.filters.start_date ? parseDate(props.filters.start_date) : undefined,
+  to: props.filters.end_date ? parseDate(props.filters.end_date) : undefined
 });
 
 // Watch for date range changes and update form values
 watch(dateRange, (newRange) => {
-  form.value.start_date = newRange.from ? newRange.from.toISOString().split('T')[0] : '';
-  form.value.end_date = newRange.to ? newRange.to.toISOString().split('T')[0] : '';
+  form.start_date = newRange.from ? newRange.from.toDate(getLocalTimeZone()).toISOString().split('T')[0] : '';
+  form.end_date = newRange.to ? newRange.to.toDate(getLocalTimeZone()).toISOString().split('T')[0] : '';
 }, { deep: true });
 
-const form = ref({
+const form = useForm({
   search: props.filters.search || '',
-  location: props.filters.location || '',
   radius: props.filters.radius || 50,
   category: props.filters.category || 'all',
-  available: props.filters.available || false,
-  min_price: props.filters.min_price || props.stats.min_price,
-  max_price: props.filters.max_price || props.stats.max_price,
   start_date: props.filters.start_date || '',
   end_date: props.filters.end_date || '',
   coordinates: props.filters.coordinates || null,
-  city: props.filters.city || null
+  city: props.filters.city || null,
+  postcode: props.filters.postcode || null
 });
 
-const hasActiveFilters = computed(() => {
-  return form.value.category !== 'all' || 
-         form.value.radius !== 10 || 
-         form.value.min_price || 
-         form.value.max_price || 
-         form.value.start_date || 
-         form.value.end_date || 
-         form.value.available;
-});
+const handleSearch = () => {
+  isSearching.value = true;
+  emit('searching', isSearching.value);
+  form.get(route('home'), {
+    only: ['filters', 'equipments'],
+    preserveScroll: true,
+    preserveState: true,
+    onFinish: () => {
+      isSearching.value = false;
+      emit('searching', isSearching.value);
+    }
+  });
+};
 
 const activeFiltersCount = computed(() => {
   let count = 0;
-  if (form.value.category !== 'all') count++;
-  if (form.value.radius !== 50) count++;
-  if (form.value.min_price) count++;
-  if (form.value.max_price) count++;
-  if (form.value.start_date) count++;
-  if (form.value.available) count++;
-  if (form.value.search) count++;
-  if (form.value.city) count++;
+  if (form.category !== 'all') count++;
+  if (form.radius !== 50) count++;
+  if (form.start_date) count++;
   return count;
 });
-
-// Popular categories for quick access
-const popularCategories = computed(() => {
-  return props.stats.categories.slice(0, 4); // Show top 4 categories
-});
-
-const selectCategory = (category) => {
-  form.value.category = category.id;
-  onSearch();
-};
 
 // Load filters from localStorage
 const loadFiltersFromStorage = () => {
@@ -351,18 +237,11 @@ const loadFiltersFromStorage = () => {
   if (savedFilters) {
     try {
       const parsedFilters = JSON.parse(savedFilters);
-      // Convert date strings back to Date objects if they exist
-      if (parsedFilters.start_date) {
-        dateRange.value.from = new Date(parsedFilters.start_date);
-      }
-      if (parsedFilters.end_date) {
-        dateRange.value.to = new Date(parsedFilters.end_date);
-      }
-      // Merge saved filters with default values
-      form.value = {
-        ...form.value,
-        ...parsedFilters
-      };
+      // Only update city, coordinates, and radius
+      form.city = parsedFilters.city || null;
+      form.coordinates = parsedFilters.coordinates || null;
+      form.radius = parsedFilters.radius || 50;
+      form.postcode = parsedFilters.postcode || null;
     } catch (e) {
       console.error('Error loading filters from localStorage:', e);
     }
@@ -372,7 +251,13 @@ const loadFiltersFromStorage = () => {
 // Save filters to localStorage
 const saveFiltersToStorage = (filters) => {
   try {
-    localStorage.setItem('search_filters', JSON.stringify(filters));
+    const filtersToSave = {
+      city: filters.city,
+      coordinates: filters.coordinates,
+      radius: filters.radius,
+      postcode: filters.postcode
+    };
+    localStorage.setItem('search_filters', JSON.stringify(filtersToSave));
   } catch (e) {
     console.error('Error saving filters to localStorage:', e);
   }
@@ -393,36 +278,29 @@ const resetFilters = () => {
     from: undefined,
     to: undefined
   };
-  form.value = {
-    search: form.value.search,
-    location: form.value.location,
+  form.reset({
+    search: '',
     radius: 50,
     category: 'all',
-    available: false,
-    min_price: props.stats.min_price,
-    max_price: props.stats.max_price,
     start_date: '',
     end_date: '',
     coordinates: null,
     city: null,
-    departement: null
-  };
+    postcode: null
+  });
   // Clear localStorage when resetting filters
   localStorage.removeItem('search_filters');
-  emit('search', form.value);
-};
-
-const onSearch = () => {
-  emit('search', form.value);
+  handleSearch();
 };
 
 // Handle city information
 const handleCity = (cityInfo) => {
-  form.value.city = cityInfo.name;
-  form.value.coordinates = {
+  form.city = cityInfo.name;
+  form.postcode = cityInfo.postcode;
+  form.coordinates = {
     lat: cityInfo.lat,
     lng: cityInfo.lng
   };
-  form.value.radius = form.value.radius || 5;
+  form.radius = form.radius || 5;
 };
 </script> 

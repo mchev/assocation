@@ -4,8 +4,8 @@ import { ref, computed } from 'vue'
 import NavLink from '@/components/NavLink.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 import CartMenu from '@/components/CartMenu.vue'
-import SearchInput from '@/components/Home/SearchInput.vue'
 import { Button } from '@/components/ui/button'
+import TopbarSearch from '@/components/TopbarSearch.vue'
 import { 
   Plus,
   LayoutDashboard,
@@ -61,7 +61,7 @@ const navigationItems = computed(() => [
 <template>
   <nav class="border-b border-gray-200 dark:border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
+      <div class="flex justify-between min-h-16">
         <div class="flex items-center">
           <!-- Logo -->
           <Link :href="route('home')" class="flex-shrink-0 flex items-center">
@@ -77,7 +77,7 @@ const navigationItems = computed(() => [
           </Link>
 
           <!-- Desktop Navigation -->
-          <div class="hidden md:ml-8 md:flex md:space-x-6">
+          <div class="hidden md:ml-6 md:flex md:space-x-4">
             <Button asChild v-if="!user" size="sm">
               <Link :href="route('app.organizations.equipments.create')" class="gap-2 flex items-center">
                 <Plus class="h-4 w-4" />
@@ -101,7 +101,7 @@ const navigationItems = computed(() => [
         <!-- Desktop Right Section -->
         <div class="hidden md:flex md:items-center md:space-x-4">
           <!-- Search (if needed) -->
-          <SearchInput v-if="$slots.search" class="w-72" />
+          <TopbarSearch v-if="user && !route().current('home')" />
           
           <!-- Auth Navigation -->
           <template v-if="user">
@@ -200,7 +200,7 @@ const navigationItems = computed(() => [
               Mon profil
             </Link>
             <Link
-              :href="route('app.organizations.settings')"
+              :href="route('app.organizations.settings.edit')"
               class="flex items-center gap-2 px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50"
             >
               <Settings class="h-5 w-5" />

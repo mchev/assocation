@@ -5,12 +5,14 @@
     <!-- Equipment Image -->
     <Link 
       :href="route('equipments.show', equipment)"
-      class="block aspect-[4/3] bg-accent/10 relative overflow-hidden"
+      class="block aspect-[16/9] bg-accent/10 relative overflow-hidden"
     >
       <img
-        v-if="equipment.image"
-        :src="equipment.image"
+        v-if="equipment.images && equipment.images.length > 0"
+        :src="equipment.images[0].url"
         :alt="equipment.name"
+        loading="lazy"
+        placeholder="blur"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
       />
       <div 

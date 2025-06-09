@@ -10,7 +10,7 @@
             v-model="cityQuery"
             type="text"
             class="flex-1 h-12 px-3 bg-transparent focus:outline-none"
-            placeholder="Où ?"
+            placeholder="Ajouter une localisation"
             :disabled="isLoading"
             @focus="showSuggestions = true"
           />
@@ -139,6 +139,7 @@ const selectSuggestion = (suggestion) => {
     name: suggestion.name,
     lat: suggestion.coordinates.lat,
     lng: suggestion.coordinates.lng,
+    postcode: suggestion.postcode,
     departement: suggestion.postcode.substring(0, 2)
   });
 };

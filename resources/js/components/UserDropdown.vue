@@ -32,7 +32,7 @@ const createOrganization = () => {
 }
 
 const goToSettings = () => {
-    router.visit(route('app.organizations.settings'))
+    router.visit(route('app.organizations.settings.edit'))
 }
 
 // Generate initials for organization avatar
@@ -102,7 +102,7 @@ const getOrganizationInitials = (name) => {
             <DropdownMenuSeparator />
             <DropdownMenuItem v-if="currentOrganization" @click="goToSettings" class="cursor-pointer">
                 <Cog6ToothIcon class="mr-2 h-4 w-4" />
-                <span>Paramètres de l'organisation actuelle</span>
+                <span>Paramètres de l'organisation</span>
             </DropdownMenuItem>
             <DropdownMenuItem @click="createOrganization" class="cursor-pointer">
                 <PlusIcon class="mr-2 h-4 w-4" />
@@ -114,7 +114,7 @@ const getOrganizationInitials = (name) => {
             <DropdownMenuItem as-child>
                 <Link :href="route('profile.edit')" class="w-full">
                     <UserIcon class="mr-2 h-4 w-4" />
-                    Mon profil
+                    Mon compte
                 </Link>
             </DropdownMenuItem>
             <DropdownMenuItem as-child>

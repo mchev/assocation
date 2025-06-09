@@ -2,7 +2,7 @@
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" class="relative">
-                <Truck class="size-6" />
+                <Truck class="size-5" />
                 <Badge v-if="totalItems > 0" variant="primary" class="absolute -top-2 -right-2 min-w-[20px] h-5">
                     {{ totalItems }}
                 </Badge>

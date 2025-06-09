@@ -2,6 +2,7 @@
 import Header from '@/layouts/partials/Header.vue'
 import Footer from '@/layouts/partials/Footer.vue'
 import { Head } from '@inertiajs/vue3'
+import FlashMessage from '@/components/FlashMessage.vue'
 
 defineProps({
   title: {
@@ -23,6 +24,14 @@ defineProps({
     </Head>
 
     <Header />
+    <FlashMessage />
+
+    <!-- Page Heading -->
+    <header class="dark:bg-muted/50 shadow" v-if="$slots.header">
+      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 font-title">
+        <slot name="header" />
+      </div>
+    </header>
 
     <main>
       <slot />

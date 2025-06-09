@@ -19,7 +19,7 @@
           </Link>
         </Button>
         <Button  asChild variant="outline" class="group">
-          <Link :href="route('app.organizations.settings')" class="flex items-center">
+          <Link :href="route('app.organizations.settings.edit')" class="flex items-center">
             <Settings class="i-lucide-settings mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
             Gérer l'organisation
           </Link>
