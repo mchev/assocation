@@ -15,25 +15,19 @@ class HomeController extends Controller
     {
 
         if ($request->user()) {
+            $cacheKey = 'user_preferences_'.$request->user()->id;
+            $userPreferences = Cache::get($cacheKey);
+            $locationData = $request->only(['coordinates', 'radius', 'city', 'postcode']);
 
-            // Get the cached user preferences
-            $userPreferences = Cache::get('user_preferences_'.$request->user()->id);
-
-            // Compare the user preferences with the request
-            if ($request->filled('coordinates') && $request->filled('radius') && $request->filled('city') && $request->filled('postcode')) {
-                if (! $userPreferences || $userPreferences['coordinates'] !== $request->coordinates || $userPreferences['radius'] !== $request->radius || $userPreferences['city'] !== $request->city || $userPreferences['postcode'] !== $request->postcode) {
-                    // Update the user preferences
-                    $request->user()->update([
-                        'preferences' => $request->only(['coordinates', 'radius', 'city', 'postcode']),
-                    ]);
-                    // Store the user preferences in the cache
-                    Cache::put('user_preferences_'.$request->user()->id, $request->only(['coordinates', 'radius', 'city', 'postcode']), 60 * 60 * 24 * 30);
-                    $userPreferences = $request->only(['coordinates', 'radius', 'city', 'postcode']);
-                }
+            if ($this->hasValidLocationData($request) && $this->shouldUpdatePreferences($userPreferences, $locationData)) {
+                $request->user()->update(['preferences' => $locationData]);
+                Cache::put($cacheKey, $locationData, now()->addDays(30));
+                $userPreferences = $locationData;
+            } else {
+                $userPreferences = null;
             }
-
         } else {
-            $userPreferences = $request->only(['coordinates', 'radius', 'city', 'postcode']);
+            $userPreferences = $this->hasValidLocationData($request) ? $request->only(['coordinates', 'radius', 'city', 'postcode']) : null;
         }
 
         $query = Equipment::query()
@@ -109,5 +103,15 @@ class HomeController extends Controller
             ],
             'stats' => $stats,
         ]);
+    }
+
+    private function hasValidLocationData(Request $request)
+    {
+        return $request->filled('coordinates') && $request->filled('radius') && $request->filled('city') && $request->filled('postcode');
+    }
+
+    private function shouldUpdatePreferences($userPreferences, $locationData)
+    {
+        return ! $userPreferences || $userPreferences['coordinates'] !== $locationData['coordinates'] || $userPreferences['radius'] !== $locationData['radius'] || $userPreferences['city'] !== $locationData['city'] || $userPreferences['postcode'] !== $locationData['postcode'];
     }
 }

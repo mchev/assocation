@@ -92,7 +92,7 @@ const advantages = [
                             <div class="mt-6 flex flex-wrap items-center gap-3 justify-center lg:justify-start">
                                 <Link
                                     :href="route('discover')"
-                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-500 dark:from-violet-400 dark:to-blue-400 dark:hover:from-violet-300 dark:hover:to-blue-300"
+                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-500 dark:from-violet-500 dark:to-blue-500 dark:hover:from-violet-600 dark:hover:to-blue-600"
                                 >
                                     Découvrir la plateforme
                                     <ArrowRightIcon class="ml-2 h-4 w-4" />
