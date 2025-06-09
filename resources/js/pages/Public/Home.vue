@@ -1,5 +1,8 @@
 <template>
-  <PublicLayout title="Location et prêt de matériel événementiel" description="Assodépôt facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements. ">
+  <PublicLayout 
+    title="Location et prêt de matériel événementiel" 
+    :description="`${appName} facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.`"
+  >
     <main class="min-h-screen bg-background">
       <!-- Hero Section -->
       <section class="relative pb-12">
@@ -34,7 +37,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
@@ -83,4 +86,7 @@ const search = (filters) => {
     }
   });
 };
+
+const page = usePage();
+const appName = page.props.name;
 </script> 

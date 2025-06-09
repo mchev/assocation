@@ -35,6 +35,21 @@ class Organization extends Model
         'subscription_ends_at' => 'datetime',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function ($organization) {
+            Depot::create([
+                'organization_id' => $organization->id,
+                'name' => 'Dépôt principal',
+                'address' => $organization->address,
+                'city' => $organization->city,
+                'postal_code' => $organization->postal_code,
+                'is_active' => true,
+            ]);
+        });
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

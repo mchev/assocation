@@ -2,19 +2,19 @@
   <div class="relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Search Bar Container -->
-      <div class="relative bg-white rounded-xl shadow-xl border border-gray-200/60">
+      <div class="relative rounded-xl shadow-xl border border-gray-200/60">
         <!-- Search Header -->
         <div class="px-6 pt-6 pb-4">
-          <h2 class="text-lg font-semibold text-gray-900">Trouvez le matériel dont vous avez besoin</h2>
-          <p class="mt-1 text-sm text-gray-500">Recherchez parmi des milliers d'équipements disponibles près de chez vous.</p>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Trouvez le matériel dont vous avez besoin</h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Recherchez parmi des milliers d'équipements disponibles près de chez vous.</p>
         </div>
 
         <!-- Main Search Bar -->
         <div class="px-6 pb-6">
-          <div class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200/60">
+          <div class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200/60 dark:bg-gray-800 dark:border-gray-700">
             <!-- Search Input -->
             <div class="flex-1">
-              <Label class="text-sm font-medium mb-2 text-gray-700">Que recherchez-vous ?</Label>
+              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Que recherchez-vous ?</Label>
               <SearchInput 
                 v-model="form.search" 
                 placeholder="Ex: Vidéoprojecteur, Enceinte, Table..." 
@@ -23,7 +23,7 @@
 
             <!-- Location Input -->
             <div class="flex-1">
-              <Label class="text-sm font-medium mb-2 text-gray-700">Où ?</Label>
+              <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Où ?</Label>
               <CityInput 
                 v-model="form.city"
                 @update:modelValue="handleCity"
@@ -37,7 +37,7 @@
                 type="submit"
                 size="lg"
                 :disabled="isSearching"
-                class="w-full md:w-auto min-w-[140px] bg-primary hover:bg-primary/90 shadow-sm"
+                class="w-full md:w-auto min-w-[140px] bg-primary hover:bg-primary/90 shadow-sm dark:bg-primary dark:hover:bg-primary/90"
                 @click="onSearch"
               >
                 <Search v-if="!isSearching" class="h-5 w-5 mr-2" />
@@ -57,7 +57,7 @@
               variant="outline"
               size="sm"
               @click="showAdvancedFilters = !showAdvancedFilters"
-              class="text-sm group hover:border-primary hover:text-primary"
+              class="text-sm group hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary"
             >
               <Filter 
                 class="h-4 w-4 mr-1.5 transition-transform duration-200" 
@@ -66,14 +66,14 @@
               {{ showAdvancedFilters ? 'Masquer les filtres' : 'Filtres avancés' }}
               <span 
                 v-if="activeFiltersCount" 
-                class="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs"
+                class="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs dark:bg-primary/10 dark:text-primary"
               >
                 {{ activeFiltersCount }}
               </span>
             </Button>
 
             <!-- Popular Categories -->
-            <div class="flex items-center gap-2 text-sm text-gray-500">
+            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <span class="hidden sm:inline">Populaire :</span>
               <div class="flex flex-wrap gap-2">
                 <Button
@@ -81,7 +81,7 @@
                   :key="category.id"
                   variant="ghost"
                   size="sm"
-                  class="text-xs hover:text-primary"
+                  class="text-xs hover:text-primary dark:hover:text-primary"
                   @click="selectCategory(category)"
                 >
                   {{ category.name }}
@@ -104,7 +104,7 @@
             v-if="showAdvancedFilters"
             class="px-6 pb-6"
           >
-            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200/60">
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200/60 dark:bg-gray-800 dark:border-gray-700">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Category Select -->
                 <div class="space-y-2">
@@ -122,7 +122,7 @@
                     </TooltipProvider>
                   </Label>
                   <Select v-model="form.category">
-                    <SelectTrigger id="category" class="w-full bg-white">
+                    <SelectTrigger id="category" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -150,7 +150,7 @@
                     </TooltipProvider>
                   </Label>
                   <Select v-model="form.radius">
-                    <SelectTrigger id="radius" class="w-full bg-white">
+                    <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Sélectionner un rayon" />
                     </SelectTrigger>
                     <SelectContent>
@@ -182,7 +182,7 @@
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        class="w-full justify-start text-left font-normal bg-white"
+                        class="w-full justify-start text-left font-normal bg-white dark:bg-gray-800"
                         :class="{ 'text-muted-foreground': !dateRange.from }"
                       >
                         <CalendarIcon class="mr-2 h-4 w-4" />
@@ -234,7 +234,7 @@
                   variant="outline"
                   size="sm"
                   @click="resetFilters"
-                  class="text-sm hover:text-destructive hover:border-destructive"
+                  class="text-sm hover:text-destructive hover:border-destructive dark:hover:text-destructive dark:hover:border-destructive"
                 >
                   <X class="h-4 w-4 mr-1.5" />
                   Réinitialiser les filtres

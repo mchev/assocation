@@ -73,6 +73,11 @@ class Equipment extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(EquipmentImage::class)->orderBy('order');
+    }
+
     public function availabilities(): HasMany
     {
         return $this->hasMany(Availability::class);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Equipment\StoreEquipmentAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
@@ -59,6 +60,11 @@ class EquipmentController extends Controller
                     ->orderBy('categories.name', $direction)
                     ->select('equipments.*');
                 break;
+            case 'depot':
+                $query->join('depots', 'equipments.depot_id', '=', 'depots.id')
+                    ->orderBy('depots.name', $direction)
+                    ->select('equipments.*');
+                break;
             default:
                 $query->orderBy($sort, $direction);
         }
@@ -76,10 +82,11 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function show(Request $request, Organization $organization, Equipment $equipment)
+    public function show(Request $request, Equipment $equipment)
     {
         $this->authorize('view', $equipment);
         $user = $request->user();
+        $organization = $user->currentOrganization;
 
         // Get current rental and upcoming rentals
         $currentDate = now();
@@ -100,7 +107,7 @@ class EquipmentController extends Controller
 
         return Inertia::render('App/Organizations/Equipments/Show', [
             'organization' => $organization,
-            'equipment' => array_merge($equipment->load('category', 'depot')->toArray(), [
+            'equipment' => array_merge($equipment->load('category', 'depot', 'images')->toArray(), [
                 'current_rental' => $currentRental ? [
                     'renter' => [
                         'name' => $currentRental->borrowerOrganization->name,
@@ -137,14 +144,20 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function store(StoreRequest $request, Organization $organization)
+    public function store(StoreRequest $request, StoreEquipmentAction $storeEquipmentAction)
     {
+        $organization = $request->user()->currentOrganization;
         $this->authorize('create', [Equipment::class, $organization]);
 
-        $organization->equipments()->create($request->validated());
+        $validated = $request->validated();
+        $validated['organization_id'] = $organization->id;
+        $images = $request->file('images', []);
 
-        return redirect()->route('app.organizations.equipments.index', $organization)
-            ->with('success', 'Matériel créé avec succès.');
+        $equipment = $storeEquipmentAction->execute($validated, $images);
+
+        return redirect()
+            ->route('app.organizations.equipments.index', $organization)
+            ->with('success', 'L\'équipement a été ajouté avec succès.');
     }
 
     public function edit(Organization $organization, Equipment $equipment)

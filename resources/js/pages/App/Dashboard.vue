@@ -4,6 +4,28 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
       
+      <!-- Quick Actions -->
+      <div class="flex flex-wrap gap-4">
+        <Button  asChild variant="default" class="group">
+          <Link :href="route('app.organizations.equipments.create')" class="flex items-center">
+            <PlusCircle class="i-lucide-plus-circle mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
+            Ajouter du matériel
+          </Link>
+        </Button>
+        <Button  asChild variant="outline" class="group">
+          <Link :href="route('app.organizations.reservations.create')" class="flex items-center">
+            <CalendarPlus class="i-lucide-calendar-plus mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
+            Créer une réservation
+          </Link>
+        </Button>
+        <Button  asChild variant="outline" class="group">
+          <Link :href="route('app.organizations.settings')" class="flex items-center">
+            <Settings class="i-lucide-settings mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
+            Gérer l'organisation
+          </Link>
+        </Button>
+      </div>
+
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -265,7 +287,7 @@
 </template>
 
 <script setup>
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head, Link, usePage } from '@inertiajs/vue3'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -275,6 +297,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { format, formatDistance } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { onMounted } from 'vue'
+import { PlusCircle, CalendarPlus, Settings } from 'lucide-vue-next'
 
 const user = usePage().props.auth.user
 

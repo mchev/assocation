@@ -65,8 +65,14 @@ const navigationItems = computed(() => [
         <div class="flex items-center">
           <!-- Logo -->
           <Link :href="route('home')" class="flex-shrink-0 flex items-center">
-            <h1 class="text-3xl font-bold font-title bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-              assodepot
+            <h1 class="flex items-baseline">
+              <span class="text-3xl font-bold font-title bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent">
+                asso
+              </span>
+              <span class="text-3xl font-bold font-title bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent relative">
+                cation
+                <span class="absolute -bottom-1.5 left-0 w-full h-0.5 bg-gradient-to-r from-violet-400 to-blue-600 rounded-full transform scale-x-100 transition-transform"></span>
+              </span>
             </h1>
           </Link>
 

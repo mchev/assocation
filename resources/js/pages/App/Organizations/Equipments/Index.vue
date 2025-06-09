@@ -151,24 +151,24 @@
                     </TableHead>
                     <TableHead 
                       class="cursor-pointer hover:bg-muted/50"
-                      @click="sort('condition')"
+                      @click="sort('is_available')"
                     >
                       <div class="flex items-center space-x-2">
-                        <span>État</span>
+                        <span>Dispo.</span>
                         <component
-                          :is="getSortIcon('condition')"
+                          :is="getSortIcon('is_available')"
                           class="w-4 h-4"
                         />
                       </div>
                     </TableHead>
                     <TableHead 
                       class="cursor-pointer hover:bg-muted/50"
-                      @click="sort('is_available')"
+                      @click="sort('depot')"
                     >
                       <div class="flex items-center space-x-2">
-                        <span>Disponibilité</span>
+                        <span>Emplacement</span>
                         <component
-                          :is="getSortIcon('is_available')"
+                          :is="getSortIcon('depot')"
                           class="w-4 h-4"
                         />
                       </div>
@@ -191,42 +191,26 @@
                 <TableBody>
                   <TableRow v-for="item in equipments.data" :key="item.id">
                     <TableCell class="font-medium">
-                      <Link :href="route('app.organizations.equipments.show', [organization, item])">{{ item.name }}</Link>
+                      <Link :href="route('app.organizations.equipments.show', item)">{{ item.name }}</Link>
                       <p class="text-sm text-muted-foreground truncate max-w-60">
                         {{ item.description }}
                       </p>
                     </TableCell>
                     <TableCell>{{ item.category.name }}</TableCell>
-                    <TableCell>
-                      <Badge
-                        :variant="{
-                          new: 'default',
-                          good: 'success',
-                          fair: 'warning',
-                          poor: 'destructive'
-                        }[item.condition]"
-                      >
-                        {{ {
-                          new: 'Neuf',
-                          good: 'Bon',
-                          fair: 'Moyen',
-                          poor: 'Mauvais'
-                        }[item.condition] }}
-                      </Badge>
+                    <TableCell class="text-center">
+                      <component
+                        :is="item.is_available ? CheckCircle : XCircle"
+                        :class="item.is_available ? 'text-success' : 'text-destructive'"
+                        class="w-4 h-4 mx-auto"
+                      />
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        :variant="item.is_available ? 'success' : 'destructive'"
-                      >
-                        {{ item.is_available ? 'Disponible' : 'Non disponible' }}
-                      </Badge>
-                      <Badge
-                        v-if="item.is_rentable"
-                        variant="secondary"
-                        class="ml-2"
-                      >
-                        Louable
-                      </Badge>
+                      <div class="max-w-40 flex flex-col">
+                        <span class="truncate font-medium">{{ item.depot.name }}</span>
+                        <span class="text-xs text-muted-foreground">
+                          {{ item.depot.city }}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell>{{ item.rental_price }}€</TableCell>
                     <TableCell class="text-right">
@@ -234,18 +218,24 @@
                         <Button
                           as="a"
                           :href="route('app.organizations.equipments.show', item)"
-                          size="sm"
+                          size="icon"
+                          variant="ghost"
+                          class="hover:bg-muted"
                         >
-                          Voir
+                          <Eye class="h-4 w-4" />
+                          <span class="sr-only">Voir</span>
                         </Button>
 
                         <Button
                           v-if="can.equipments.update"
                           as="a"
                           :href="route('app.organizations.equipments.edit', item)"
-                          size="sm"
+                          size="icon"
+                          variant="ghost"
+                          class="hover:bg-muted"
                         >
-                          Modifier
+                          <Pencil class="h-4 w-4" />
+                          <span class="sr-only">Modifier</span>
                         </Button>
                       </div>
                     </TableCell>
@@ -284,7 +274,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle, XCircle, Eye, Pencil, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps({
   organization: {

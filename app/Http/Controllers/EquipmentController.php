@@ -67,6 +67,7 @@ class EquipmentController extends Controller
         return Inertia::render('Organizations/Equipment/Show', [
             'organization' => $organization,
             'equipment' => $equipment,
+            'images' => $equipment->images,
             'can' => [
                 'update' => auth()->check() ? auth()->user()->can('update', $equipment) : false,
                 'delete' => auth()->check() ? auth()->user()->can('delete', $equipment) : false,

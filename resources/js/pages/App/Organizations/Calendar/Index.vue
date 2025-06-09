@@ -116,9 +116,9 @@ const createReservation = () => {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
             initialView: 'dayGridMonth',
             headerToolbar: {
-              left: 'prev,next today',
+              left: 'prev today',
               center: 'title',
-              right: 'dayGridMonth'
+              right: 'next'
             },
             events: calendarEvents,
             eventClick: handleEventClick,

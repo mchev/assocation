@@ -1,9 +1,12 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import { ArrowRightIcon, XIcon, ShieldCheckIcon, LayoutListIcon, UsersIcon, SparklesIcon } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+
+const page = usePage();
+const appName = page.props.name;
 
 const isVisible = ref(true)
 
@@ -53,11 +56,11 @@ const advantages = [
             <!-- Background with gradient -->
             <div class="absolute inset-0  rounded-2xl" />
             
-            <Card class="relative border-none bg-gradient-to-br from-gray-200 via-gray-50 to-background">
+            <Card class="relative border-none bg-gradient-to-br from-violet-100 via-blue-50 to-background dark:from-violet-950 dark:via-blue-950 dark:to-background">
                 <Button 
                     variant="ghost" 
                     size="icon"
-                    class="absolute right-3 top-3 hover:bg-gray-100/80" 
+                    class="absolute right-3 top-3 hover:bg-white/80" 
                     @click="closeHero"
                 >
                     <XIcon class="h-4 w-4" />
@@ -70,26 +73,26 @@ const advantages = [
                             <div class="space-y-4">
                                 <h1 
                                     id="hero-heading" 
-                                    class="text-2xl sm:text-3xl font-bold font-title text-gray-900 leading-tight"
+                                    class="text-2xl sm:text-3xl font-bold font-title text-gray-900 leading-tight dark:text-white"
                                 >
                                     <span class="inline-block">
                                         Location et prêt de matériel 
-                                        <span class="text-primary whitespace-nowrap">événementiel</span>
+                                        <span class="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent whitespace-nowrap dark:from-violet-400 dark:to-blue-400">événementiel</span>
                                     </span>
-                                    <span class="block text-lg sm:text-xl mt-2 text-gray-600 font-medium">
+                                    <span class="block text-lg sm:text-xl mt-2 text-gray-600 font-medium dark:text-gray-400">
                                         entre associations et particuliers
                                     </span>
                                 </h1>
                                 
-                                <p class="text-base text-gray-500 max-w-xl mx-auto lg:mx-0">
-                                    <strong class="text-gray-700">Assodépôt</strong> facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
+                                <p class="text-base text-gray-500 max-w-xl mx-auto lg:mx-0 dark:text-gray-400">
+                                    <strong class="text-gray-900 dark:text-white">{{ appName }}</strong> facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
                                 </p>
                             </div>
 
                             <div class="mt-6 flex flex-wrap items-center gap-3 justify-center lg:justify-start">
                                 <Link
                                     :href="route('discover')"
-                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-500 dark:from-violet-400 dark:to-blue-400 dark:hover:from-violet-300 dark:hover:to-blue-300"
                                 >
                                     Découvrir la plateforme
                                     <ArrowRightIcon class="ml-2 h-4 w-4" />
@@ -98,18 +101,18 @@ const advantages = [
                                     variant="outline"
                                     as="a"
                                     :href="route('how-it-works')"
-                                    class="text-sm"
+                                    class="text-sm border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900"
                                 >
                                     Comment ça marche ?
                                 </Button>
                             </div>
                         </div>
 
-                        <div class="hidden lg:block w-px h-32 bg-gray-200 self-center"></div>
+                        <div class="hidden lg:block w-px h-32 bg-gradient-to-b from-violet-200 to-blue-200 self-center dark:from-violet-800 dark:to-blue-800"></div>
 
                         <div class="flex-shrink-0 lg:w-80">
                             <div class="rounded-lg p-4">
-                                <h2 class="text-sm font-medium text-gray-900 mb-4">
+                                <h2 class="text-sm font-medium text-gray-900 mb-4 dark:text-white">
                                     Avantages de la plateforme
                                 </h2>
                                 <ul class="grid gap-3" role="list">
@@ -119,19 +122,19 @@ const advantages = [
                                         class="flex items-start gap-3 group"
                                     >
                                         <div 
-                                            class="rounded-md bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors duration-200"
-                                            :class="{ 'bg-primary/20': advantage.title === 'Gratuit' }"
+                                            class="rounded-md bg-gradient-to-br from-violet-100 to-blue-100 p-2 group-hover:from-violet-200 group-hover:to-blue-200 transition-colors duration-200 dark:from-violet-900 dark:to-blue-900"
+                                            :class="{ 'from-violet-200 to-blue-200 dark:from-violet-800 dark:to-blue-800': advantage.title === 'Gratuit' }"
                                         >
                                             <component 
                                                 :is="advantage.icon" 
-                                                class="w-4 h-4 text-primary"
+                                                class="w-4 h-4 text-violet-600 dark:text-violet-400"
                                             />
                                         </div>
                                         <div>
-                                            <h3 class="text-sm font-medium text-gray-900">
+                                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">
                                                 {{ advantage.title }}
                                             </h3>
-                                            <p class="text-xs text-gray-500 mt-0.5">
+                                            <p class="text-xs text-gray-500 mt-0.5 dark:text-gray-400">
                                                 {{ advantage.description }}
                                             </p>
                                         </div>

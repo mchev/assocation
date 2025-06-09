@@ -12,9 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('address');
-            $table->string('city');
-            $table->string('postal_code');
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('postal_code')->nullable();
             $table->string('country')->default('FR');
             $table->string('phone')->nullable();
             $table->string('email')->nullable();

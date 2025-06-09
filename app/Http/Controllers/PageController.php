@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +21,19 @@ class PageController extends Controller
      */
     public function discover(): Response
     {
-        return Inertia::render('Discover');
+        $popularCategories = Category::withCount('equipment')
+            ->orderByDesc('equipment_count')
+            ->take(4)
+            ->get()
+            ->map(fn ($category) => [
+                'name' => $category->name,
+                'count' => $category->equipment_count,
+                'description' => $category->description,
+            ]);
+
+        return Inertia::render('Discover', [
+            'popularCategories' => $popularCategories,
+        ]);
     }
 
     /**

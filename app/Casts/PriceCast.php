@@ -11,12 +11,15 @@ class PriceCast implements CastsAttributes
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  mixed  $value
-     * @return float
      */
-    public function get($model, string $key, $value, array $attributes)
+    public function get($model, string $key, $value, array $attributes): float
     {
-        // Convert from cents to decimal
-        return $value ? number_format($value / 100, 2, ',', '') : '0,00';
+        if ($value === null) {
+            return 0.00;
+        }
+
+        // Convert from cents to decimal with 2 decimal places
+        return round($value / 100, 2);
     }
 
     /**
