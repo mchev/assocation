@@ -86,7 +86,7 @@ class HomeController extends Controller
 
         // Get stats for filters
         $stats = [
-            'categories' => Category::select(['id', 'name', 'slug'])->orderBy('name')->get(),
+            'categories' => Category::select(['id', 'name'])->orderBy('name')->get(),
         ];
 
         return Inertia::render('Public/Home', [

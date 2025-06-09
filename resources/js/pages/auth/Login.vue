@@ -48,9 +48,11 @@ const submit = () => {
             <div class="space-y-6">
                 <!-- Social Login -->
                 <div class="grid gap-4">
-                    <Button variant="outline" class="w-full" @click="router.get(route('google.login'))">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2" />
-                        Continuer avec Google
+                    <Button variant="outline" class="w-full" asChild>
+                        <a href="/auth/google/redirect" rel="nofollow">
+                            <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2" />
+                            Continuer avec Google
+                        </a>
                     </Button>
                 </div>
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::prefix('carts')->name('carts.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
@@ -20,8 +21,11 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
 });
 
-Route::get('auth/google', [GoogleController::class, 'redirect'])
-    ->name('google.login');
+Route::get('/auth/google/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
 
-Route::get('auth/google/callback', [GoogleController::class, 'callback'])
-    ->name('google.callback');
+Route::get('/auth/google/callback', function () {
+    $user = Socialite::driver('google')->user();
+    dd($user);
+});
