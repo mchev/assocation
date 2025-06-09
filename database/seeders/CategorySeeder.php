@@ -64,7 +64,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements de sonorisation',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Lumière
             [
@@ -117,7 +117,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements d\'éclairage',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Vidéo
             [
@@ -165,7 +165,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements vidéo',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Structure
             [
@@ -208,7 +208,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements de structure',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Énergie
             [
@@ -246,7 +246,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements électriques',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Transport
             [
@@ -284,7 +284,7 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements de transport',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
             // Mobilier
             [
@@ -327,14 +327,14 @@ class CategorySeeder extends Seeder
                         'description' => 'Autres équipements de mobilier',
                         'icon' => 'more-horizontal',
                     ],
-                ]
+                ],
             ],
         ];
 
         foreach ($categories as $categoryData) {
             $children = $categoryData['children'] ?? [];
             unset($categoryData['children']);
-            
+
             $category = Category::create($categoryData);
 
             foreach ($children as $childData) {

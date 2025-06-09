@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Depot;
 use App\Models\Equipment;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -53,4 +53,4 @@ class AdminSeeder extends Seeder
         //     ]);
         // }
     }
-} 
+}

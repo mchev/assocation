@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Depot;
 use App\Models\Equipment;
-use App\Models\Category;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class OrganizationSeeder extends Seeder
@@ -47,4 +47,4 @@ class OrganizationSeeder extends Seeder
             }
         }
     }
-} 
+}

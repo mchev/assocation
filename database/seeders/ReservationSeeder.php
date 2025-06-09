@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ReservationItemStatus;
+use App\Enums\ReservationStatus;
 use App\Models\Equipment;
 use App\Models\Organization;
 use App\Models\Reservation;
 use App\Models\ReservationItem;
-use App\Enums\ReservationStatus;
-use App\Enums\ReservationItemStatus;
 use Illuminate\Database\Seeder;
 
 class ReservationSeeder extends Seeder
@@ -106,4 +106,4 @@ class ReservationSeeder extends Seeder
                 });
         });
     }
-} 
+}
