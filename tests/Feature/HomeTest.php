@@ -10,8 +10,8 @@ test('guest can view home page', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Public/Home')
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('equipments')
         );
 });
 
