@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { ref, computed } from 'vue'
-import { Head, usePage, router } from '@inertiajs/vue3'
+import { usePage, router } from '@inertiajs/vue3'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -10,7 +10,7 @@ import frLocale from '@fullcalendar/core/locales/fr'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CalendarDays, User, Package, CreditCard, Building2, Phone, Mail, Plus } from 'lucide-vue-next'
+import { CalendarDays, User, Package, CreditCard, Building2, Phone, Mail } from 'lucide-vue-next'
 
 const props = defineProps({
   reservations: {

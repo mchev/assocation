@@ -165,19 +165,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { useForm, router } from '@inertiajs/vue3';
-import Cart from '@/components/Cart.vue';
 import ImageGallery from '@/components/ImageGallery.vue';
 import ReservationForm from '@/Components/ReservationForm.vue';
-import { MapPin, Phone, Mail, Globe, Calendar, Clock, Users, Tag } from 'lucide-vue-next';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { addDays, format, isSameDay, isWithinInterval, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import axios from 'axios';
 
 const props = defineProps({
@@ -233,15 +224,6 @@ const formatSpecificationKey = (key) => {
     return key.split('_').map(word => 
         word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
-};
-
-const isDateUnavailable = (date) => {
-    const dateString = format(date, 'yyyy-MM-dd');
-    return availabilities.value[dateString] === false;
-};
-
-const isDateToday = (date) => {
-    return isSameDay(date, new Date());
 };
 
 const fetchAvailabilities = async (date) => {

@@ -251,14 +251,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -274,7 +273,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle, XCircle, Eye, Pencil, Trash2 } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle, XCircle, Eye, Pencil } from 'lucide-vue-next'
 
 const props = defineProps({
   organization: {

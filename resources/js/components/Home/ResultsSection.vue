@@ -81,7 +81,6 @@
 
 <script setup>
 import { computed } from 'vue';
-import Icon from '@/components/ui/icon/Icon.vue';
 import Pagination from '@/components/Pagination.vue';
 import EquipmentCard from './EquipmentCard.vue';
 import { Button } from '@/components/ui/button';

@@ -442,7 +442,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import {
   Stepper,
   StepperDescription,
@@ -459,7 +458,6 @@ import {
   CheckCircle,
   AlertCircle,
   XCircle,
-  ImagePlus,
   ClipboardList,
   Settings,
   Euro,
@@ -564,26 +562,6 @@ const form = useForm({
   specifications: {},
   images: [],
 })
-
-// FilePond options
-const pondOptions = {
-  allowMultiple: true,
-  allowReorder: true,
-  instantUpload: false,
-  allowImagePreview: true,
-  imagePreviewHeight: 170,
-  labelIdle: 'Glissez vos photos ici ou <span class="filepond--label-action">parcourez</span>',
-  labelFileProcessing: 'Chargement',
-  labelFileProcessingComplete: 'Chargement terminé',
-  labelFileProcessingAborted: 'Chargement annulé',
-  labelFileProcessingError: 'Erreur lors du chargement',
-  labelFileRemoveError: 'Erreur lors de la suppression',
-  labelTapToCancel: 'Cliquez pour annuler',
-  labelTapToRetry: 'Cliquez pour réessayer',
-  labelTapToUndo: 'Cliquez pour annuler',
-  acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-  maxFiles: 10,
-}
 
 // Handle FilePond events
 const handleFilePondInit = () => {

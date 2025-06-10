@@ -292,14 +292,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { format, formatDistance } from 'date-fns'
+import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { onMounted } from 'vue'
 import { PlusCircle, CalendarPlus, Settings } from 'lucide-vue-next'
-
-const user = usePage().props.auth.user
 
 const props = defineProps({
   organization: {
@@ -337,16 +333,6 @@ const props = defineProps({
   }
 })
 
-const formatDateTime = (date) => {
-  if (!date) return '---'
-  try {
-    return format(new Date(date), 'PPP à p', { locale: fr })
-  } catch (error) {
-    console.error('Error formatting date:', error)
-    return '---'
-  }
-}
-
 const formatDateRange = (startDate, endDate) => {
   if (!startDate || !endDate) return '---'
   try {
@@ -357,12 +343,6 @@ const formatDateRange = (startDate, endDate) => {
     console.error('Error formatting date range:', error)
     return '---'
   }
-}
-
-const getReservationItemsSummary = (items) => {
-  if (!items?.length) return 'Aucun équipement'
-  if (items.length === 1) return items[0].equipment.name
-  return `${items[0].equipment.name} + ${items.length - 1} autre${items.length > 2 ? 's' : ''}`
 }
 
 const formatPrice = (price) => {

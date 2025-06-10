@@ -182,11 +182,6 @@ const emit = defineEmits(['searching']);
 
 const isSearching = ref(false);
 
-// Date range setup
-const today = new Date();
-const minDate = today;
-const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
 const dateRange = ref({
   from: props.filters.start_date ? parseDate(props.filters.start_date) : undefined,
   to: props.filters.end_date ? parseDate(props.filters.end_date) : undefined
@@ -222,14 +217,6 @@ const handleSearch = () => {
     }
   });
 };
-
-const activeFiltersCount = computed(() => {
-  let count = 0;
-  if (form.category !== 'all') count++;
-  if (form.radius !== 50) count++;
-  if (form.start_date) count++;
-  return count;
-});
 
 // Load filters from localStorage
 const loadFiltersFromStorage = () => {

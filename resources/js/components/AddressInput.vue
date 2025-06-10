@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, computed, nextTick } from 'vue';
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { MapPin, X, Loader } from 'lucide-vue-next';
 import debounce from 'lodash/debounce';

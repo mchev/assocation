@@ -1,10 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
+import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RangeCalendar } from '@/components/ui/range-calendar'

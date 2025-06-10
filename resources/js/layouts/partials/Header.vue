@@ -20,7 +20,6 @@ import {
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
-const organization = computed(() => user.value?.current_organization)
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false)
