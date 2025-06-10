@@ -48,7 +48,7 @@ jobs:
       run: php artisan test
 
   deploy:
-    name: Deploy to Production
+    name: Deploy to Production to Forge
     needs: tests
     runs-on: ubuntu-latest
     environment: production
