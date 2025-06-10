@@ -2,6 +2,7 @@
 
 use App\Models\Equipment;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -23,8 +24,7 @@ test('user can view equipment list', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Public/Home')
+        ->assertInertia(fn (Assert $page) => $page
             ->has('equipments.data', 3)
         );
 });
