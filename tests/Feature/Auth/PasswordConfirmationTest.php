@@ -13,10 +13,10 @@ test('confirm password screen can be rendered', function () {
 });
 
 test('password can be confirmed', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['password' => Hash::make('Password123!')]);
 
     $response = $this->actingAs($user)->post('/confirm-password', [
-        'password' => 'password',
+        'password' => 'Password123!',
     ]);
 
     $response->assertRedirect();

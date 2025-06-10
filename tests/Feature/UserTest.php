@@ -13,7 +13,7 @@ test('user automatically gets a current organization on creation', function () {
 });
 
 test('user can set a different current organization', function () {
-    $user = User::factory()->withOrganization()->create();
+    $user = User::factory()->create();
     $newOrg = Organization::factory()->create();
 
     // Attach user to new organization
@@ -29,7 +29,7 @@ test('user can set a different current organization', function () {
 });
 
 test('user cannot set non-member organization as current', function () {
-    $user = User::factory()->withOrganization()->create();
+    $user = User::factory()->create();
     $otherOrg = Organization::factory()->create();
 
     $result = $user->setPrimaryOrganization($otherOrg);
@@ -39,7 +39,7 @@ test('user cannot set non-member organization as current', function () {
 });
 
 test('user always has a current organization', function () {
-    $user = User::factory()->withOrganization()->create();
+    $user = User::factory()->create();
     $org = $user->currentOrganization;
 
     // Remove current organization

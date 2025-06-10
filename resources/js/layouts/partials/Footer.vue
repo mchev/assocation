@@ -4,7 +4,7 @@
 </script>
 
 <template>
-    <footer class="bg-gray-50 dark:bg-gray-900">
+    <footer class="bg-gray-50 dark:bg-gray-900 mt-12">
         <div class="max-w-7xl mx-auto px-4 py-8">
             <p class="text-center text-sm text-gray-500 dark:text-gray-400">
                 &copy; {{ new Date().getFullYear() }} {{ name }}. Tous droits réservés.

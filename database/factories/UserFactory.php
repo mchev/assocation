@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Organization;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,31 +27,16 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make('Password123!'),
             'remember_token' => Str::random(10),
             'phone' => fake()->phoneNumber(),
             'avatar_path' => null,
             'is_active' => true,
             'last_login_at' => null,
+            'country' => 'FR',
             'preferred_language' => 'fr',
             'preferences' => [],
         ];
-    }
-
-    /**
-     * Configure the model factory to create a user with an organization.
-     */
-    public function withOrganization(): static
-    {
-        return $this->afterCreating(function (User $user) {
-            $organization = Organization::factory()->create([
-                'name' => $user->name."'s Organization",
-                'email' => $user->email,
-            ]);
-
-            $user->organizations()->attach($organization->id, ['role' => 'admin']);
-            $user->update(['current_organization_id' => $organization->id]);
-        });
     }
 
     /**

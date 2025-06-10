@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrganizationFactory extends Factory
@@ -79,7 +80,7 @@ class OrganizationFactory extends Factory
             'website' => $this->generateWebsite($name),
             'logo_path' => null,
             'is_active' => true,
-            'owner_id' => null, // Will be set when creating the organization
+            'owner_id' => User::factory(),
         ];
     }
 

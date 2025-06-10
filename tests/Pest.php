@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase as BaseTestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,9 +16,8 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+uses(BaseTestCase::class, RefreshDatabase::class)
+    ->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -26,8 +30,17 @@ pest()->extend(Tests\TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+expect()->extend('toBeValidationError', function () {
+    return $this->toBeInstanceOf(\Illuminate\Validation\ValidationException::class);
+});
+
+expect()->extend('toHaveValidationError', function (string $field) {
+    return expect($this->value->errors()->has($field))->toBeTrue();
+});
+
+expect()->extend('toBeRedirectedToLogin', function () {
+    return expect($this->value->status())->toBe(302)
+        ->and($this->value->headers->get('Location'))->toBe(route('login'));
 });
 
 /*
@@ -41,7 +54,22 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function actingAsUser(?User $user = null): TestCase
 {
-    // ..
+    return test()->actingAs($user ?? User::factory()->create());
+}
+
+function createUser(array $attributes = []): User
+{
+    return User::factory()->create($attributes);
+}
+
+function makeUser(array $attributes = []): User
+{
+    return User::factory()->make($attributes);
+}
+
+function route_without_query_params(string $route): string
+{
+    return explode('?', $route)[0];
 }

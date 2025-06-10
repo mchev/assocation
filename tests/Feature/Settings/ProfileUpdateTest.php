@@ -22,6 +22,8 @@ test('profile information can be updated', function () {
         ->patch('/settings/profile', [
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'country' => 'FR',
+            'preferred_language' => 'fr',
         ]);
 
     $response
@@ -32,6 +34,8 @@ test('profile information can be updated', function () {
 
     expect($user->name)->toBe('Test User');
     expect($user->email)->toBe('test@example.com');
+    expect($user->country)->toBe('FR');
+    expect($user->preferred_language)->toBe('fr');
     expect($user->email_verified_at)->toBeNull();
 });
 
@@ -43,6 +47,8 @@ test('email verification status is unchanged when the email address is unchanged
         ->patch('/settings/profile', [
             'name' => 'Test User',
             'email' => $user->email,
+            'country' => 'FR',
+            'preferred_language' => 'fr',
         ]);
 
     $response
@@ -58,7 +64,7 @@ test('user can delete their account', function () {
     $response = $this
         ->actingAs($user)
         ->delete('/settings/profile', [
-            'password' => 'password',
+            'password' => 'Password123!',
         ]);
 
     $response

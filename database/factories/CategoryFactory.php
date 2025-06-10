@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
@@ -28,8 +27,7 @@ class CategoryFactory extends Factory
         $name = $this->faker->unique()->words(rand(1, 3), true);
 
         return [
-            'name' => ucwords($name),
-            'slug' => Str::slug($name),
+            'name' => $name,
             'description' => $this->faker->optional(0.7)->sentence(),
             'parent_id' => null,
             'order' => $this->faker->numberBetween(0, 100),

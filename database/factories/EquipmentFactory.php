@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Depot;
 use App\Models\Equipment;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
@@ -104,7 +105,6 @@ class EquipmentFactory extends Factory
             // Si aucune catégorie n'existe, en créer une par défaut
             $category = Category::create([
                 'name' => 'Matériel technique',
-                'slug' => 'materiel-technique',
                 'description' => 'Matériel technique divers',
                 'order' => 0,
             ]);
@@ -127,6 +127,12 @@ class EquipmentFactory extends Factory
 
         $price = fake()->numberBetween($equipmentType['prices'][0] * 100, $equipmentType['prices'][1] * 100);
 
+        // Create organization with owner
+        $owner = User::factory()->create();
+        $organization = Organization::factory()->create([
+            'owner_id' => $owner->id,
+        ]);
+
         return [
             'name' => $name,
             'description' => $this->generateDescription($name, $specs),
@@ -138,9 +144,12 @@ class EquipmentFactory extends Factory
             'deposit_amount' => $price * 10,
             'requires_deposit' => fake()->boolean(),
             'specifications' => $specs,
-            'organization_id' => Organization::factory(),
-            'depot_id' => Depot::factory(),
+            'organization_id' => $organization->id,
+            'depot_id' => Depot::factory()->create([
+                'organization_id' => $organization->id,
+            ]),
             'category_id' => $category->id,
+            'is_available' => true,
         ];
     }
 
