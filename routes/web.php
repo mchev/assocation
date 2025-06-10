@@ -18,6 +18,9 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/', 'home')->name('home');
     Route::get('/decouvrir', 'discover')->name('discover');
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
+    Route::get('/mentions-legales', 'terms')->name('terms');
+    Route::get('/politique-de-confidentialite', 'privacy')->name('privacy');
+    Route::get('/conditions-generales-d-utilisation', 'conditions')->name('conditions');
 });
 
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
