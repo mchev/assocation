@@ -58,11 +58,11 @@
             <div class="">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Category Select -->
-                <CategoryTreeSelect
+                <!-- <CategoryTreeSelect
                   v-model="form.category"
                   :categories="stats.categories"
                   @update:modelValue="handleSearch"
-                />
+                /> -->
 
                 <!-- Radius Select -->
                 <div class="space-y-2">
