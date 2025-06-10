@@ -13,7 +13,6 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'slug',
         'description',
         'parent_id',
         'order',
@@ -33,27 +32,6 @@ class Category extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
-    }
-
-    /**
-     * Get all descendants of the category.
-     */
-    public function descendants()
-    {
-        return $this->children()->with('descendants');
-    }
-
-    /**
-     * Get all ancestors of the category.
-     */
-    public function ancestors()
-    {
-        return $this->parent()->with('ancestors');
-    }
-
-    public function scopeTree()
-    {
-        return $this->whereNull('parent_id')->with('descendants')->orderBy('name');
     }
 
     /**

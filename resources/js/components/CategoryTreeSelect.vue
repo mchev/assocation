@@ -1,17 +1,7 @@
 <template>
   <div class="space-y-1.5">
-    <Label :for="id" class="flex items-center gap-2 text-sm font-medium leading-none text-muted-foreground">
+    <Label :for="id" class="text-sm font-medium text-gray-700 dark:text-white">
       {{ label }}
-      <TooltipProvider v-if="tooltip">
-        <Tooltip :delayDuration="0">
-          <TooltipTrigger asChild>
-            <HelpCircle class="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-          </TooltipTrigger>
-          <TooltipContent side="right" class="text-xs bg-popover">
-            <p>{{ tooltip }}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
     </Label>
 
     <Popover v-model:open="isOpen" :modal="true">
@@ -22,7 +12,7 @@
           role="combobox" 
           :aria-expanded="isOpen"
           :aria-label="label"
-          class="w-full justify-between font-normal bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          class="w-full justify-between font-normal bg-white dark:bg-gray-800"
           :class="[
             !modelValue && 'text-muted-foreground',
             'focus-visible:ring-1 focus-visible:ring-ring',
@@ -50,7 +40,8 @@
       </PopoverTrigger>
       
       <PopoverContent 
-        class="w-screen p-0 sm:w-[var(--radix-popover-trigger-width)] shadow-lg"
+        class="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg"
+        :style="{ '--radix-popover-trigger-width': 'min(calc(100vw - 2rem), 400px)' }"
         :align="align"
         :side="side"
         :sideOffset="sideOffset"
@@ -59,8 +50,8 @@
         <Command class="rounded-lg border bg-popover">
           <CommandInput 
             v-model="searchQuery"
-            :placeholder="`Rechercher une catégorie...`"
-            class="h-9"
+            :placeholder="'Rechercher une catégorie...'"
+            class="h-11"
           />
           
           <CommandList class="max-h-[300px] overflow-y-auto overscroll-contain">
@@ -98,12 +89,60 @@
               
               <div class="px-1 py-2">
                 <template v-for="category in (searchQuery ? filteredCategories : categories)" :key="category.id">
-                  <RecursiveCategoryItem
-                    :category="category"
-                    :modelValue="modelValue"
-                    :searchQuery="searchQuery"
-                    @select="handleSelect"
-                  />
+                  <!-- Parent category -->
+                  <CommandItem 
+                    :value="category.name"
+                    @select="handleSelect(category)"
+                    class="rounded-sm cursor-pointer data-[selected=true]:bg-accent"
+                    :class="{ 'bg-accent': modelValue === category.id }"
+                  >
+                    <div class="flex items-center w-full gap-2">
+                      <Check 
+                        v-if="modelValue === category.id" 
+                        class="h-4 w-4 text-accent-foreground flex-shrink-0" 
+                      />
+                      <span 
+                        :class="[
+                          'flex-grow text-sm',
+                          modelValue === category.id ? 'pl-0 font-bold text-accent-foreground' : 'pl-6',
+                          'font-bold'
+                        ]"
+                      >
+                        {{ category.name }}
+                      </span>
+                      <ChevronRight 
+                        v-if="category.children?.length" 
+                        class="h-4 w-4 text-muted-foreground flex-shrink-0 opacity-75" 
+                      />
+                    </div>
+                  </CommandItem>
+
+                  <!-- Children categories -->
+                  <template v-if="category.children?.length">
+                    <CommandItem 
+                      v-for="child in category.children"
+                      :key="child.id"
+                      :value="child.name"
+                      @select="handleSelect(child)"
+                      class="rounded-sm cursor-pointer data-[selected=true]:bg-accent ml-4"
+                      :class="{ 'bg-accent': modelValue === child.id }"
+                    >
+                      <div class="flex items-center w-full gap-2">
+                        <Check 
+                          v-if="modelValue === child.id" 
+                          class="h-4 w-4 text-accent-foreground flex-shrink-0" 
+                        />
+                        <span 
+                          :class="[
+                            'flex-grow text-sm',
+                            modelValue === child.id ? 'pl-0 font-bold text-accent-foreground' : 'pl-6'
+                          ]"
+                        >
+                          {{ child.name }}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  </template>
                 </template>
               </div>
             </CommandGroup>
@@ -116,7 +155,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { HelpCircle, ChevronDown, Check, X } from 'lucide-vue-next';
+import { ChevronDown, ChevronRight, Check, X } from 'lucide-vue-next';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -129,8 +168,6 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import RecursiveCategoryItem from './RecursiveCategoryItem.vue';
 
 const props = defineProps({
   modelValue: {
@@ -152,10 +189,6 @@ const props = defineProps({
   allItemsLabel: {
     type: String,
     default: 'Toutes les catégories'
-  },
-  tooltip: {
-    type: String,
-    default: 'Filtrer par type d\'équipement'
   },
   align: {
     type: String,
@@ -180,39 +213,33 @@ const isOpen = ref(false);
 const selected = ref(null);
 const searchQuery = ref('');
 
-// Recursive function to search categories and their descendants
+// Simple search function that checks both parent and children
 const searchInCategory = (category, query) => {
-  const matchesSearch = category.name.toLowerCase().includes(query.toLowerCase());
+  if (!category || !query) return false;
+  
+  const lowerQuery = query.toLowerCase();
+  const matchesSearch = category.name.toLowerCase().includes(lowerQuery);
   
   if (matchesSearch) return true;
   
-  if (category.descendants?.length) {
-    return category.descendants.some(descendant => searchInCategory(descendant, query));
-  }
-  
-  return false;
+  return category.children?.some(child => 
+    child.name.toLowerCase().includes(lowerQuery)
+  ) || false;
 };
 
-// Recursive function to get all matching categories and their ancestors
-const getMatchingCategories = (categories, query) => {
-  return categories.reduce((matches, category) => {
-    if (searchInCategory(category, query)) {
-      const categoryWithFilteredDescendants = {
-        ...category,
-        descendants: category.descendants 
-          ? getMatchingCategories(category.descendants, query)
-          : []
-      };
-      matches.push(categoryWithFilteredDescendants);
-    }
-    return matches;
-  }, []);
-};
-
-// Computed property for filtered categories
+// Filtered categories computed property
 const filteredCategories = computed(() => {
   if (!searchQuery.value) return props.categories;
-  return getMatchingCategories(props.categories, searchQuery.value);
+  if (!props.categories?.length) return [];
+  
+  return props.categories.filter(category => 
+    searchInCategory(category, searchQuery.value)
+  ).map(category => ({
+    ...category,
+    children: category.children?.filter(child =>
+      child.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }));
 });
 
 const handleSelect = (category) => {
