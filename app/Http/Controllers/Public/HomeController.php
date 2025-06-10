@@ -8,6 +8,7 @@ use App\Models\Equipment;
 use App\Services\LocationPreferencesService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -46,6 +47,7 @@ class HomeController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
+        // Apply category filter
         if ($request->filled('category') && $request->category !== 'all') {
             $category = Category::find($request->category);
             if ($category) {
@@ -93,12 +95,14 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Category::with(['children' => function ($query) {
-                    $query->select('id', 'name', 'parent_id');
-                }])
-                    ->whereNull('parent_id')
-                    ->select('id', 'name')
-                    ->get(),
+                'categories' => Cache::remember('categories.tree', 3600, function() {
+                    return Category::with(['children' => function ($query) {
+                        $query->select('id', 'name', 'parent_id');
+                    }])
+                        ->whereNull('parent_id')
+                        ->select('id', 'name')
+                        ->get();
+                }),
             ],
         ]);
     }

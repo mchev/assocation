@@ -154,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { ChevronDown, ChevronRight, Check, X } from 'lucide-vue-next';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -206,6 +206,18 @@ const props = defineProps({
     type: Number,
     default: 0
   }
+});
+
+// Add debugging
+console.log('CategoryTreeSelect mounted with', props.categories.length, 'categories');
+
+// Watch for changes that might cause issues
+watch(() => props.categories, (newVal) => {
+  console.log('Categories changed:', newVal.length);
+}, { deep: true });
+
+watch(() => props.modelValue, (newVal) => {
+  console.log('Model value changed:', newVal);
 });
 
 const emit = defineEmits(['update:modelValue']);

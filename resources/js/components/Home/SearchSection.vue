@@ -58,11 +58,11 @@
             <div class="">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Category Select -->
-                <!-- <CategoryTreeSelect
+                <CategoryTreeSelect
                   v-model="form.category"
                   :categories="stats.categories"
                   @update:modelValue="handleSearch"
-                /> -->
+                />
 
                 <!-- Radius Select -->
                 <div class="space-y-2">
@@ -137,7 +137,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import CategoryTreeSelect from '@/components/CategoryTreeSelect.vue';
+import CategoryTreeSelect from '@/components/CategoryTreeSelectSimple.vue';
 import { parseDate, getLocalTimeZone } from '@internationalized/date';
 import SearchInput from './SearchInput.vue';
 import CityInput from './CityInput.vue';
@@ -176,7 +176,7 @@ watch(dateRange, (newRange) => {
 const form = useForm({
   search: props.filters.search || '',
   radius: props.filters.radius || 50,
-  category: props.filters.category || 'all',
+  // category: props.filters.category || 'all',  // Comment this out when CategoryTreeSelect is not used
   start_date: props.filters.start_date || '',
   end_date: props.filters.end_date || '',
   coordinates: props.filters.coordinates || null,
@@ -248,7 +248,7 @@ const resetFilters = () => {
   form.reset({
     search: '',
     radius: 50,
-    category: 'all',
+    // category: 'all',  // Comment this out when CategoryTreeSelect is not used
     start_date: '',
     end_date: '',
     coordinates: null,
