@@ -180,14 +180,14 @@ const isOpen = ref(false);
 const selected = ref(null);
 const searchQuery = ref('');
 
-// Recursive function to search categories and their descendants
+// Recursive function to search categories and their children
 const searchInCategory = (category, query) => {
   const matchesSearch = category.name.toLowerCase().includes(query.toLowerCase());
   
   if (matchesSearch) return true;
   
-  if (category.descendants?.length) {
-    return category.descendants.some(descendant => searchInCategory(descendant, query));
+  if (category.children?.length) {
+    return category.children.some(child => searchInCategory(child, query));
   }
   
   return false;
@@ -197,13 +197,13 @@ const searchInCategory = (category, query) => {
 const getMatchingCategories = (categories, query) => {
   return categories.reduce((matches, category) => {
     if (searchInCategory(category, query)) {
-      const categoryWithFilteredDescendants = {
+      const categoryWithFilteredChildren = {
         ...category,
-        descendants: category.descendants 
-          ? getMatchingCategories(category.descendants, query)
+        children: category.children 
+          ? getMatchingCategories(category.children, query)
           : []
       };
-      matches.push(categoryWithFilteredDescendants);
+      matches.push(categoryWithFilteredChildren);
     }
     return matches;
   }, []);

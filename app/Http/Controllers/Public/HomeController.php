@@ -49,14 +49,13 @@ class HomeController extends Controller
         if ($request->filled('category') && $request->category !== 'all') {
             $category = Category::find($request->category);
             if ($category) {
-                $categoryIds = collect([$category->id])
-                    ->merge($category->descendants()->pluck('id'))
-                    ->merge($category->ancestors()->pluck('id'))
-                    ->unique()
-                    ->values()
-                    ->toArray();
-
-                $query->whereIn('category_id', $categoryIds);
+                $query->where(function ($query) use ($category) {
+                    $query->where('category_id', $category->id)
+                        ->orWhereHas('category', function ($query) use ($category) {
+                            $query->where('parent_id', $category->id)
+                                ->orWhere('id', $category->parent_id);
+                        });
+                });
             }
         }
 
@@ -96,7 +95,7 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Category::tree()->get(),
+                'categories' => Category::whereNull('parent_id')->orderBy('name')->with('children')->get(),
             ],
         ]);
     }
