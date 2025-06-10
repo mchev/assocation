@@ -1,5 +1,5 @@
 <template>
-  <template v-if="category.children?.length">
+  <template v-if="category.descendants?.length">
     <CommandItem 
       :value="category.name"
       @select="$emit('select', category)"
@@ -26,9 +26,9 @@
 
     <div class="ml-3 pl-3 border-l border-border/50">
       <RecursiveCategoryItem
-        v-for="child in category.children"
-        :key="child.id"
-        :category="child"
+        v-for="descendant in category.descendants"
+        :key="descendant.id"
+        :category="descendant"
         :modelValue="modelValue"
         :searchQuery="searchQuery"
         @select="$emit('select', $event)"
