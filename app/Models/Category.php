@@ -51,9 +51,9 @@ class Category extends Model
         return $this->parent()->with('ancestors');
     }
 
-    public static function tree()
+    public function scopeTree()
     {
-        return self::whereNull('parent_id')->with('descendants')->orderBy('name');
+        return $this->whereNull('parent_id')->with('descendants')->orderBy('name');
     }
 
     /**
