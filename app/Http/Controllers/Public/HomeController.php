@@ -7,8 +7,8 @@ use App\Models\Category;
 use App\Models\Equipment;
 use App\Services\LocationPreferencesService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
 
 class HomeController extends Controller
 {
@@ -95,7 +95,7 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Cache::remember('categories.tree', 3600, function() {
+                'categories' => Cache::remember('categories.tree', 3600, function () {
                     return Category::with(['children' => function ($query) {
                         $query->select('id', 'name', 'parent_id');
                     }])

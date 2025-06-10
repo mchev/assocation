@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\App;
 
 use App\Actions\Equipment\StoreEquipmentAction;
+use App\Actions\Equipment\UpdateEquipmentAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
@@ -82,56 +83,6 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function show(Request $request, Equipment $equipment)
-    {
-        $this->authorize('view', $equipment);
-        $user = $request->user();
-        $organization = $user->currentOrganization;
-
-        // Get current rental and upcoming rentals
-        $currentDate = now();
-        $currentRental = $equipment->reservations()
-            ->with('borrowerOrganization:id,name')
-            ->where('reservations.start_date', '<=', $currentDate)
-            ->where('reservations.end_date', '>=', $currentDate)
-            ->where('reservations.status', 'approved')
-            ->first();
-
-        $upcomingRentals = $equipment->reservations()
-            ->with('borrowerOrganization:id,name')
-            ->where('reservations.start_date', '>', $currentDate)
-            ->where('reservations.status', 'approved')
-            ->orderBy('reservations.start_date')
-            ->take(5)
-            ->get();
-
-        return Inertia::render('App/Organizations/Equipments/Show', [
-            'organization' => $organization,
-            'equipment' => array_merge($equipment->load('category', 'depot', 'images')->toArray(), [
-                'current_rental' => $currentRental ? [
-                    'renter' => [
-                        'name' => $currentRental->borrowerOrganization->name,
-                    ],
-                    'start_date' => $currentRental->start_date->format('d/m/Y'),
-                    'end_date' => $currentRental->end_date->format('d/m/Y'),
-                ] : null,
-                'upcoming_rentals' => $upcomingRentals->map(function ($rental) {
-                    return [
-                        'renter' => [
-                            'name' => $rental->borrowerOrganization->name,
-                        ],
-                        'start_date' => $rental->start_date->format('d/m/Y'),
-                        'end_date' => $rental->end_date->format('d/m/Y'),
-                    ];
-                }),
-            ]),
-            'can' => [
-                'update' => $user->can('update', $equipment),
-                'delete' => $user->can('delete', $equipment),
-            ],
-        ]);
-    }
-
     public function create(Request $request)
     {
         $organization = $request->user()->currentOrganization;
@@ -160,9 +111,12 @@ class EquipmentController extends Controller
             ->with('success', 'L\'équipement a été ajouté avec succès.');
     }
 
-    public function edit(Organization $organization, Equipment $equipment)
+    public function edit(Request $request, Equipment $equipment)
     {
         $this->authorize('update', $equipment);
+        $organization = $request->user()->currentOrganization;
+
+        $equipment->load(['category', 'depot', 'images']);
 
         return Inertia::render('App/Organizations/Equipments/Edit', [
             'equipment' => $equipment,
@@ -176,7 +130,10 @@ class EquipmentController extends Controller
     {
         $this->authorize('update', $equipment);
 
-        $equipment->update($request->validated());
+        $validated = $request->validated();
+        $images = $request->file('images', []);
+
+        app(UpdateEquipmentAction::class)->execute($equipment, $validated, $images);
 
         return redirect()->route('app.organizations.equipments.index', $organization)
             ->with('success', 'Matériel modifié avec succès.');

@@ -37,7 +37,9 @@ class EquipmentPolicy
      */
     public function update(User $user, Equipment $equipment): bool
     {
-        return $user->isAdminOf($equipment->organization);
+        $organization = $user->currentOrganization;
+
+        return $user->isAdminOf($organization) && $equipment->organization_id === $organization->id;
     }
 
     /**

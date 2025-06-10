@@ -185,16 +185,22 @@
                         />
                       </div>
                     </TableHead>
-                    <TableHead class="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow v-for="item in equipments.data" :key="item.id">
+                  <TableRow 
+                    v-for="item in equipments.data" 
+                    :key="item.id"
+                    class="group cursor-pointer hover:bg-muted/50"
+                    @click="$inertia.visit(route('app.organizations.equipments.edit', item))"
+                  >
                     <TableCell class="font-medium">
-                      <Link :href="route('app.organizations.equipments.show', item)">{{ item.name }}</Link>
-                      <p class="text-sm text-muted-foreground truncate max-w-60">
-                        {{ item.description }}
-                      </p>
+                      <div>
+                        {{ item.name }}
+                        <p class="text-sm text-muted-foreground truncate max-w-60">
+                          {{ item.description }}
+                        </p>
+                      </div>
                     </TableCell>
                     <TableCell>{{ item.category.name }}</TableCell>
                     <TableCell class="text-center">
@@ -213,32 +219,6 @@
                       </div>
                     </TableCell>
                     <TableCell>{{ item.rental_price }}€</TableCell>
-                    <TableCell class="text-right">
-                      <div class="flex items-center justify-end space-x-2">
-                        <Button
-                          as="a"
-                          :href="route('app.organizations.equipments.show', item)"
-                          size="icon"
-                          variant="ghost"
-                          class="hover:bg-muted"
-                        >
-                          <Eye class="h-4 w-4" />
-                          <span class="sr-only">Voir</span>
-                        </Button>
-
-                        <Button
-                          v-if="can.equipments.update"
-                          as="a"
-                          :href="route('app.organizations.equipments.edit', item)"
-                          size="icon"
-                          variant="ghost"
-                          class="hover:bg-muted"
-                        >
-                          <Pencil class="h-4 w-4" />
-                          <span class="sr-only">Modifier</span>
-                        </Button>
-                      </div>
-                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
