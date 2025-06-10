@@ -51,6 +51,11 @@ class Category extends Model
         return $this->parent()->with('ancestors');
     }
 
+    public static function tree()
+    {
+        return self::whereNull('parent_id')->with('descendants')->orderBy('name');
+    }
+
     /**
      * Get the equipment in this category.
      */

@@ -58,32 +58,11 @@
             <div class="">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Category Select -->
-                <div class="space-y-2">
-                  <Label for="category" class="flex items-center gap-2">
-                    Catégorie
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <HelpCircle class="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Filtrer par type d'équipement</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </Label>
-                  <Select v-model="form.category" @update:modelValue="handleSearch">
-                    <SelectTrigger id="category" class="w-full bg-white dark:bg-gray-800">
-                      <SelectValue placeholder="Toutes les catégories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes les catégories</SelectItem>
-                      <SelectItem v-for="category in stats.categories" :key="category.id" :value="category.id">
-                        {{ category.name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CategoryTreeSelect
+                  v-model="form.category"
+                  :categories="stats.categories"
+                  @update:modelValue="handleSearch"
+                />
 
                 <!-- Radius Select -->
                 <div class="space-y-2">
@@ -158,6 +137,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import CategoryTreeSelect from '@/components/CategoryTreeSelect.vue';
 import { parseDate, getLocalTimeZone } from '@internationalized/date';
 import SearchInput from './SearchInput.vue';
 import CityInput from './CityInput.vue';

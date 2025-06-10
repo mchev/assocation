@@ -47,7 +47,17 @@ class HomeController extends Controller
         }
 
         if ($request->filled('category') && $request->category !== 'all') {
-            $query->where('category_id', $request->category);
+            $category = Category::find($request->category);
+            if ($category) {
+                $categoryIds = collect([$category->id])
+                    ->merge($category->descendants()->pluck('id'))
+                    ->merge($category->ancestors()->pluck('id'))
+                    ->unique()
+                    ->values()
+                    ->toArray();
+
+                $query->whereIn('category_id', $categoryIds);
+            }
         }
 
         // Apply location filter if preferences exist
@@ -69,6 +79,7 @@ class HomeController extends Controller
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereDoesntHave('reservations', function ($query) use ($request) {
                 $query->whereBetween('start_date', [$request->start_date, $request->end_date]);
+                $query->orWhereBetween('end_date', [$request->start_date, $request->end_date]);
             });
         }
 
@@ -85,7 +96,7 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Category::select(['id', 'name'])->orderBy('name')->get(),
+                'categories' => Category::tree()->get(),
             ],
         ]);
     }
