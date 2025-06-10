@@ -35,7 +35,6 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
 
     // Delete Organization
     Route::get('organizations/settings/delete', [OrganizationSettingsController::class, 'delete'])->name('organizations.settings.delete');
-    Route::delete('organizations', [OrganizationController::class, 'destroy'])->name('organizations.destroy');
 
     Route::resource('organizations', OrganizationController::class)->only(['create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('/calendar', [CalendarController::class, 'index'])->name('organizations.calendar');
