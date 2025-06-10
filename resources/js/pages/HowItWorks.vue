@@ -6,16 +6,13 @@ import {
     SearchIcon, 
     CalendarIcon, 
     MessageSquareIcon, 
-    CreditCardIcon, 
     PackageIcon, 
     CheckCircleIcon,
     ListIcon,
     UsersIcon,
     ShieldCheckIcon,
     ClockIcon,
-    EuroIcon,
     HeartIcon,
-    ChevronDownIcon
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {

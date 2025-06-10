@@ -35,14 +35,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
 
-const props = defineProps({
+defineProps({
   equipments: {
     type: Object,
     required: true

@@ -26,7 +26,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-const props = defineProps({
+defineProps({
     depots: {
         type: Array,
         default: () => [],

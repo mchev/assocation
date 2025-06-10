@@ -9,7 +9,7 @@
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
 
-const props = defineProps({
+defineProps({
   organization: Object,
   equipment: Object,
 })

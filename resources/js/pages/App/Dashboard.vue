@@ -287,7 +287,7 @@
 </template>
 
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { ref } from 'vue';
 
-const props = defineProps({
+defineProps({
     depots: {
         type: Array,
         default: () => [],

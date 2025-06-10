@@ -154,9 +154,8 @@
 
 <script setup>
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import { ref, computed, onMounted } from 'vue';
-import { toast } from 'vue-sonner';
-import { ShoppingCart, Truck, ArrowLeftIcon } from 'lucide-vue-next';
+import { ref, onMounted } from 'vue';
+import { Truck } from 'lucide-vue-next';
 import {
     Card,
     CardContent,
@@ -205,19 +204,6 @@ const formatDate = (date) => {
         month: 'long',
         day: 'numeric'
     });
-};
-
-const formatDay = (day) => {
-    const days = {
-        'monday': 'Lundi',
-        'tuesday': 'Mardi',
-        'wednesday': 'Mercredi',
-        'thursday': 'Jeudi',
-        'friday': 'Vendredi',
-        'saturday': 'Samedi',
-        'sunday': 'Dimanche'
-    };
-    return days[day] || day;
 };
 
 const formatSpecificationKey = (key) => {

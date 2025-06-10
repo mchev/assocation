@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import OrganisationLayout from '@/layouts/settings/OrganisationLayout.vue';
 import GeneralForm from './Partials/GeneralForm.vue';
 
-const props = defineProps({
+defineProps({
     organization: {
         type: Object,
         required: true,

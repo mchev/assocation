@@ -4,11 +4,8 @@ import { Head, usePage, Link } from '@inertiajs/vue3'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
-    SearchIcon, 
     MapPinIcon, 
     CalendarIcon,
-    TruckIcon,
-    HeartIcon,
     StarIcon,
     ShieldCheckIcon,
     UsersIcon
