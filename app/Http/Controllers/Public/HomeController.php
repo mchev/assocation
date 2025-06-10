@@ -46,18 +46,18 @@ class HomeController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        if ($request->filled('category') && $request->category !== 'all') {
-            $category = Category::find($request->category);
-            if ($category) {
-                $query->where(function ($query) use ($category) {
-                    $query->where('category_id', $category->id)
-                        ->orWhereHas('category', function ($query) use ($category) {
-                            $query->where('parent_id', $category->id)
-                                ->orWhere('id', $category->parent_id);
-                        });
-                });
-            }
-        }
+        // if ($request->filled('category') && $request->category !== 'all') {
+        //     $category = Category::find($request->category);
+        //     if ($category) {
+        //         $query->where(function ($query) use ($category) {
+        //             $query->where('category_id', $category->id)
+        //                 ->orWhereHas('category', function ($query) use ($category) {
+        //                     $query->where('parent_id', $category->id)
+        //                         ->orWhere('id', $category->parent_id);
+        //                 });
+        //         });
+        //     }
+        // }
 
         // Apply location filter if preferences exist
         if ($locationPreferences && isset($locationPreferences['coordinates'], $locationPreferences['radius'])) {
@@ -95,7 +95,7 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Category::whereNull('parent_id')->orderBy('name')->with('children')->get(),
+                'categories' => null //Category::whereNull('parent_id')->orderBy('name')->with('children')->get(),
             ],
         ]);
     }
