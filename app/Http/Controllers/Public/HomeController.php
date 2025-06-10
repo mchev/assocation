@@ -96,7 +96,7 @@ class HomeController extends Controller
                 'postcode' => $locationPreferences['postcode'] ?? null,
             ],
             'stats' => [
-                'categories' => Category::tree()->get(),
+                'categories' => null,//Category::tree()->get(),
             ],
         ]);
     }
