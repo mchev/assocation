@@ -80,18 +80,11 @@
                         <CardContent class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-muted-foreground">Prix de location</span>
-                                <span class="text-2xl font-bold">{{ formatPrice(equipment.rental_price) }} €</span>
+                                <span class="text-2xl font-bold">{{ formatPrice(equipment.rental_price) }} € / jour</span>
                             </div>
                             <div v-if="equipment.requires_deposit" class="flex items-center justify-between">
                                 <span class="text-muted-foreground">Caution requise</span>
                                 <span class="font-medium">{{ formatPrice(equipment.deposit_amount) }} €</span>
-                            </div>
-                            <Separator />
-                            <div class="flex items-center justify-between">
-                                <span class="text-muted-foreground">Disponibilité</span>
-                                <Badge :variant="equipment.is_available ? 'success' : 'destructive'">
-                                    {{ equipment.is_available ? 'Disponible' : 'Indisponible' }}
-                                </Badge>
                             </div>
                         </CardContent>
                     </Card>
@@ -104,15 +97,10 @@
                     <!-- Location Card -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Localisation</CardTitle>
+                            <CardTitle>Localisation : {{ equipment.depot?.city }}</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
-                            <div class="space-y-2">
-                                <p class="font-medium">{{ equipment.depot?.name }}</p>
-                                <p class="text-muted-foreground">
-                                    {{ equipment.depot?.city }}
-                                </p>
-                            </div>
+                            <EquipmentMiniMap :city="equipment.depot?.city" />
                             <Separator />
                             <div class="space-y-2">
                                 <h4 class="font-medium">Informations de contact</h4>
@@ -166,8 +154,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import ImageGallery from '@/components/ImageGallery.vue';
-import ReservationForm from '@/Components/ReservationForm.vue';
+import ReservationForm from '@/components/ReservationForm.vue';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import EquipmentMiniMap from '@/components/EquipmentMiniMap.vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -215,13 +204,12 @@ const formatSpecificationKey = (key) => {
 const fetchAvailabilities = async (date) => {
     loading.value = true;
     try {
-        const response = await axios.get(`/api/equipments/${props.equipment.id}/availability`, {
-            params: {
-                month: date.getMonth() + 1,
-                year: date.getFullYear()
-            }
-        });
-        availabilities.value = response.data.availabilities;
+        const response = await axios.get(route('api.equipments.reservations-dates-by-month', {
+            equipment: props.equipment.id,
+            start: date.toISOString(),
+            end: date.toISOString()
+        }));
+        availabilities.value = response.data;
     } catch (error) {
         console.error('Erreur lors du chargement des disponibilités:', error);
     } finally {

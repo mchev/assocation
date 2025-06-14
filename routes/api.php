@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,12 +31,14 @@ Route::middleware([
     config('jetstream.auth_middleware'),
 ])->group(function () {});
 
+// Equipment routes
+Route::get('/equipments/{equipment}/available-quantity', [EquipmentController::class, 'availableQuantity'])
+    ->name('api.equipments.available-quantity');
+Route::get('/equipments/{equipment}/reservations-dates-by-month', [EquipmentController::class, 'reservationsDatesByMonth'])
+    ->name('api.equipments.reservations-dates-by-month');
+
 // Category routes
 Route::apiResource('categories', CategoryController::class);
 Route::get('categories/tree', [CategoryController::class, 'tree']);
-
-// Routes pour les disponibilités
-Route::get('/equipments/{equipment}/availability', [AvailabilityController::class, 'getMonthlyAvailability']);
-Route::post('/equipments/{equipment}/availability', [AvailabilityController::class, 'updateAvailability']);
 
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('api.search.suggestions');

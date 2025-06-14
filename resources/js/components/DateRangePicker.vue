@@ -63,6 +63,7 @@ const buttonClasses = computed(() => {
     </PopoverTrigger>
     <PopoverContent class="w-auto p-0">
       <RangeCalendar 
+        v-bind="$attrs" 
         v-model="value" 
         initial-focus 
         :number-of-months="1" 

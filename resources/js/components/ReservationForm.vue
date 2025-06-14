@@ -10,6 +10,9 @@
                         <Label>Période de location</Label>
                         <DateRangePicker
                             v-model="dateRange"
+                            start-day="1"
+                            :min-date="new Date()"
+                            locale="fr-FR"
                             :disabled="false"
                         />
                     </div>
@@ -19,18 +22,16 @@
                             id="quantity" 
                             type="number" 
                             v-model="form.quantity"
-                            :min="1"
-                            :disabled="false"
+                            :min="0"
+                            :max="availableQuantity"
+                            :disabled="disableQuantityField"
                         />
-                    </div>
-                    <div class="space-y-2">
-                        <Label for="notes">Notes</Label>
-                        <Textarea 
-                            id="notes" 
-                            v-model="form.notes"
-                            placeholder="Ajoutez des besoins spécifiques ou des questions..."
-                            :disabled="false"
-                        />
+                        <p v-if="availableQuantity > 0" class="text-xs text-gray-500">
+                            {{ availableQuantity }} disponible{{ availableQuantity > 1 ? 's' : '' }} pour la période sélectionnée.
+                        </p>
+                        <p v-else class="text-xs text-red-500">
+                            Aucune disponibilité pour la période sélectionnée.
+                        </p>
                     </div>
                 </div>
             </form>
@@ -39,7 +40,7 @@
             <Button 
                 type="submit"
                 form="reservation-form"
-                :disabled="!isReservationValid"
+                :disabled="!form.quantity || !form.rental_start || !form.rental_end || form.quantity <= 0"
                 @click="handleReservation"
             >
                 <Truck class="mr-2 h-4 w-4" />
@@ -50,7 +51,8 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
+import axios from 'axios';
 import { useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { Truck } from 'lucide-vue-next';
@@ -69,6 +71,9 @@ const props = defineProps({
     }
 });
 
+const disableQuantityField = ref(true);
+const availableQuantity = ref(0);
+
 const dateRange = ref({
     from: null,
     to: null
@@ -78,52 +83,32 @@ const form = useForm({
     rental_start: null,
     rental_end: null,
     quantity: 1,
-    notes: ''
 });
 
-// Update form values when dateRange changes
-const updateFormDates = (newValue) => {
-    form.rental_start = newValue.from instanceof CalendarDate 
-        ? newValue.from.toDate(getLocalTimeZone())
-        : newValue.from;
-    form.rental_end = newValue.to instanceof CalendarDate 
-        ? newValue.to.toDate(getLocalTimeZone())
-        : newValue.to;
-};
+watch(dateRange, (newValue) => {
 
-const isReservationValid = computed(() => {
-    if (!dateRange.value.from || !dateRange.value.to) {
-        return false;
-    }
-    
-    const start = dateRange.value.from instanceof CalendarDate 
-        ? dateRange.value.from.toDate(getLocalTimeZone())
-        : new Date(dateRange.value.from);
-    const end = dateRange.value.to instanceof CalendarDate 
-        ? dateRange.value.to.toDate(getLocalTimeZone())
-        : new Date(dateRange.value.to);
-    const today = new Date();
-    
-    // Reset time components for all dates to compare only dates
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    
-    // Validate that:
-    // 1. Start date is not in the past
-    // 2. End date is after start date
-    // 3. Quantity is positive
-    const isValid = start >= today && end > start && form.quantity > 0;
-    
-    return isValid;
-});
+    disableQuantityField.value = true;
 
-// Watch for changes in dateRange and update form values
-watch(dateRange, updateFormDates, { deep: true });
+    if (!newValue.from || !newValue.to) return;
+
+    let start = newValue.from instanceof CalendarDate ? newValue.from.toDate(getLocalTimeZone()) : newValue.from;
+    let end = newValue.to instanceof CalendarDate ? newValue.to.toDate(getLocalTimeZone()) : newValue.to;
+
+    axios.get(route('api.equipments.available-quantity', {
+        equipment: props.equipment.id,
+        start: start,
+        end: end
+    })).then(response => {
+        availableQuantity.value = response.data;
+        disableQuantityField.value = false;
+    });
+
+    form.rental_start = start;
+    form.rental_end = end;
+
+}, { deep: true });
 
 const handleReservation = () => {
-    if (!isReservationValid.value) return;
-
     form.post(route('carts.add', props.equipment.id), {
         onSuccess: () => {
             toast.success('Article ajouté au camion');
