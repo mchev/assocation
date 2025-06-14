@@ -111,7 +111,7 @@ class Equipment extends Model
         return (int) $availableQuantity;
     }
 
-    public function reservationsDatesByMonth($date)
+    public function reservationsDatesByMonth($month, $year)
     {
         // Returns : [
         //     'equipment_id' => 1,
@@ -119,26 +119,56 @@ class Equipment extends Model
         //     'status' => 'confirmed',
         // ]
 
+        $startOfMonth = Carbon::parse($year.'-'.$month.'-01')->startOfMonth();
+        $endOfMonth = Carbon::parse($year.'-'.$month.'-01')->endOfMonth();
+
         $reservations = $this->reservations()
+            ->whereHas('items', function ($query) {
+                $query->where('equipment_id', $this->id);
+            })
             ->whereIn('reservations.status', [ReservationStatus::CONFIRMED, ReservationStatus::PENDING])
-            ->where('start_date', '<=', Carbon::parse($date)->startOfMonth()->format('Y-m-d'))
-            ->where('end_date', '>=', Carbon::parse($date)->endOfMonth()->format('Y-m-d'))
+            ->where(function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where(function ($q) use ($startOfMonth, $endOfMonth) {
+                    // Réservations qui commencent dans le mois
+                    $q->where('start_date', '>=', $startOfMonth)
+                        ->where('start_date', '<=', $endOfMonth);
+                })->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
+                    // Réservations qui se terminent dans le mois
+                    $q->where('end_date', '>=', $startOfMonth)
+                        ->where('end_date', '<=', $endOfMonth);
+                })->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
+                    // Réservations qui englobent le mois
+                    $q->where('start_date', '<=', $startOfMonth)
+                        ->where('end_date', '>=', $endOfMonth);
+                });
+            })
             ->get();
 
         // For each reservation, get the dates between startDate and endDate
         $dates = [];
-        $reservations->each(function ($reservation) use (&$dates) {
-            $period = CarbonPeriod::create($reservation->start_date, $reservation->end_date);
+        $reservations->each(function ($reservation) use (&$dates, $startOfMonth) {
+            $period = CarbonPeriod::between(
+                Carbon::parse($reservation->start_date)->startOfDay(),
+                Carbon::parse($reservation->end_date)->endOfDay()
+            );
+
             foreach ($period as $date) {
-                $dates[] = [
-                    'equipment_id' => $reservation->equipment_id,
-                    'date' => $date->format('Y-m-d'),
-                    'status' => $reservation->status,
-                ];
+                // Ne garder que les dates du mois demandé
+                if ($date->format('Y-m') === $startOfMonth->format('Y-m')) {
+                    $dates[] = [
+                        'equipment_id' => $this->id,
+                        'date' => $date->format('Y-m-d'),
+                        'status' => $reservation->status,
+                        'color' => match ($reservation->status) {
+                            ReservationStatus::CONFIRMED => 'red',
+                            ReservationStatus::PENDING => 'orange',
+                            default => 'green',
+                        },
+                    ];
+                }
             }
         });
 
         return $dates;
-
     }
 }

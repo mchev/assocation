@@ -1,7 +1,7 @@
 <template>
     <Card>
         <CardHeader>
-            <CardTitle>Faire une réservation</CardTitle>
+            <CardTitle>Faire une demande de réservation</CardTitle>
         </CardHeader>
         <CardContent>
             <form id="reservation-form" @submit.prevent="handleReservation">

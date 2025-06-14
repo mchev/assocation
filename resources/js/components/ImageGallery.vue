@@ -9,7 +9,8 @@ import {
     X, 
     ZoomIn, 
     ZoomOut,
-    Loader2
+    Loader2,
+    Image
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -19,16 +20,22 @@ const props = defineProps({
     }
 })
 
-const featuredImage = props.images[0]
-const remainingImages = props.images.slice(1)
-
 const selectedImage = ref(null)
 const isDialogOpen = ref(false)
 const currentImageIndex = ref(0)
 const isLoading = ref(false)
 const zoomLevel = ref(1)
 
-const allImages = computed(() => [featuredImage, ...remainingImages])
+const allImages = computed(() => props.images)
+
+// Calculate how many placeholder cards we need
+const placeholderCount = computed(() => {
+    const count = allImages.value.length
+    if (count === 0) return 3
+    if (count === 1) return 2
+    if (count === 2) return 1
+    return 0
+})
 
 const openImageDialog = (image) => {
     selectedImage.value = image
@@ -117,45 +124,38 @@ onUnmounted(() => {
 
 <template>
     <div class="space-y-6">
-        <!-- Featured Image -->
-        <Card 
-            v-if="featuredImage" 
-            class="overflow-hidden cursor-pointer group"
-            @click="openImageDialog(featuredImage)"
-        >
-            <CardContent class="p-0 relative">
-                <AspectRatio :ratio="16/9">
-                    <img 
-                        :src="featuredImage.url" 
-                        :alt="featuredImage.original_name"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                    >
-                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <ZoomIn class="w-8 h-8 text-white" />
-                    </div>
-                </AspectRatio>
-            </CardContent>
-        </Card>
-
-        <!-- Remaining Images Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Images Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Actual Images -->
             <Card 
-                v-for="image in remainingImages" 
+                v-for="image in allImages" 
                 :key="image.id" 
-                class="overflow-hidden group cursor-pointer"
+                class="overflow-hidden group cursor-pointer p-0"
                 @click="openImageDialog(image)"
             >
-                <CardContent class="p-0 relative">
-                    <AspectRatio :ratio="1">
-                        <img 
-                            :src="image.url" 
-                            :alt="image.original_name" 
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                        >
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <ZoomIn class="w-6 h-6 text-white" />
+                <CardContent class="p-0 relative h-full w-full">
+                    <img 
+                        :src="image.url" 
+                        :alt="image.original_name" 
+                        class="object-cover group-hover:scale-105 transition-transform duration-300 h-full w-full"
+                        loading="lazy"
+                    >
+                    <div class="absolute inset-0 bg-black/40 dark:bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <ZoomIn class="w-6 h-6 text-white dark:text-black" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Placeholder Cards -->
+            <Card 
+                v-for="i in placeholderCount" 
+                :key="`placeholder-${i}`"
+                class="overflow-hidden bg-gray-50/50 dark:bg-gray-900/50"
+            >
+                <CardContent class="p-0">
+                    <AspectRatio :ratio="4/3">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <Image class="w-8 h-8 text-gray-200 dark:text-gray-700" />
                         </div>
                     </AspectRatio>
                 </CardContent>
@@ -173,7 +173,7 @@ onUnmounted(() => {
                     <!-- Close button -->
                     <button 
                         @click="isDialogOpen = false"
-                        class="absolute top-4 right-4 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/75 transition-colors"
+                        class="absolute top-4 right-4 z-50 rounded-full bg-black/50 dark:bg-white/50 p-2 text-white dark:text-black hover:bg-black/75 dark:hover:bg-white/75 transition-colors"
                         aria-label="Close dialog"
                     >
                         <X class="w-6 h-6" />
@@ -183,7 +183,7 @@ onUnmounted(() => {
                     <div class="absolute top-4 left-4 z-50 flex gap-2">
                         <button 
                             @click="handleZoom('out')"
-                            class="rounded-full bg-black/50 p-2 text-white hover:bg-black/75 transition-colors"
+                            class="rounded-full bg-black/50 dark:bg-white/50 p-2 text-white dark:text-black hover:bg-black/75 dark:hover:bg-white/75 transition-colors"
                             :disabled="zoomLevel <= 1"
                             aria-label="Zoom out"
                         >
@@ -191,7 +191,7 @@ onUnmounted(() => {
                         </button>
                         <button 
                             @click="handleZoom('in')"
-                            class="rounded-full bg-black/50 p-2 text-white hover:bg-black/75 transition-colors"
+                            class="rounded-full bg-black/50 dark:bg-white/50 p-2 text-white dark:text-black hover:bg-black/75 dark:hover:bg-white/75 transition-colors"
                             :disabled="zoomLevel >= 3"
                             aria-label="Zoom in"
                         >
@@ -203,7 +203,7 @@ onUnmounted(() => {
                     <button 
                         v-if="currentImageIndex > 0"
                         @click="navigateImage('prev')"
-                        class="absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/75 transition-colors"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 dark:bg-white/50 p-2 text-white dark:text-black hover:bg-black/75 dark:hover:bg-white/75 transition-colors"
                         aria-label="Previous image"
                     >
                         <ChevronLeft class="w-8 h-8" />
@@ -212,7 +212,7 @@ onUnmounted(() => {
                     <button 
                         v-if="currentImageIndex < allImages.length - 1"
                         @click="navigateImage('next')"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 p-2 text-white hover:bg-black/75 transition-colors"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-black/50 dark:bg-white/50 p-2 text-white dark:text-black hover:bg-black/75 dark:hover:bg-white/75 transition-colors"
                         aria-label="Next image"
                     >
                         <ChevronRight class="w-8 h-8" />
@@ -221,21 +221,21 @@ onUnmounted(() => {
                     <!-- Loading spinner -->
                     <div 
                         v-if="isLoading"
-                        class="absolute inset-0 flex items-center justify-center bg-black/50"
+                        class="absolute inset-0 flex items-center justify-center bg-black/50 dark:bg-white/50"
                     >
-                        <Loader2 class="w-8 h-8 text-white animate-spin" />
+                        <Loader2 class="w-8 h-8 text-white dark:text-black animate-spin" />
                     </div>
 
                     <!-- Image -->
                     <div 
-                        class="overflow-auto max-h-[90vh] flex items-center justify-center"
+                        class="overflow-auto max-h-[90vh] flex items-center justify-center bg-gray-50 dark:bg-gray-900"
                         :style="{ cursor: zoomLevel > 1 ? 'move' : 'default' }"
                     >
                         <img 
                             v-if="selectedImage"
                             :src="selectedImage.url" 
                             :alt="selectedImage.original_name"
-                            class="w-full h-auto transition-transform duration-300"
+                            class="w-full h-auto object-contain transition-transform duration-300"
                             :style="{ transform: `scale(${zoomLevel})` }"
                             @load="handleImageLoad"
                             loading="lazy"
@@ -243,7 +243,7 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Image counter -->
-                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-3 py-1 rounded-full text-white text-sm">
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 dark:bg-white/50 px-3 py-1 rounded-full text-white dark:text-black text-sm">
                         {{ currentImageIndex + 1 }} / {{ allImages.length }}
                     </div>
                 </div>

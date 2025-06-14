@@ -20,25 +20,10 @@
                         </CardHeader>
                     </Card>
 
-                    <!-- Image Gallery -->
-                    <Card>
-                        <CardContent class="p-0">
-                            <div class="relative aspect-[16/9] w-full bg-muted">
-                                <ImageGallery v-if="equipment.images && equipment.images.length > 0" :images="equipment.images" />
-                                <template v-else>
-                                    <div class="w-full h-full flex items-center justify-center rounded-t-lg">
-                                        <div class="text-center space-y-2">
-                                            <Truck class="w-12 h-12 mx-auto text-muted-foreground" />
-                                            <p class="text-muted-foreground font-medium">{{ equipment.name }}</p>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <ImageGallery v-if="equipment.images && equipment.images.length > 0" :images="equipment.images" />
 
                     <!-- Equipment Details -->
-                    <Card>
+                    <Card v-if="equipment.specifications || equipment.last_maintenance_date || equipment.next_maintenance_date">
                         <CardContent class="space-y-6">
 
                             <!-- Specifications -->
@@ -108,30 +93,7 @@
                                 <p class="text-muted-foreground">{{ equipment.depot?.email }}</p>
                             </div>
                             <Separator />
-                            <div class="space-y-4">
-                                <h4 class="font-medium">Disponibilités</h4>
-                                <div v-if="loading" class="flex justify-center py-4">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                </div>
-                                <CalendarComponent
-                                    v-else
-                                    :disabled="true"
-                                    :modifiers="{ today: false }"
-                                    :month="currentDate"
-                                    @update:month="handleMonthChange"
-                                    class="rounded-md border"
-                                />
-                                <div class="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <div class="flex items-center gap-1">
-                                        <div class="size-2 rounded-full bg-primary"></div>
-                                        <span>Disponible</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <div class="size-2 rounded-full bg-destructive"></div>
-                                        <span>Indisponible</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <EquipmentCalendar :equipment="equipment" />
                         </CardContent>
                     </Card>
                 </div>
@@ -143,7 +105,6 @@
 <script setup>
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { ref, onMounted } from 'vue';
-import { Truck } from 'lucide-vue-next';
 import {
     Card,
     CardContent,
@@ -155,9 +116,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import ImageGallery from '@/components/ImageGallery.vue';
 import ReservationForm from '@/components/ReservationForm.vue';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import EquipmentMiniMap from '@/components/EquipmentMiniMap.vue';
-import axios from 'axios';
+import EquipmentCalendar from '@/components/EquipmentCalendar.vue';
 
 const props = defineProps({
     equipment: {
@@ -201,28 +161,5 @@ const formatSpecificationKey = (key) => {
     ).join(' ');
 };
 
-const fetchAvailabilities = async (date) => {
-    loading.value = true;
-    try {
-        const response = await axios.get(route('api.equipments.reservations-dates-by-month', {
-            equipment: props.equipment.id,
-            start: date.toISOString(),
-            end: date.toISOString()
-        }));
-        availabilities.value = response.data;
-    } catch (error) {
-        console.error('Erreur lors du chargement des disponibilités:', error);
-    } finally {
-        loading.value = false;
-    }
-};
 
-const handleMonthChange = (date) => {
-    currentDate.value = date;
-    fetchAvailabilities(date);
-};
-
-onMounted(() => {
-    fetchAvailabilities(currentDate.value);
-});
 </script>

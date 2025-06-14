@@ -11,11 +11,11 @@ class EquipmentController extends Controller
     public function reservationsDatesByMonth(Equipment $equipment, Request $request)
     {
         $request->validate([
-            'start' => 'required|date',
-            'end' => 'required|date',
+            'month' => 'required|integer',
+            'year' => 'required|integer',
         ]);
 
-        $reservations = $equipment->reservationsDatesByMonth($request->start, $request->end);
+        $reservations = $equipment->reservationsDatesByMonth($request->month, $request->year);
 
         return response()->json($reservations);
     }
