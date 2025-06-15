@@ -9,10 +9,11 @@
                         <CardHeader>
                             <div class="space-y-2">
                                 <div class="flex items-center gap-2">
-                                    <Badge variant="outline">{{ equipment.category?.name }}</Badge>
-                                    <Badge :variant="getConditionVariant(equipment.condition)">
-                                        {{ equipment.condition }}
+                                    <Badge :variant="primary">
+                                        <User class="w-4 h-4" />
+                                        {{ equipment.organization?.name }}
                                     </Badge>
+                                    <Badge variant="outline">{{ equipment.category?.name }}</Badge>
                                 </div>
                                 <CardTitle class="text-3xl">{{ equipment.name }}</CardTitle>
                                 <CardDescription class="text-lg">{{ equipment.description }}</CardDescription>
@@ -87,12 +88,6 @@
                         <CardContent class="space-y-4">
                             <EquipmentMiniMap :city="equipment.depot?.city" />
                             <Separator />
-                            <div class="space-y-2">
-                                <h4 class="font-medium">Informations de contact</h4>
-                                <p class="text-muted-foreground">{{ equipment.depot?.phone }}</p>
-                                <p class="text-muted-foreground">{{ equipment.depot?.email }}</p>
-                            </div>
-                            <Separator />
                             <EquipmentCalendar :equipment="equipment" />
                         </CardContent>
                     </Card>
@@ -117,6 +112,7 @@ import ImageGallery from '@/components/ImageGallery.vue';
 import ReservationForm from '@/components/ReservationForm.vue';
 import EquipmentMiniMap from '@/components/EquipmentMiniMap.vue';
 import EquipmentCalendar from '@/components/EquipmentCalendar.vue';
+import { User } from 'lucide-vue-next';
 
 defineProps({
     equipment: {

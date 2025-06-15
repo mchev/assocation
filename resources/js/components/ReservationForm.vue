@@ -99,7 +99,13 @@ watch(dateRange, (newValue) => {
         end: end
     })).then(response => {
         availableQuantity.value = response.data;
-        disableQuantityField.value = false;
+        if (availableQuantity.value > 0) {
+            disableQuantityField.value = false;
+            form.quantity = 1;
+        }
+        if (availableQuantity.value === 0) {
+            form.quantity = 0;
+        }
     });
 
     form.rental_start = start;

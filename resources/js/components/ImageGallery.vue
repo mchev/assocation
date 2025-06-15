@@ -150,7 +150,7 @@ onUnmounted(() => {
             <Card 
                 v-for="i in placeholderCount" 
                 :key="`placeholder-${i}`"
-                class="overflow-hidden bg-gray-50/50 dark:bg-gray-900/50"
+                class="hidden lg:block overflow-hidden bg-gray-50/50 dark:bg-gray-900/50"
             >
                 <CardContent class="p-0">
                     <AspectRatio :ratio="4/3">
