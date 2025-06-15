@@ -121,16 +121,6 @@ defineProps({
     }
 });
 
-const getConditionVariant = (condition) => {
-    const variants = {
-        'new': 'success',
-        'good': 'default',
-        'fair': 'warning',
-        'poor': 'destructive'
-    };
-    return variants[condition] || 'default';
-};
-
 const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR', {
         minimumFractionDigits: 2,
