@@ -104,7 +104,6 @@
 
 <script setup>
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import { ref, onMounted } from 'vue';
 import {
     Card,
     CardContent,
@@ -119,16 +118,12 @@ import ReservationForm from '@/components/ReservationForm.vue';
 import EquipmentMiniMap from '@/components/EquipmentMiniMap.vue';
 import EquipmentCalendar from '@/components/EquipmentCalendar.vue';
 
-const props = defineProps({
+defineProps({
     equipment: {
         type: Object,
         required: true
     }
 });
-
-const currentDate = ref(new Date());
-const availabilities = ref({});
-const loading = ref(false);
 
 const getConditionVariant = (condition) => {
     const variants = {
