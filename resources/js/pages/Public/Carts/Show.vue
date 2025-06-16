@@ -1,6 +1,14 @@
 <template>
-    <PublicLayout>
-        <div class="container py-6">
+    <PublicLayout title="Mon camion" description="Vérifier le chargement avant de confirmer votre demande">
+        <template #header>
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-xl font-semibold">Mon camion</h1>
+                <p class="text-sm text-muted-foreground">
+                    Vérifiez bien les dates et les quantités avant de confirmer votre demande.
+                </p>
+            </div>
+        </template>
+        <div class="max-w-7xl mx-auto py-6">
             <!-- Empty cart state -->
             <div v-if="items.length === 0" class="flex flex-col items-center justify-center py-12">
                 <Truck class="h-16 w-16 text-muted-foreground mb-4" />
@@ -18,31 +26,25 @@
                 <!-- Items list -->
                 <div class="lg:col-span-2 space-y-6">
                     <div v-for="group in items" :key="group.organization.id" class="space-y-4">
-                        <Card>
+                        <Card class="bg-secondary/50">
                             <CardHeader>
-                                <CardTitle class="flex items-center gap-2">
-                                    <img 
-                                        v-if="group.organization.logo" 
-                                        :src="group.organization.logo" 
-                                        :alt="group.organization.name"
-                                        class="w-8 h-8 rounded-full object-cover"
-                                    />
-                                    <span>{{ group.organization.name }}</span>
+                                <CardTitle>
+                                    <span class="uppercase font-medium">{{ group.organization.name }}</span>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-4">
                                 <Card v-for="(item, index) in group.items" :key="item.equipment.id" class="group">
-                                    <CardContent class="p-6">
-                                        <div class="flex gap-6">
+                                    <CardContent class="px-4">
+                                        <div class="flex flex-wrap gap-6">
                                             <!-- Item image -->
                                             <div class="relative">
                                                 <img
                                                     v-if="item.image"
                                                     :src="item.image"
                                                     :alt="item.equipment.name"
-                                                    class="w-32 h-32 object-cover rounded-lg"
+                                                    class="w-12 h-12 lg:w-32 lg:h-32 object-cover rounded-lg"
                                                 />
-                                                <div v-else class="w-32 h-32 bg-muted rounded-lg flex items-center justify-center">
+                                                <div v-else class="w-12 h-12 lg:w-32 lg:h-32 bg-muted rounded-lg flex items-center justify-center">
                                                     <Camera class="h-10 w-10 text-muted-foreground" />
                                                 </div>
                                             </div>
@@ -52,8 +54,7 @@
                                                 <h3 class="text-lg font-semibold mb-2">{{ item.equipment.name }}</h3>
                                                 <div class="space-y-2 text-sm text-muted-foreground">
                                                     <p>
-                                                        <span class="font-medium">Période de location:</span><br>
-                                                        {{ formatDate(item.rental_start) }} - {{ formatDate(item.rental_end) }}
+                                                        du {{ formatDate(item.rental_start) }} au {{ formatDate(item.rental_end) }}
                                                     </p>
                                                     <div class="space-y-1">
                                                         <span class="font-medium">Quantité:</span>
@@ -86,7 +87,7 @@
                                             </div>
 
                                             <!-- Item price and actions -->
-                                            <div class="text-right">
+                                            <div class="lg:text-right space-y-2">
                                                 <p class="text-lg font-semibold">
                                                     {{ formatPrice(item.total) }}
                                                 </p>
@@ -98,11 +99,11 @@
                                                 </p>
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon"
-                                                    class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    @click="removeItem(index)"
+                                                    class="text-destructive"
+                                                    size="sm"
+                                                    @click="removeItem(item)"
                                                 >
-                                                    <Trash class="h-4 w-4" />
+                                                    <Trash class="h-4 w-4" /> Retirer
                                                 </Button>
                                             </div>
                                         </div>
@@ -121,41 +122,10 @@
                             </CardContent>
                         </Card>
                     </div>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle class="flex items-center gap-2">
-                                <Info class="h-5 w-5 text-primary" />
-                                Informations importantes
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div class="space-y-4">
-                                <div class="flex gap-3">
-                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">
-                                        <AlertTriangle class="h-4 w-4" />
-                                    </div>
-                                    <p class="text-sm text-orange-500">Les demandes de réservation en attente depuis plus d'une semaine seront automatiquement annulées.</p>
-                                </div>
-                                <div class="flex gap-3">
-                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                        <User class="h-4 w-4" />
-                                    </div>
-                                    <p class="text-sm">Vous pouvez consulter vos réservations en cours dans votre espace personnel.</p>
-                                </div>
-                                <div class="flex gap-3">
-                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                        <CreditCard class="h-4 w-4" />
-                                    </div>
-                                    <p class="text-sm">Les paiements et arrangements financiers se font directement avec les propriétaires des équipements, en dehors de la plateforme.</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
                 </div>
 
                 <!-- Order summary -->
-                <div class="lg:col-span-1">
+                <div class="lg:col-span-1 space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle>Récapitulatif de la réservation</CardTitle>
@@ -185,7 +155,7 @@
                                         <div class="space-y-3 text-sm">
                                             <div class="flex gap-3">
                                                 <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">1</div>
-                                                <p>Vous notifiez les propriétaires des équipements sélectionnés en cliquant sur le bouton "Confirmer ma demande".</p>
+                                                <p>Vous notifiez les organisations propriétaires des équipements sélectionnés en cliquant sur le bouton "Confirmer ma demande".</p>
                                             </div>
                                             <div class="flex gap-3">
                                                 <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">2</div>
@@ -200,13 +170,11 @@
                             </div>
 
                             <Button 
-                                    asChild 
                                     class="w-full"
                                     :disabled="isProcessing"
+                                    @click="showConfirmationModal = true"
                                 >
-                                    <Link :href="route('checkout.index')">
-                                        Confirmer ma demande
-                                    </Link>
+                                    Confirmer ma demande
                                 </Button>
 
                                 <Button 
@@ -220,6 +188,66 @@
 
                         </CardContent>
                     </Card>
+
+                    <Dialog v-model:open="showConfirmationModal">
+                        <DialogContent class="sm:max-w-[600px]">
+                            <DialogHeader>
+                                <DialogTitle>Confirmation de votre demande</DialogTitle>
+                                <DialogDescription>
+                                    Veuillez prendre connaissance des informations importantes avant de confirmer votre demande.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div class="space-y-4 py-4">
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">
+                                        <AlertTriangle class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm text-destructive">Les demandes de réservation en attente depuis plus d'une semaine seront automatiquement annulées.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <Users class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm">Chaque demande faite à une organisation différente est traitée comme une réservation distincte.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <Shield class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm">La plateforme agit uniquement comme intermédiaire et ne peut être tenue responsable des litiges entre les parties.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <FileText class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm">Il est de la responsabilité des utilisateurs de vérifier l'état et la conformité du matériel avant la location.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <AlertCircle class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm">La plateforme ne garantit pas la disponibilité des équipements et ne peut être tenue responsable des annulations.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <CreditCard class="h-4 w-4" />
+                                    </div>
+                                    <p class="text-sm">Les paiements et arrangements financiers se font directement avec les propriétaires des équipements, en dehors de la plateforme.</p>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline" @click="showConfirmationModal = false">
+                                    Annuler
+                                </Button>
+                                <Button asChild>
+                                    <Link :href="route('checkout.index')">
+                                        Je confirme ma demande
+                                    </Link>
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
                 </div>
             </div>
         </div>
@@ -229,14 +257,16 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { Truck, Minus, Plus, Trash, AlertTriangle, User, CreditCard, Camera } from 'lucide-vue-next';
+import { Truck, Minus, Plus, Trash, AlertTriangle, CreditCard, Camera, Users, Shield, FileText, AlertCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'vue-sonner';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 const isProcessing = ref(false);
+const showConfirmationModal = ref(false);
 const items = computed(() => usePage().props.items);
 
 const formatDate = (date) => {
@@ -295,9 +325,18 @@ const updateQuantity = (index, quantity) => {
     );
 };
 
-const removeItem = (index) => {
+const removeItem = (item) => {
+
+    if(!confirm('Voulez-vous vraiment retirer cet article du camion ?')) return;
+    
     handleAction(() =>
-        router.delete(route('cart.remove', index), {
+        router.delete(route('carts.remove', item.equipment.id), {
+            data: {
+                rental_start: item.rental_start,
+                rental_end: item.rental_end,
+            }
+        }, {
+            preserveScroll: true,
             onSuccess: () => {
                 toast('Article supprimé', {
                     description: "L'article a été retiré de votre camion."
@@ -314,8 +353,11 @@ const removeItem = (index) => {
 };
 
 const clearCart = () => {
+
+    if(!confirm('Voulez-vous vraiment vider votre camion ?')) return;
+    
     handleAction(() =>
-        router.delete(route('cart.clear'), {
+        router.delete(route('carts.clear'), {
             onSuccess: () => {
                 toast('Camion vidé', {
                     description: 'Tous les articles ont été retirés de votre camion.'

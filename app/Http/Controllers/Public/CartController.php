@@ -19,7 +19,7 @@ class CartController extends Controller
         foreach ($cart as $item) {
             $equipment = Equipment::with('organization')->find($item['equipment_id']);
             if ($equipment) {
-                $days = Carbon::parse($item['rental_end'])->diffInDays(Carbon::parse($item['rental_start'])) + 1;
+                $days = abs(Carbon::parse($item['rental_end'])->diffInDays(Carbon::parse($item['rental_start']))) + 1;
                 $itemData = [
                     'equipment' => $equipment,
                     'image' => $equipment->photos ? $equipment->photos[0]->url : null,

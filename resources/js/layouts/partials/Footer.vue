@@ -9,7 +9,7 @@
             <p class="text-center text-sm text-gray-500 dark:text-gray-400">
                 &copy; {{ new Date().getFullYear() }} {{ name }}. Tous droits réservés.
             </p>
-            <div class="flex justify-center gap-4 mt-4">
+            <div class="flex flex-wrap justify-center gap-4 mt-4">
                 <a href="/decouvrir" class="text-sm text-gray-500 dark:text-gray-400">Découvrir</a>
                 <a href="/comment-ca-marche" class="text-sm text-gray-500 dark:text-gray-400">Comment ça marche</a>
                 <a href="/mentions-legales" class="text-sm text-gray-500 dark:text-gray-400">Mentions légales</a>
