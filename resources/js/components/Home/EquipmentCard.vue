@@ -21,18 +21,6 @@
       >
         <Tag class="w-12 h-12" />
       </div>
-      
-      <!-- Availability Badge -->
-      <div class="absolute top-3 right-3">
-        <Badge
-          :variant="equipment.is_available ? 'success' : 'destructive'"
-          class="flex items-center gap-1 shadow-sm"
-        >
-          <ShieldCheck v-if="equipment.is_available" class="h-3 w-3" />
-          <AlertTriangle v-else class="h-3 w-3" />
-          {{ equipment.is_available ? 'Disponible' : 'Indisponible' }}
-        </Badge>
-      </div>
     </Link>
 
     <div class="p-6">
@@ -82,8 +70,11 @@
       </div>
 
       <!-- Description -->
-      <p class="mt-4 text-sm text-muted-foreground line-clamp-2">
+      <p v-if="equipment.description" class="mt-4 text-sm text-muted-foreground line-clamp-1">
         {{ equipment.description }}
+      </p>
+      <p v-else class="mt-4 text-sm text-muted-foreground line-clamp-2">
+        Aucune description
       </p>
 
       <!-- Actions -->

@@ -37,7 +37,7 @@
                     <div 
                         v-for="(item, index) in items" 
                         :key="index" 
-                        class="group px-2 py-2 hover:bg-accent transition-colors"
+                        class="group px-2 py-2"
                     >
                         <div class="flex items-center gap-3">
                             <div class="flex-1 min-w-0">
@@ -68,11 +68,11 @@
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                class="h-8 w-8 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                @click="removeItem(index)"
+                                class="h-8 w-8"
+                                @click="removeItem(item)"
                                 :aria-label="`Retirer ${item.equipment.name}`"
                             >
-                                <Trash2 class="h-4 w-4" />
+                                <Trash class="h-4 w-4 text-destructive" />
                             </Button>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                 
                 <DropdownMenuSeparator />
                 
-                <div class="p-3 space-y-2 bg-accent/50">
+                <div class="p-3 space-y-2">
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-muted-foreground">Sous-total</span>
                         <span class="font-medium">{{ formatPrice(totalPrice) }}</span>
@@ -102,6 +102,13 @@
                             Passer la commande
                         </Link>
                     </Button>
+                    <Button 
+                        variant="destructive" 
+                        class="w-full"
+                        @click="clearCart"
+                    >
+                        Vider le camion
+                    </Button>
                 </div>
             </template>
         </DropdownMenuContent>
@@ -111,7 +118,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { Truck, Trash2, CalendarIcon, PackageIcon } from 'lucide-vue-next';
+import { Truck, Trash, CalendarIcon, PackageIcon } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -164,9 +171,16 @@ const totalDeposit = computed(() => {
     }, 0) ?? 0;
 });
 
-const removeItem = (index) => {
-    router.delete(route('cart.remove', index), {
+const removeItem = (item) => {
+    if(!confirm('Êtes-vous sûr de vouloir retirer cet article du camion ?')) return;
+    
+    router.delete(route('carts.remove', item.equipment.id), {
+        data: {
+            rental_start: item.rental_start,
+            rental_end: item.rental_end,
+        },
         preserveScroll: true,
+        only: ['cart'],
         onSuccess: () => {
             toast.success('Article retiré du camion', {
                 description: "L'article a été retiré de votre camion avec succès."
@@ -175,6 +189,22 @@ const removeItem = (index) => {
         onError: () => {
             toast.error('Erreur de suppression', {
                 description: "Une erreur s'est produite lors de la suppression de l'article."
+            });
+        }
+    });
+};
+
+const clearCart = () => {
+    router.delete(route('carts.clear'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.success('Camion vidé', {
+                description: "Votre camion a été vidé avec succès."
+            });
+        },
+        onError: () => {
+            toast.error('Erreur', {
+                description: "Une erreur s'est produite lors du vidage du camion."
             });
         }
     });

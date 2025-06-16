@@ -101,7 +101,7 @@ const advantages = [
                                     variant="outline"
                                     as="a"
                                     :href="route('how-it-works')"
-                                    class="text-sm border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900"
+                                    class="text-sm border-violet-200 text-violet-700 hover:text-violet-500 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900"
                                 >
                                     Comment ça marche ?
                                 </Button>
