@@ -42,8 +42,8 @@ const navigationItems = computed(() => [
   },
   {
     name: 'Réservations',
-    href: route('app.organizations.reservations.index'),
-    active: route().current('app.organizations.reservations.index'),
+    href: route('app.organizations.reservations.in.index'),
+    active: route().current('app.organizations.reservations.in.index'),
     icon: Calendar,
     show: !!user.value
   },

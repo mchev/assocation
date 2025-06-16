@@ -7,7 +7,8 @@ use App\Http\Controllers\App\OrganizationController;
 use App\Http\Controllers\App\OrganizationDepotController;
 use App\Http\Controllers\App\OrganizationMemberController;
 use App\Http\Controllers\App\OrganizationSettingsController;
-use App\Http\Controllers\App\ReservationController;
+use App\Http\Controllers\App\ReservationInController;
+use App\Http\Controllers\App\ReservationOutController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(function () {
@@ -49,26 +50,34 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
         Route::delete('/{equipment}', [EquipmentController::class, 'destroy'])->name('destroy');
     });
 
-    // Reservations Management
-    Route::prefix('reservations')->name('organizations.reservations.')->group(function () {
-        Route::get('/', [ReservationController::class, 'index'])->name('index');
-        Route::get('/create', [ReservationController::class, 'create'])->name('create');
-        Route::post('/', [ReservationController::class, 'store'])->name('store');
-        Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
-        Route::get('/{reservation}/edit', [ReservationController::class, 'edit'])->name('edit');
-        Route::put('/{reservation}', [ReservationController::class, 'update'])->name('update');
-        Route::delete('/{reservation}', [ReservationController::class, 'destroy'])->name('destroy');
+    // (in) Reservations Management
+    Route::prefix('reservations/in')->name('organizations.reservations.in.')->group(function () {
+        Route::get('/', [ReservationInController::class, 'index'])->name('index');
+        Route::get('/create', [ReservationInController::class, 'create'])->name('create');
+        Route::get('/{reservation}', [ReservationInController::class, 'show'])->name('show');
+    });
+
+    // (out) Reservations Management
+    Route::prefix('reservations/out')->name('organizations.reservations.out.')->group(function () {
+        Route::get('/', [ReservationOutController::class, 'index'])->name('index');
+        Route::get('/create', [ReservationOutController::class, 'create'])->name('create');
+        Route::post('/', [ReservationOutController::class, 'store'])->name('store');
+        Route::get('/{reservation}', [ReservationOutController::class, 'show'])->name('show');
+        Route::get('/{reservation}/edit', [ReservationOutController::class, 'edit'])->name('edit');
+        Route::put('/{reservation}', [ReservationOutController::class, 'update'])->name('update');
+        Route::delete('/{reservation}', [ReservationOutController::class, 'destroy'])->name('destroy');
 
         // Reservation Status Management
-        Route::post('/{reservation}/confirm', [ReservationController::class, 'confirm'])->name('confirm');
-        Route::post('/{reservation}/reject', [ReservationController::class, 'reject'])->name('reject');
-        Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
-        Route::post('/{reservation}/complete', [ReservationController::class, 'complete'])->name('complete');
+        Route::post('/{reservation}/confirm', [ReservationOutController::class, 'confirm'])->name('confirm');
+        Route::post('/{reservation}/reject', [ReservationOutController::class, 'reject'])->name('reject');
+        Route::post('/{reservation}/cancel', [ReservationOutController::class, 'cancel'])->name('cancel');
+        Route::post('/{reservation}/complete', [ReservationOutController::class, 'complete'])->name('complete');
 
         // Reservation Items Management
-        Route::post('/{reservation}/items/{item}/pickup', [ReservationController::class, 'pickupItem'])->name('items.pickup');
-        Route::post('/{reservation}/items/{item}/return', [ReservationController::class, 'returnItem'])->name('items.return');
-        Route::post('/{reservation}/discount', [ReservationController::class, 'applyDiscount'])->name('discount.apply');
-        Route::delete('/{reservation}/discount', [ReservationController::class, 'removeDiscount'])->name('discount.remove');
+        Route::post('/{reservation}/items/{item}/pickup', [ReservationOutController::class, 'pickupItem'])->name('items.pickup');
+        Route::post('/{reservation}/items/{item}/return', [ReservationOutController::class, 'returnItem'])->name('items.return');
+        Route::post('/{reservation}/discount', [ReservationOutController::class, 'applyDiscount'])->name('discount.apply');
+        Route::delete('/{reservation}/discount', [ReservationOutController::class, 'removeDiscount'])->name('discount.remove');
     });
+
 });

@@ -30,6 +30,7 @@ class CartController extends Controller
                     'days' => $days,
                     'deposit' => $equipment->requires_deposit ? $equipment->deposit_amount * $item['quantity'] : 0,
                     'total' => $equipment->rental_price * $days * $item['quantity'],
+                    'quantityAvailable' => $equipment->availableQuantity($item['rental_start'], $item['rental_end']),
                 ];
 
                 $orgId = $equipment->organization->id;
@@ -99,15 +100,21 @@ class CartController extends Controller
         return back();
     }
 
-    public function update(Request $request, $key)
+    public function update(Request $request, Equipment $equipment)
     {
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
+            'rental_start' => 'required|date',
+            'rental_end' => 'required|date|after:rental_start',
         ]);
 
         $cart = session()->get('cart', []);
+        $key = $equipment->id.'-'.$validated['rental_start'].'-'.$validated['rental_end'];
+
         if (isset($cart[$key])) {
             $cart[$key]['quantity'] = $validated['quantity'];
+            $cart[$key]['rental_start'] = $validated['rental_start'];
+            $cart[$key]['rental_end'] = $validated['rental_end'];
             session()->put('cart', $cart);
         }
 

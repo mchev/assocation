@@ -101,7 +101,7 @@ const createReservation = () => {
         </h2>
         <Button
           as="a"
-          :href="route('app.organizations.reservations.create', organization)"
+          :href="route('app.organizations.reservations.in.create', organization)"
           variant="default"
           size="default"
         >

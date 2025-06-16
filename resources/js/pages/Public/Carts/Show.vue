@@ -62,7 +62,7 @@
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
-                                                                @click="updateQuantity(index, item.quantity - 1)"
+                                                                @click="updateQuantity(item, item.quantity - 1)"
                                                                 :disabled="item.quantity <= 1"
                                                                 class="transition-opacity"
                                                             >
@@ -72,8 +72,9 @@
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
-                                                                @click="updateQuantity(index, item.quantity + 1)"
+                                                                @click="updateQuantity(item, item.quantity + 1)"
                                                                 class="transition-opacity"
+                                                                :disabled="item.quantity >= item.quantityAvailable"
                                                             >
                                                                 <Plus class="h-4 w-4" />
                                                             </Button>
@@ -202,7 +203,7 @@
                                     <div class="flex-shrink-0 w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">
                                         <AlertTriangle class="h-4 w-4" />
                                     </div>
-                                    <p class="text-sm text-destructive">Les demandes de réservation en attente depuis plus d'une semaine seront automatiquement annulées.</p>
+                                    <p class="text-sm text-destructive">Les demandes de réservation de plus d'une semaine restées sans réponse seront automatiquement annulées.</p>
                                 </div>
                                 <div class="flex gap-3">
                                     <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -240,7 +241,7 @@
                                     Annuler
                                 </Button>
                                 <Button asChild>
-                                    <Link :href="route('checkout.index')">
+                                    <Link :href="route('app.organizations.reservations.in.create')">
                                         Je confirme ma demande
                                     </Link>
                                 </Button>
@@ -305,16 +306,17 @@ const handleAction = async (action) => {
     }
 };
 
-const updateQuantity = (index, quantity) => {
+const updateQuantity = (item, quantity) => {
     if (quantity < 1) return;
 
     handleAction(() => 
-        router.put(route('cart.update', index), { quantity }, {
-            onSuccess: () => {
-                toast('Camion mis à jour', {
-                    description: 'La quantité a été mise à jour avec succès.'
-                });
-            },
+        router.put(route('carts.update', item.equipment.id), {
+            quantity: quantity,
+            rental_start: item.rental_start,
+            rental_end: item.rental_end,
+        }, {
+            preserveScroll: true,
+            only: ['items'],
             onError: () => {
                 toast('Erreur', {
                     description: "Une erreur s'est produite lors de la mise à jour de la quantité.",

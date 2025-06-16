@@ -13,9 +13,9 @@
           </Link>
         </Button>
         <Button  asChild variant="outline" class="group">
-          <Link :href="route('app.organizations.reservations.create')" class="flex items-center">
+          <Link :href="route('app.organizations.reservations.out.create')" class="flex items-center">
             <CalendarPlus class="i-lucide-calendar-plus mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
-            Créer une réservation
+            Créer une sortie de matériel
           </Link>
         </Button>
         <Button  asChild variant="outline" class="group">
