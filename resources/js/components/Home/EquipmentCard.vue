@@ -96,7 +96,6 @@
 <script setup>
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   MapPin, 
@@ -104,8 +103,6 @@ import {
   Euro, 
   Calendar,
   ArrowRight,
-  ShieldCheck,
-  AlertTriangle
 } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
