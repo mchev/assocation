@@ -26,7 +26,6 @@ Route::prefix('carts')->name('carts.')->group(function () {
 });
 
 Route::controller(PageController::class)->group(function () {
-    Route::get('/', 'home')->name('home');
     Route::get('/decouvrir', 'discover')->name('discover');
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
     Route::get('/mentions-legales', 'terms')->name('terms');
