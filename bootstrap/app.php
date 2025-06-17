@@ -12,7 +12,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: [
             __DIR__.'/../routes/web.php',
-            __DIR__.'/../routes/public.php',
             __DIR__.'/../routes/app.php',
             __DIR__.'/../routes/settings.php',
             __DIR__.'/../routes/auth.php',

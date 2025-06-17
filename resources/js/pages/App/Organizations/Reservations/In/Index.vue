@@ -132,7 +132,7 @@ import {
 } from '@/components/ui/table'
 import Pagination from '@/components/Pagination.vue'
 
-const props = defineProps({
+defineProps({
   organization: {
     type: Object,
     required: true

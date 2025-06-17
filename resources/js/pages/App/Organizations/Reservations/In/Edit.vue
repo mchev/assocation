@@ -176,7 +176,6 @@ import { router } from '@inertiajs/vue3'
 import { Trash2Icon } from 'lucide-vue-next'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 
 const props = defineProps({
   reservation: {
