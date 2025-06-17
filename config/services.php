@@ -38,4 +38,7 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'horizon' => [
+        'email' => env('HORIZON_EMAIL'),
+    ],
 ];
