@@ -245,7 +245,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
 import Pagination from '@/components/Pagination.vue'
 
 const props = defineProps({

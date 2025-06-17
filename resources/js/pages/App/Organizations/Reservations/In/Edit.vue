@@ -69,18 +69,13 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
 import ReservationLayout from '@/pages/App/Organizations/Reservations/Layout.vue'
-import { Button } from '@/components/ui/button'
-import { Link } from '@inertiajs/vue3'
 import { Badge } from '@/components/ui/badge'
 
-const props = defineProps({
+defineProps({
   reservation: {
     type: Object,
     required: true
   }
 })
-
-const form = useForm({})
 </script> 
