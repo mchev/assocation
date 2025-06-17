@@ -33,7 +33,7 @@
                                 </CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-4">
-                                <Card v-for="(item, index) in group.items" :key="item.equipment.id" class="group">
+                                <Card v-for="item in group.items" :key="item.equipment.id" class="group">
                                     <CardContent class="px-4">
                                         <div class="flex flex-wrap gap-6">
                                             <!-- Item image -->

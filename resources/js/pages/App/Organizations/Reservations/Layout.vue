@@ -6,7 +6,7 @@
     import { usePage } from '@inertiajs/vue3';
     import { computed } from 'vue';
 
-    const props = defineProps({
+    defineProps({
         title: String,
         description: String,
         loading: {

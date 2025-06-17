@@ -1,0 +1,1 @@
+import{i as o}from"./x-B-1_nBWT.js";import{r as a,b as u}from"./app-QgaNazCu.js";function n(t){const e=o({nonce:a()});return u(()=>{var r;return(t==null?void 0:t.value)||((r=e.nonce)==null?void 0:r.value)})}function I(t,e=Number.NEGATIVE_INFINITY,r=Number.POSITIVE_INFINITY){return Math.min(r,Math.max(e,t))}export{I as c,n as u};
