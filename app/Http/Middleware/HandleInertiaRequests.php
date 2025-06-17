@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Equipment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -46,18 +47,23 @@ class HandleInertiaRequests extends Middleware
                 ->find($item['equipment_id']);
 
             if ($equipment) {
+                $days = abs(Carbon::parse($item['rental_start'])->diffInDays(Carbon::parse($item['rental_end'])) + 1);
                 $cartItems[] = [
                     'key' => $key,
                     'equipment' => [
                         'id' => $equipment->id,
                         'name' => $equipment->name,
                         'image' => $equipment->image,
-                        'price' => $equipment->price,
-                        'deposit' => $equipment->deposit,
+                        'rental_price' => $equipment->rental_price,
+                        'requires_deposit' => $equipment->requires_deposit,
+                        'deposit_amount' => $equipment->deposit_amount,
                     ],
+                    'days' => $days,
                     'rental_start' => $item['rental_start'],
                     'rental_end' => $item['rental_end'],
                     'quantity' => $item['quantity'],
+                    'total_price' => $equipment->rental_price * $days * $item['quantity'],
+                    'total_deposit' => $equipment->deposit_amount * $days * $item['quantity'],
                     'notes' => $item['notes'] ?? null,
                 ];
             }

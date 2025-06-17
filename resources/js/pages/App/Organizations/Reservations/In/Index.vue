@@ -124,7 +124,7 @@
                       @click="sort('lender_organization.name')"
                     >
                       <div class="flex items-center space-x-2">
-                        <span>Destinataire</span>
+                        <span>Provenance</span>
                         <component
                           :is="getSortIcon('lender_organization.name')"
                           class="w-4 h-4"
@@ -173,7 +173,7 @@
                 <TableBody>
                   <TableRow v-for="reservation in reservations.data" :key="reservation.id">
                     <TableCell class="font-medium">
-                      <Link :href="route('app.organizations.reservations.in.show', [organization, reservation])">
+                      <Link :href="route('app.organizations.reservations.in.edit', reservation)">
                         {{ reservation.lender_organization.name }}
                       </Link>
                     </TableCell>
@@ -198,19 +198,9 @@
                     <TableCell class="text-right">
                       <div class="flex items-center justify-end space-x-2">
                         <Button asChild>
-                          <Link :href="route('app.organizations.reservations.in.show', [reservation])">
-                            <Eye class="w-4 h-4 mr-2" />
-                            Détails
+                          <Link :href="route('app.organizations.reservations.in.edit',reservation)">
+                            Gérer
                           </Link>
-                        </Button>
-
-                        <Button
-                          v-if="can.update"
-                          as="a"
-                          :href="route('app.organizations.reservations.in.edit', [organization, reservation])"
-                          size="sm"
-                        >
-                          Modifier
                         </Button>
                       </div>
                     </TableCell>

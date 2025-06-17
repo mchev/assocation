@@ -68,7 +68,7 @@
                 </li>
                 <li>
                   <Link 
-                    :href="route('app.organizations.reservations.create', {equipment:equipment.id})"
+                    :href="route('app.organizations.reservations.out.create', {equipment:equipment.id})"
                     class="flex items-center text-muted-foreground hover:text-foreground group"
                   >
                     <CalendarPlus class="w-4 h-4 mr-2" />

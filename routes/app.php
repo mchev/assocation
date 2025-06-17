@@ -54,7 +54,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
     Route::prefix('reservations/in')->name('organizations.reservations.in.')->group(function () {
         Route::get('/', [ReservationInController::class, 'index'])->name('index');
         Route::get('/create', [ReservationInController::class, 'create'])->name('create');
-        Route::get('/{reservation}', [ReservationInController::class, 'show'])->name('show');
+        Route::get('/{reservation}/edit', [ReservationInController::class, 'edit'])->name('edit');
     });
 
     // (out) Reservations Management
