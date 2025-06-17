@@ -11,7 +11,7 @@
                         <DateRangePicker
                             v-model="dateRange"
                             start-day="1"
-                            :min-date="new Date()"
+                            :min-value="today(getLocalTimeZone()).add({ days: 2 })"
                             locale="fr-FR"
                             :disabled="false"
                         />
@@ -29,7 +29,7 @@
                         <p v-if="availableQuantity > 0" class="text-xs text-gray-500">
                             {{ availableQuantity }} disponible{{ availableQuantity > 1 ? 's' : '' }} pour la période sélectionnée.
                         </p>
-                        <p v-else class="text-xs text-red-500">
+                        <p v-if="availableQuantity === 0 && dateRange.from && dateRange.to" class="text-xs text-red-500">
                             Aucune disponibilité pour la période sélectionnée.
                         </p>
                     </div>
@@ -61,7 +61,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import DateRangePicker from '@/components/DateRangePicker.vue';
-import { CalendarDate, getLocalTimeZone } from '@internationalized/date';
+import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 
 const props = defineProps({
     equipment: {

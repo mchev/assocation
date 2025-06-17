@@ -98,6 +98,11 @@ class Reservation extends Model
         return $this->hasMany(ReservationItem::class);
     }
 
+    public function getDurationAttribute(): int
+    {
+        return abs($this->start_date->diffInDays($this->end_date)) + 1;
+    }
+
     public function isPending(): bool
     {
         return $this->status === ReservationStatus::PENDING;

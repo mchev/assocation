@@ -42,7 +42,7 @@ const buttonClasses = computed(() => {
 
 <template>
   <Popover>
-    <PopoverTrigger as-child>
+    <PopoverTrigger asChild>
       <Button
         variant="outline"
         :class="buttonClasses"
@@ -61,12 +61,10 @@ const buttonClasses = computed(() => {
         </template>
       </Button>
     </PopoverTrigger>
-    <PopoverContent class="w-auto p-0">
+    <PopoverContent class="w-auto p-0" align="start">
       <RangeCalendar 
         v-bind="$attrs" 
         v-model="value" 
-        initial-focus 
-        :number-of-months="1" 
         @update:modelValue="(newValue) => {
           value.start = newValue.start;
           value.end = newValue.end;

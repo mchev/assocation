@@ -9,7 +9,7 @@
                         <CardHeader>
                             <div class="space-y-2">
                                 <div class="flex items-center gap-2">
-                                    <Badge :variant="primary">
+                                    <Badge variant="primary">
                                         <User class="w-4 h-4" />
                                         {{ equipment.organization?.name }}
                                     </Badge>

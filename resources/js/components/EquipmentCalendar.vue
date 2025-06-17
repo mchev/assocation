@@ -64,7 +64,10 @@ const calendarOptions = computed(() => ({
     displayEventTime: false,
     displayEventEnd: false,
     eventClassNames: 'availibilityEvent',
-    showNonCurrentDates: true
+    showNonCurrentDates: true,
+    // validRange: {
+    //     start: new Date().toISOString().split('T')[0],
+    // }
 }));
 
 const fetchAvailabilities = async (year, month) => {

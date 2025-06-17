@@ -40,6 +40,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=open-sans:400,500,600" rel="stylesheet" />
         <link href="https://fonts.bunny.net/css?family=abeezee:400" rel="stylesheet" />
+
+        <script defer src="https://stats.pegase.io/script.js" data-website-id="f0ba459b-ef50-4556-8c2e-971dc388b643"></script>
+        
         @routes
         @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         @inertiaHead

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organization;
 use App\Models\User;
 use App\Notifications\OrganizationInvitationNotification;
 use Illuminate\Http\Request;
@@ -15,7 +14,7 @@ class OrganizationMemberController extends Controller
     {
         $organization = $request->user()->currentOrganization;
 
-        return Inertia::render('App/Organizations/Settings/Show', [
+        return Inertia::render('App/Organizations/Settings/Members/Index', [
             'organization' => $organization,
             'members' => $organization->users()->get()->map(function ($user) {
                 return [
@@ -26,7 +25,7 @@ class OrganizationMemberController extends Controller
                     'status' => 'active',
                 ];
             }),
-            'pending_invitations' => $organization->invitations()
+            'pendingInvitations' => $organization->invitations()
                 ->whereNull('accepted_at')
                 ->get()
                 ->map(function ($invitation) {
@@ -53,29 +52,22 @@ class OrganizationMemberController extends Controller
         ]);
 
         $organization = $request->user()->currentOrganization;
-
-        // Check if user exists
         $user = User::where('email', $validated['email'])->first();
 
+        $invitation = $organization->invitations()->create([
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+            'token' => \Str::random(32),
+        ]);
+
         if ($user) {
-            // If user exists, add them to organization with role
-            $organization->users()->attach($user->id, ['role' => $validated['role']]);
-
-            return redirect()->back()->with('success', 'Membre ajouté avec succès');
+            $user->notify(new OrganizationInvitationNotification($invitation));
         } else {
-            // If user doesn't exist, create invitation
-            $invitation = $organization->invitations()->create([
-                'email' => $validated['email'],
-                'role' => $validated['role'],
-                'token' => \Str::random(32),
-            ]);
-
-            // Send invitation email
             \Notification::route('mail', $validated['email'])
                 ->notify(new OrganizationInvitationNotification($invitation));
-
-            return redirect()->back()->with('success', 'Invitation envoyée avec succès');
         }
+
+        return redirect()->back()->with('success', 'Invitation envoyée avec succès');
     }
 
     public function remove(Request $request, User $member)

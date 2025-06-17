@@ -24,7 +24,7 @@
     <AppLayout :title="title" :description="description">
         <div class="max-w-7xl mx-auto">
             <nav 
-                class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 rounded-b-xl bg-gray-100/50 p-4 shadow-sm"
+                class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 rounded-b-xl bg-secondary p-4 shadow-sm"
                 role="navigation"
                 aria-label="Réservations navigation"
             >
@@ -44,7 +44,7 @@
                             <span>Mes demandes</span>
                         </Link>
                     </Button>
-                    <p class="text-xs text-gray-600 text-center">
+                    <p class="text-xs text-muted-foreground text-center">
                         Consultez et gérez vos demandes d'emprunt de matériel auprès d'autres organisations
                     </p>
                 </div>
@@ -69,7 +69,7 @@
                             <span>Demandes reçues</span>
                         </Link>
                     </Button>
-                    <p class="text-xs text-gray-600 text-center">
+                    <p class="text-xs text-muted-foreground text-center">
                         Gérez les demandes d'emprunt de matériel reçues de la part d'autres organisations
                     </p>
                 </div>

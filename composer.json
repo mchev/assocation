@@ -19,6 +19,8 @@
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
         "socialiteproviders/google": "^4.1",
+        "symfony/brevo-mailer": "^7.3",
+        "symfony/http-client": "^7.3",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
