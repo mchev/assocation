@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\HelloassoController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Public\CartController;
 use App\Http\Controllers\Public\EquipmentController;
@@ -35,3 +36,6 @@ Route::controller(PageController::class)->group(function () {
 
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
+
+Route::get('/auth/helloasso/redirect', [HelloassoController::class, 'redirect'])->name('helloasso.redirect');
+Route::get('/auth/helloasso/callback', [HelloassoController::class, 'callback'])->name('helloasso.callback');

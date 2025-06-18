@@ -28,6 +28,9 @@ class Organization extends Model
         'subscription_type',
         'subscription_ends_at',
         'owner_id',
+        'helloasso_id',
+        'helloasso_name',
+        'helloasso_slug',
     ];
 
     protected $casts = [

@@ -38,6 +38,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'helloasso' => [
+        'client_id' => env('HELLOASSO_CLIENT_ID'),
+        'client_secret' => env('HELLOASSO_CLIENT_SECRET'),
+        'redirect' => env('HELLOASSO_REDIRECT_URI'),
+    ],
+
     'horizon' => [
         'email' => env('HORIZON_EMAIL'),
     ],

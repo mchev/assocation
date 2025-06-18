@@ -44,10 +44,21 @@ const submit = () => {
                 <div class="grid gap-4">
                     <Button variant="outline" class="w-full" asChild>
                         <a href="/auth/google/redirect" rel="nofollow">
-                            <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2" />
+                            <img src="https://www.google.com/favicon.ico" alt="Google" class="size-5 mr-2" />
                             Continuer avec Google
                         </a>
                     </Button>
+                    <div class="relative">
+                        <Button variant="outline" class="w-full" asChild disabled>
+                            <a href="#" rel="nofollow">
+                                <img src="https://www.helloasso.com/favicon.ico" alt="HelloAsso" class="size-4 mr-2" />
+                                Continuer avec HelloAsso
+                            </a>
+                        </Button>
+                        <div class="absolute -top-1 -right-1 bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            Prochainement
+                        </div>
+                    </div>
                 </div>
 
                 <div class="relative">
