@@ -217,10 +217,10 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
+  SelectTrigger, 
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle, XCircle } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
 
 const props = defineProps({
   organization: {
