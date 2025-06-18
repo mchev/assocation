@@ -56,7 +56,6 @@ class CartController extends Controller
     public function add(Request $request, Equipment $equipment)
     {
         $validated = $request->validate([
-
             'rental_start' => 'required|date',
             'rental_end' => 'required|date|after_or_equal:rental_start',
             'quantity' => 'required|integer|min:1',

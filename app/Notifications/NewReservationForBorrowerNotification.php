@@ -29,7 +29,7 @@ class NewReservationForBorrowerNotification extends Notification implements Shou
             ->line("Votre demande de réservation pour {$this->reservation->borrowerOrganization->name} a bien été enregistrée.")
             ->line('Vous recevrez un email lorsque votre demande sera acceptée ou refusée.')
             ->action('Gérer la réservation', route('app.organizations.reservations.in.edit', $this->reservation))
-            ->line("L'organisation qui possède l'équipement a une semaine pour répondre à votre demande. Au delà de ce délai, votre demande sera automatiquement annulée.");
+            ->line("L'organisation qui possède l'équipement a {$this->reservation->deadlineForHuman} pour répondre à votre demande. Au delà de ce délai, votre demande sera automatiquement annulée.");
     }
 
     public function toArray(object $notifiable): array

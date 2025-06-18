@@ -9,6 +9,7 @@ enum ReservationStatus: string
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
     case COMPLETED = 'completed';
+    case CANCELLED_AUTOMATICALLY = 'cancelled_automatically';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum ReservationStatus: string
             self::REJECTED => 'Refusée',
             self::CANCELLED => 'Annulée',
             self::COMPLETED => 'Terminée',
+            self::CANCELLED_AUTOMATICALLY => 'Annulée automatiquement',
         };
     }
 
@@ -29,6 +31,7 @@ enum ReservationStatus: string
             self::REJECTED => 'bg-red-100 text-red-800',
             self::CANCELLED => 'bg-gray-100 text-gray-800',
             self::COMPLETED => 'bg-blue-100 text-blue-800',
+            self::CANCELLED_AUTOMATICALLY => 'bg-gray-100 text-gray-800',
         };
     }
 }

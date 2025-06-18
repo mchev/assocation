@@ -30,7 +30,7 @@ class NewReservationForLenderNotification extends Notification implements Should
             ->line("Équipements demandés : {$this->reservation->items->map(fn ($item) => "{$item->equipment->name} (x{$item->quantity})")->join(', ')}")
             ->line("Période : du {$this->reservation->start_date->format('d/m/Y')} au {$this->reservation->end_date->format('d/m/Y')}")
             ->action('Gérer la réservation', route('app.organizations.reservations.out.edit', $this->reservation))
-            ->line("Merci d'examiner cette demande dès que possible. Au delà de 7 jours, la réservation sera automatiquement annulée.");
+            ->line("Merci d'examiner cette demande dès que possible. Dans {$this->reservation->deadlineForHuman} à partir de la réception de cet email, la réservation sera automatiquement annulée.");
     }
 
     public function toArray(object $notifiable): array

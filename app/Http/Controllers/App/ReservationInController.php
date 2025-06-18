@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Reservations\CancelReservation;
 use App\Actions\Reservations\CreateReservationFromCart;
-use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
@@ -89,13 +89,9 @@ class ReservationInController extends Controller
     {
         $this->authorize('delete', $reservation);
 
-        $reservation->update([
-            'status' => ReservationStatus::CANCELLED,
-        ]);
+        (new CancelReservation)->handle($reservation);
 
-        // Notify organizations
-        // Send an email to the borrower
-
-        return redirect()->route('app.organizations.reservations.in.index');
+        return redirect()->route('app.organizations.reservations.in.index')
+            ->with('success', 'Réservation annulée avec succès');
     }
 }

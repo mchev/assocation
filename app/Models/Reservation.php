@@ -59,7 +59,7 @@ class Reservation extends Model
      */
     public function lenderOrganization(): BelongsTo
     {
-        return $this->belongsTo(Organization::class, 'from_organization_id');
+        return $this->belongsTo(Organization::class, 'from_organization_id')->withTrashed();
     }
 
     /**
@@ -67,7 +67,7 @@ class Reservation extends Model
      */
     public function borrowerOrganization(): BelongsTo
     {
-        return $this->belongsTo(Organization::class, 'to_organization_id');
+        return $this->belongsTo(Organization::class, 'to_organization_id')->withTrashed();
     }
 
     /**
