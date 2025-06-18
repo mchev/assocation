@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Reservations\CancelReservation;
+use App\Actions\Reservations\ConfirmReservation;
 use App\Actions\Reservations\CreateCalendarReservation;
+use App\Actions\Reservations\RejectReservation;
 use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
@@ -226,15 +229,9 @@ class ReservationOutController extends Controller
             return back()->withErrors(['error' => 'Cette réservation ne peut pas être confirmée.']);
         }
 
-        try {
-            DB::transaction(fn () => $reservation->confirm());
+        $reservation = (new ConfirmReservation)->handle($reservation);
 
-            return back()->with('success', 'Réservation confirmée avec succès.');
-        } catch (\Exception $e) {
-            report($e);
-
-            return back()->withErrors(['error' => 'Une erreur est survenue lors de la confirmation de la réservation.']);
-        }
+        return back()->with('success', 'Réservation confirmée avec succès.');
     }
 
     public function reject(Reservation $reservation): RedirectResponse
@@ -245,15 +242,9 @@ class ReservationOutController extends Controller
             return back()->withErrors(['error' => 'Cette réservation ne peut pas être refusée.']);
         }
 
-        try {
-            DB::transaction(fn () => $reservation->reject());
+        $reservation = (new RejectReservation)->handle($reservation);
 
-            return back()->with('success', 'Réservation refusée.');
-        } catch (\Exception $e) {
-            report($e);
-
-            return back()->withErrors(['error' => 'Une erreur est survenue lors du refus de la réservation.']);
-        }
+        return back()->with('success', 'Réservation refusée.');
     }
 
     public function cancel(Request $request, Reservation $reservation): RedirectResponse
@@ -264,19 +255,9 @@ class ReservationOutController extends Controller
             return back()->withErrors(['error' => 'Cette réservation ne peut pas être annulée.']);
         }
 
-        try {
-            $validated = $request->validate([
-                'reason' => ['required', 'string', 'max:1000'],
-            ]);
+        $reservation = (new CancelReservation)->handle($reservation);
 
-            DB::transaction(fn () => $reservation->cancel($validated['reason']));
-
-            return back()->with('success', 'Réservation annulée.');
-        } catch (\Exception $e) {
-            report($e);
-
-            return back()->withErrors(['error' => 'Une erreur est survenue lors de l\'annulation de la réservation.']);
-        }
+        return back()->with('success', 'Réservation annulée.');
     }
 
     public function complete(Reservation $reservation): RedirectResponse

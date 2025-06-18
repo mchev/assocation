@@ -69,10 +69,10 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
         Route::delete('/{reservation}', [ReservationOutController::class, 'destroy'])->name('destroy');
 
         // Reservation Status Management
-        Route::post('/{reservation}/confirm', [ReservationOutController::class, 'confirm'])->name('confirm');
-        Route::post('/{reservation}/reject', [ReservationOutController::class, 'reject'])->name('reject');
-        Route::post('/{reservation}/cancel', [ReservationOutController::class, 'cancel'])->name('cancel');
-        Route::post('/{reservation}/complete', [ReservationOutController::class, 'complete'])->name('complete');
+        Route::put('/{reservation}/confirm', [ReservationOutController::class, 'confirm'])->name('confirm');
+        Route::put('/{reservation}/reject', [ReservationOutController::class, 'reject'])->name('reject');
+        Route::put('/{reservation}/cancel', [ReservationOutController::class, 'cancel'])->name('cancel');
+        Route::put('/{reservation}/complete', [ReservationOutController::class, 'complete'])->name('complete');
 
         // Reservation Items Management
         Route::post('/{reservation}/items/{item}/pickup', [ReservationOutController::class, 'pickupItem'])->name('items.pickup');

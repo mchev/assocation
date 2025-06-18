@@ -39,7 +39,7 @@
                 @click="cancelReservation"
               >
                 <XIcon class="h-4 w-4" />
-                Annuler
+                Annuler la réservation
               </Button>
             </div>
           </div>
