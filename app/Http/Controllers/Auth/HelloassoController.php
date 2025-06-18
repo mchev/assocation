@@ -8,6 +8,7 @@ use App\Services\HelloAssoOrganizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class HelloassoController extends Controller
@@ -58,6 +59,8 @@ class HelloassoController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error('HelloAsso authentication error: '.$e->getMessage());
 
             return redirect()->route('login')->with('error', 'Une erreur est survenue lors de la connexion avec HelloAsso.');
         }

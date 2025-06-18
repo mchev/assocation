@@ -33,7 +33,7 @@ watch(() => page.props.flash, (flash) => {
 // Watch for validation errors
 watch(() => page.props.errors, (errors) => {
     if (Object.keys(errors).length > 0) {
-        addMessage('error', 'Please check the form for errors');
+        addMessage('error', 'Il y a des erreurs dans le formulaire');
     }
 }, { deep: true });
 </script>

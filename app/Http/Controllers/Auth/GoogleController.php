@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
@@ -36,6 +37,8 @@ class GoogleController extends Controller
             return redirect()->intended(route('home'));
 
         } catch (\Exception $e) {
+            Log::error('Google authentication error: '.$e->getMessage());
+
             return redirect()->route('login')->with('error', 'Une erreur est survenue lors de la connexion avec Google.');
         }
     }
