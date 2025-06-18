@@ -6,7 +6,8 @@ use App\Enums\ReservationStatus;
 use App\Models\Equipment;
 use App\Models\Organization;
 use App\Models\Reservation;
-use Carbon\Carbon;
+use App\Notifications\NewReservationForBorrowerNotification;
+use App\Notifications\NewReservationForLenderNotification;
 use Illuminate\Http\Request;
 
 class CreateReservationFromCart
@@ -43,10 +44,11 @@ class CreateReservationFromCart
                     'end_date' => $endDate,
                 ]);
 
+                $days = $reservation->duration;
+
                 foreach ($items as $item) {
 
                     $equipment = Equipment::find($item['equipment_id']);
-                    $days = abs(Carbon::parse($item['rental_start'])->diffInDays(Carbon::parse($item['rental_end'])) + 1);
 
                     $reservation->items()->create([
                         'equipment_id' => $item['equipment_id'],
@@ -58,11 +60,20 @@ class CreateReservationFromCart
                     ]);
                 }
 
+                $reservation->calculateTotals();
+
             }
         }
 
-        // Notify organizations
-        // Send an email to the borrower
+        // Notify borrower
+        foreach ($reservation->borrowerOrganization->users as $user) {
+            $user->notify(new NewReservationForBorrowerNotification($reservation));
+        }
+
+        // Notify lender
+        foreach ($reservation->lenderOrganization->users as $user) {
+            $user->notify(new NewReservationForLenderNotification($reservation));
+        }
 
         // Forget the cart
         $request->session()->forget('cart');

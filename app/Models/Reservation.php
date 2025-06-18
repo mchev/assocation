@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Casts\PriceCast;
 use App\Enums\ReservationStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,13 +32,13 @@ class Reservation extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'status' => ReservationStatus::class,
-        'subtotal' => 'integer',
-        'discount_amount' => 'integer',
+        'subtotal' => PriceCast::class,
+        'discount_amount' => PriceCast::class,
         'discount_value' => 'integer',
-        'total' => 'integer',
+        'total' => PriceCast::class,
     ];
 
     // Discount Types
@@ -101,6 +103,62 @@ class Reservation extends Model
     public function getDurationAttribute(): int
     {
         return abs($this->start_date->diffInDays($this->end_date)) + 1;
+    }
+
+    public function getDeadlineAttribute(): Carbon
+    {
+        // Since we're casting to 'date', we need to ensure we're working with dates properly
+        $startDate = $this->start_date->startOfDay();
+        $now = now()->startOfDay();
+        $daysUntilStart = abs($startDate->diffInDays($now, false));
+
+        // If the reservation starts in less than 3 days, deadline is 24 hours before start
+        if ($daysUntilStart < 3) {
+            return $this->start_date->copy()->subHours(24);
+        }
+
+        // If the reservation starts in less than 7 days, deadline is 48 hours before start
+        if ($daysUntilStart < 7) {
+            return $this->start_date->copy()->subHours(48);
+        }
+
+        // If the reservation starts in less than 14 days, deadline is 1 week before start
+        if ($daysUntilStart < 14) {
+            return $this->start_date->copy()->subDays(5);
+        }
+
+        // If the reservation starts in less than 20 days, deadline is 1 week before start
+        if ($daysUntilStart < 20) {
+            return $this->start_date->copy()->subDays(7);
+        }
+
+        // Otherwise, deadline is 2 weeks before the start date
+        return $this->start_date->copy()->subDays(14);
+    }
+
+    public function getDeadlineForHumanAttribute(): string
+    {
+        $deadline = $this->deadline;
+        $now = now();
+
+        if ($now->isAfter($deadline)) {
+            return 'Délai expiré';
+        }
+
+        $totalHoursUntilDeadline = (int) $now->diffInHours($deadline, false);
+        $daysUntilDeadline = (int) floor($totalHoursUntilDeadline / 24);
+        $remainingHours = $totalHoursUntilDeadline % 24;
+
+        // If less than 1 day, show in hours
+        if ($daysUntilDeadline < 1) {
+            return $totalHoursUntilDeadline.' heure'.($totalHoursUntilDeadline > 1 ? 's' : '');
+        }
+
+        // Show days and remaining hours
+        $daysText = $daysUntilDeadline.' jour'.($daysUntilDeadline > 1 ? 's' : '');
+        $hoursText = $remainingHours > 0 ? ' et '.$remainingHours.' heure'.($remainingHours > 1 ? 's' : '') : '';
+
+        return $daysText.$hoursText;
     }
 
     public function isPending(): bool
@@ -245,32 +303,5 @@ class Reservation extends Model
             'status' => ReservationStatus::CANCELLED,
             'cancellation_reason' => $reason,
         ]);
-    }
-
-    protected static function booted()
-    {
-        static::created(function ($reservation) {
-            // Notifier l'organisation prêteuse d'une nouvelle réservation
-            $reservation->lenderOrganization->notify(new \App\Notifications\NewReservationNotification($reservation));
-        });
-
-        static::updating(function ($reservation) {
-            // Si le statut change, sauvegarder l'ancien statut pour la notification
-            if ($reservation->isDirty('status')) {
-                $reservation->previousStatus = $reservation->getOriginal('status');
-            }
-        });
-
-        static::updated(function ($reservation) {
-            // Si le statut a changé, notifier l'organisation emprunteuse
-            if ($reservation->wasChanged('status')) {
-                $reservation->borrowerOrganization->notify(
-                    new \App\Notifications\ReservationStatusChangedNotification(
-                        $reservation,
-                        $reservation->previousStatus
-                    )
-                );
-            }
-        });
     }
 }

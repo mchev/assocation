@@ -48,7 +48,7 @@ class ReservationInController extends Controller
 
     public function edit(Reservation $reservation): Response
     {
-        $reservation->load('items.equipment', 'fromOrganization');
+        $reservation->load('items.equipment', 'fromOrganization', 'user');
 
         return Inertia::render('App/Organizations/Reservations/In/Edit', [
             'reservation' => [
@@ -75,6 +75,12 @@ class ReservationInController extends Controller
 
                     return $item;
                 }),
+                'user' => [
+                    'id' => $reservation->user->id,
+                    'name' => $reservation->user->name,
+                    'email' => $reservation->user->email,
+                    'phone' => $reservation->user->phone,
+                ],
             ],
         ]);
     }

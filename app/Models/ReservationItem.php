@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\PriceCast;
 use App\Enums\ReservationItemStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,11 +28,11 @@ class ReservationItem extends Model
 
     protected $casts = [
         'quantity' => 'integer',
-        'price' => 'integer',
+        'price' => PriceCast::class,
         'status' => ReservationItemStatus::class,
         'picked_up_at' => 'datetime',
         'returned_at' => 'datetime',
-        'total_price' => 'integer',
+        'total_price' => PriceCast::class,
     ];
 
     public function reservation(): BelongsTo

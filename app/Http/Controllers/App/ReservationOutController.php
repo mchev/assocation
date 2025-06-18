@@ -133,21 +133,45 @@ class ReservationOutController extends Controller
         }
     }
 
-    public function show(Request $request, Reservation $reservation): Response
+    public function edit(Request $request, Reservation $reservation): Response
     {
         $this->authorize('view', $reservation);
 
         $reservation->load(['borrowerOrganization', 'items.equipment', 'items.depot', 'user']);
 
-        return Inertia::render('App/Organizations/Reservations/Out/Show', [
-            'organization' => $request->user()->currentOrganization,
-            'reservation' => $reservation,
-            'discountTypes' => Reservation::discountTypes(),
-            'can' => [
-                'confirm' => $reservation->canBeConfirmed(),
-                'reject' => $reservation->canBeRejected(),
-                'cancel' => $reservation->canBeCancelled(),
-                'complete' => $reservation->canBeCompleted(),
+        return Inertia::render('App/Organizations/Reservations/Out/Edit', [
+            'reservation' => [
+                'id' => $reservation->id,
+                'start_date' => $reservation->start_date->locale('fr')->isoFormat('D MMMM YYYY'),
+                'end_date' => $reservation->end_date->locale('fr')->isoFormat('D MMMM YYYY'),
+                'status' => $reservation->status->value,
+                'status_label' => $reservation->status->label(),
+                'status_color' => $reservation->status->color(),
+                'total' => $reservation->total,
+                'created_at' => $reservation->created_at->locale('fr')->isoFormat('D MMMM YYYY HH:mm'),
+                'updated_at' => $reservation->updated_at->locale('fr')->isoFormat('D MMMM YYYY HH:mm'),
+                'duration' => $reservation->duration,
+                'deadline' => $reservation->deadline,
+                'deadline_for_human' => $reservation->deadline_for_human,
+                'from_organization' => [
+                    'id' => $reservation->fromOrganization->id,
+                    'name' => $reservation->fromOrganization->name,
+                ],
+                'to_organization' => [
+                    'id' => $reservation->borrowerOrganization->id,
+                    'name' => $reservation->borrowerOrganization->name,
+                ],
+                'items' => $reservation->items->map(function ($item) {
+                    $item->city = $item->equipment->depot->city;
+
+                    return $item;
+                }),
+                'user' => [
+                    'id' => $reservation->user->id,
+                    'name' => $reservation->user->name,
+                    'email' => $reservation->user->email,
+                    'phone' => $reservation->user->phone,
+                ],
             ],
         ]);
     }

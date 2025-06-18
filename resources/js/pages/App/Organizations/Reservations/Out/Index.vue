@@ -174,7 +174,7 @@
                 <TableBody>
                   <TableRow v-for="reservation in reservations.data" :key="reservation.id">
                     <TableCell class="font-medium">
-                      <Link :href="route('app.organizations.reservations.out.show', [organization, reservation])">
+                      <Link :href="route('app.organizations.reservations.out.edit', reservation)">
                         {{ reservation.borrower_organization.name }}
                       </Link>
                     </TableCell>
@@ -199,16 +199,15 @@
                     <TableCell class="text-right">
                       <div class="flex items-center justify-end space-x-2">
                         <Button asChild>
-                          <Link :href="route('app.organizations.reservations.out.show', [reservation])">
-                            <Eye class="w-4 h-4 mr-2" />
-                            Détails
+                          <Link :href="route('app.organizations.reservations.out.edit', reservation)">
+                            Gérer
                           </Link>
                         </Button>
 
                         <Button
                           v-if="can.update"
                           as="a"
-                          :href="route('app.organizations.reservations.out.edit', [organization, reservation])"
+                          :href="route('app.organizations.reservations.out.edit', reservation)"
                           size="sm"
                         >
                           Modifier
@@ -256,7 +255,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-vue-next'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
 import Pagination from '@/components/Pagination.vue'
 
 const props = defineProps({

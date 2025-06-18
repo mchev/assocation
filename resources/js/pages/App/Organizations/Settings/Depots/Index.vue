@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import OrganisationLayout from '@/layouts/settings/OrganisationLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Building2, Pencil, Trash2, AlertTriangle } from 'lucide-vue-next';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import {
@@ -48,54 +49,55 @@ const deleteDepot = () => {
                 />
 
                 <div class="space-y-4">
-                    <div class="flex justify-end">
-                        <Button @click="router.visit(route('app.organizations.depots.create'))">
-                            Ajouter un dépôt
-                        </Button>
-                    </div>
 
-                    <div class="divide-y divide-gray-200 rounded-lg border">
-                        <div v-for="depot in depots" :key="depot.id" class="group p-4 sm:p-6 hover:bg-gray-50">
-                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div class="space-y-3">
-                                    <div class="flex items-center gap-2">
-                                        <Building2 class="h-5 w-5 text-primary-500 flex-shrink-0" />
-                                        <h3 class="text-base font-semibold text-gray-900">{{ depot.name }}</h3>
-                                    </div>
-                                    
-                                    <p v-if="depot.description" class="text-sm text-gray-500">
-                                        {{ depot.description }}
-                                    </p>
+                    <Button @click="router.visit(route('app.organizations.depots.create'))">
+                        Ajouter un dépôt
+                    </Button>
 
-                                    <div class="flex items-start gap-2 text-sm text-gray-600">
-                                        <MapPin class="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <div>{{ depot.address }}</div>
-                                            <div>{{ depot.postal_code }} {{ depot.city }}</div>
+                    <div class="space-y-4">
+                        <Card v-for="depot in depots" :key="depot.id" class="group">
+                            <CardContent class="p-6">
+                                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                    <div class="space-y-3">
+                                        <div class="flex items-center gap-2">
+                                            <Building2 class="h-5 w-5 text-primary-500 flex-shrink-0" />
+                                            <h3 class="text-base font-semibold text-foreground">{{ depot.name }}</h3>
+                                        </div>
+                                        
+                                        <p v-if="depot.description" class="text-sm text-muted-foreground">
+                                            {{ depot.description }}
+                                        </p>
+
+                                        <div class="flex items-start gap-2 text-sm text-muted-foreground">
+                                            <MapPin class="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                            <div>
+                                                <div>{{ depot.address }}</div>
+                                                <div>{{ depot.postal_code }} {{ depot.city }}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="flex items-center gap-2 self-start sm:self-center">
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        @click="router.visit(route('app.organizations.depots.edit', depot.id))"
-                                    >
-                                        <Pencil class="h-4 w-4 mr-2" />
-                                        Modifier
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        @click="openDeleteDialog(depot)"
-                                    >
-                                        <Trash2 class="h-4 w-4 mr-2" />
-                                        Supprimer
-                                    </Button>
+                                    <div class="flex items-center gap-2 self-start sm:self-center">
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm"
+                                            @click="router.visit(route('app.organizations.depots.edit', depot.id))"
+                                        >
+                                            <Pencil class="h-4 w-4 mr-2" />
+                                            Modifier
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            @click="openDeleteDialog(depot)"
+                                        >
+                                            <Trash2 class="h-4 w-4 mr-2" />
+                                            Supprimer
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </section>

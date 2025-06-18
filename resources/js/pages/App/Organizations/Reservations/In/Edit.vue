@@ -15,19 +15,19 @@
         </div>
 
         <!-- Header Section -->
-        <div class="flex justify-between items-start mb-6">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
               Réservation du {{ reservation.start_date }} au {{ reservation.end_date }}
             </h1>
             <div class="flex items-center gap-2 mt-2">
               <BuildingIcon class="h-4 w-4 text-gray-500" />
-              <h2 class="text-xl font-semibold text-gray-600">
+              <h2 class="text-lg sm:text-xl font-semibold text-gray-600">
                 {{ reservation.from_organization.name }}
               </h2>
             </div>
           </div>
-          <div class="flex flex-col items-end gap-2">
+          <div class="flex flex-col items-start sm:items-end gap-2">
             <Badge :class="`${reservation.status_color}`">
               {{ reservation.status_label }}
             </Badge>
@@ -46,62 +46,98 @@
         </div>
 
         <!-- Dates Section -->
-        <Card class="mb-6">
-          <CardHeader>
-            <CardTitle class="text-lg">Détails de la réservation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="flex items-start gap-3">
-                <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Récupération</h3>
-                  <p class="text-gray-900">{{ reservation.start_date }}</p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle class="text-lg">Détails de la réservation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-start gap-3">
+                  <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Récupération</h3>
+                    <p class="text-gray-900">{{ reservation.start_date }}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="flex items-start gap-3">
-                <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Retour</h3>
-                  <p class="text-gray-900">{{ reservation.end_date }}</p>
+                <div class="flex items-start gap-3">
+                  <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Retour</h3>
+                    <p class="text-gray-900">{{ reservation.end_date }}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="flex items-start gap-3">
-                <ClockIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Durée</h3>
-                  <p class="text-gray-900">{{ reservation.duration }} jours</p>
+                <div class="flex items-start gap-3">
+                  <ClockIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Durée</h3>
+                    <p class="text-gray-900">{{ reservation.duration }} jours</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="flex items-start gap-3">
-                <BuildingIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Organisation emprunteuse</h3>
-                  <p class="text-gray-900">{{ reservation.to_organization.name }}</p>
+                <div class="flex items-start gap-3">
+                  <BuildingIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Organisation emprunteuse</h3>
+                    <p class="text-gray-900">{{ reservation.to_organization.name }}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="flex items-start gap-3">
-                <PlusIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Créée le</h3>
-                  <p class="text-gray-900">{{ reservation.created_at }}</p>
+                <div class="flex items-start gap-3">
+                  <PlusIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Créée le</h3>
+                    <p class="text-gray-900">{{ reservation.created_at }}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="flex items-start gap-3">
-                <PencilIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500">Dernière mise à jour</h3>
-                  <p class="text-gray-900">{{ reservation.updated_at }}</p>
+                <div class="flex items-start gap-3">
+                  <PencilIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Dernière mise à jour</h3>
+                    <p class="text-gray-900">{{ reservation.updated_at }}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          <!-- Contact Section -->
+          <Card>
+            <CardHeader>
+              <CardTitle class="text-lg">Contact</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div class="grid grid-cols-1 gap-6">
+                <div class="flex items-start gap-3">
+                  <UserIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Nom</h3>
+                    <p class="text-gray-900">{{ reservation.user.name }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <MailIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Email</h3>
+                    <p class="text-gray-900">{{ reservation.user.email }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <PhoneIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Téléphone</h3>
+                    <p class="text-gray-900">{{ reservation.user.phone || 'Non renseigné' }}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <Alert variant="warning" class="mb-6">
           <AlertCircleIcon class="h-4 w-4" />
@@ -128,8 +164,10 @@
               <TableHeader>
                 <TableRow>
                   <TableHead>Équipement</TableHead>
-                  <TableHead>Quantité</TableHead>
+                  <TableHead>Qté</TableHead>
+                  <TableHead>Jours</TableHead>
                   <TableHead>Prix/jour</TableHead>
+                  <TableHead>Sous-total</TableHead>
                   <TableHead>Caution</TableHead>
                   <TableHead>Emplacement</TableHead>
                   <TableHead v-if="reservation.status === 'pending'" class="w-[100px]"></TableHead>
@@ -138,12 +176,10 @@
               <TableBody>
                 <TableRow v-for="item in reservation.items" :key="item.id">
                   <TableCell class="font-medium">{{ item.equipment.name }}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" class="text-sm font-medium">
-                      {{ item.quantity }}
-                    </Badge>
-                  </TableCell>
+                  <TableCell>{{ item.quantity }}</TableCell>
+                  <TableCell>{{ reservation.duration }}</TableCell>
                   <TableCell>{{ item.price }} €</TableCell>
+                  <TableCell>{{ item.total_price }} €</TableCell>
                   <TableCell>{{ item.equipment.deposit_amount }} €</TableCell>
                   <TableCell>{{ item.city }}</TableCell>
                   <TableCell v-if="reservation.status === 'pending'">
@@ -171,7 +207,7 @@ import ReservationLayout from '@/pages/App/Organizations/Reservations/Layout.vue
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircleIcon, CalendarIcon, BuildingIcon, ClockIcon, XIcon, ArrowLeftIcon, PlusIcon, PencilIcon } from 'lucide-vue-next'
+import { AlertCircleIcon, CalendarIcon, BuildingIcon, ClockIcon, XIcon, ArrowLeftIcon, PlusIcon, PencilIcon, UserIcon, MailIcon, PhoneIcon } from 'lucide-vue-next'
 import { router } from '@inertiajs/vue3'
 import { Trash2Icon } from 'lucide-vue-next'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -186,7 +222,7 @@ const props = defineProps({
 
 const cancelReservation = () => {
   if(!confirm('Voulez-vous vraiment annuler cette réservation ?')) return;
-  router.delete(route('organizations.reservations.in.destroy', { reservation: props.reservation.id }))
+  router.delete(route('app.organizations.reservations.in.destroy', { reservation: props.reservation.id }))
 }
 
 const removeItem = (itemId) => {

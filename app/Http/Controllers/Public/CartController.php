@@ -58,7 +58,7 @@ class CartController extends Controller
         $validated = $request->validate([
 
             'rental_start' => 'required|date',
-            'rental_end' => 'required|date|after:rental_start',
+            'rental_end' => 'required|date|after_or_equal:rental_start',
             'quantity' => 'required|integer|min:1',
         ]);
 
@@ -88,7 +88,7 @@ class CartController extends Controller
     {
         $validated = $request->validate([
             'rental_start' => 'required|date',
-            'rental_end' => 'required|date|after:rental_start',
+            'rental_end' => 'required|date|after_or_equal:rental_start',
         ]);
 
         $key = $equipment->id.'-'.$validated['rental_start'].'-'.$validated['rental_end'];
@@ -105,7 +105,7 @@ class CartController extends Controller
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
             'rental_start' => 'required|date',
-            'rental_end' => 'required|date|after:rental_start',
+            'rental_end' => 'required|date|after_or_equal:rental_start',
         ]);
 
         $cart = session()->get('cart', []);
