@@ -34,7 +34,7 @@ class StoreRequest extends FormRequest
             'depot_id' => ['required', 'exists:depots,id'],
 
             // Step 3: Photos
-            'images' => ['nullable', 'array', 'max:10'],
+            'images' => ['nullable', 'array', 'max:3'],
             'images.*' => ['image', 'mimes:jpeg,jpg,png', 'max:5120'], // 5MB max per image
 
             // Step 4: Tarification

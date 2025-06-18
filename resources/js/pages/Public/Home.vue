@@ -5,10 +5,24 @@
   >
       <!-- Hero Section -->
       <template v-if="!user">
-        <section class="relative pb-12">
+        <section class="relative">
           <HeroSection />
         </section>
       </template>
+
+      <div class="max-w-4xl mx-auto my-2">
+        <Alert class="bg-yellow-500/10 border-yellow-500 text-yellow-800">
+          <Info class="size-4" />
+          <AlertTitle>
+            {{ appName }} est actuellement en version beta
+          </AlertTitle>
+          <AlertDescription>
+            <p>L'application est fonctionnelle mais des améliorations sont encore en cours de développement.<br>
+            Si ous rencontrez un bug ou avez des suggestions d'amélioration,<br>
+            n'hésitez pas à nous contacter sur <a href="mailto:contact@assocation.fr" class="underline hover:text-primary">contact@assocation.fr</a>.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
 
       <!-- Search Section -->
       <section>
@@ -41,6 +55,8 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-vue-next';
 
 defineProps({
   equipments: {

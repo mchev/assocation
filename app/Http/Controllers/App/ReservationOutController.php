@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\App;
 
 use App\Actions\Reservations\CancelReservation;
+use App\Actions\Reservations\CompleteReservation;
 use App\Actions\Reservations\ConfirmReservation;
 use App\Actions\Reservations\CreateCalendarReservation;
 use App\Actions\Reservations\RejectReservation;
@@ -268,17 +269,9 @@ class ReservationOutController extends Controller
             return back()->withErrors(['error' => 'Cette réservation ne peut pas être terminée.']);
         }
 
-        try {
-            DB::transaction(function () use ($reservation) {
-                $reservation->update(['status' => ReservationStatus::COMPLETED]);
-            });
+        $reservation = (new CompleteReservation)->handle($reservation);
 
-            return back()->with('success', 'Réservation terminée.');
-        } catch (\Exception $e) {
-            report($e);
-
-            return back()->withErrors(['error' => 'Une erreur est survenue lors de la complétion de la réservation.']);
-        }
+        return back()->with('success', 'Réservation terminée.');
     }
 
     public function pickupItem(Reservation $reservation, ReservationItem $item): RedirectResponse

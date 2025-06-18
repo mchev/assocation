@@ -83,12 +83,13 @@ const handleDateSelect = (selectInfo) => {
 }
 
 const createReservation = () => {
-  router.visit(route('organizations.reservations.create', organization.id), {
-    data: {
-      start_date: selectedDates.value.start,
-      end_date: selectedDates.value.end
-    }
-  })
+  alert('Fonctionnalité non disponible pour le moment.')
+  // router.visit(route('organizations.reservations.create', organization.id), {
+  //   data: {
+  //     start_date: selectedDates.value.start,
+  //     end_date: selectedDates.value.end
+  //   }
+  // })
 }
 </script>
 
@@ -99,14 +100,6 @@ const createReservation = () => {
         <h2 class="font-semibold text-xl leading-tight">
           Calendrier des locations de {{ organization.name }}
         </h2>
-        <Button
-          as="a"
-          :href="route('app.organizations.reservations.in.create', organization)"
-          variant="default"
-          size="default"
-        >
-          Nouvelle réservation
-        </Button>
       </div>
     </template>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
@@ -211,17 +204,18 @@ const createReservation = () => {
                 <div class="flex-1">
                   <h4 class="font-medium mb-2">Équipements</h4>
                   <ul class="space-y-2">
-                    <li v-for="item in selectedReservation.items" :key="item.equipment" class="flex justify-between">
-                      <span>{{ item.equipment }} (x{{ item.quantity }})</span>
-                      <Badge :class="item.status.color">{{ item.status.label }}</Badge>
+                    <li v-for="item in selectedReservation.items" :key="item.equipment" class="flex items-center gap-2 text-sm">
+                      <Badge>{{ item.quantity }}</Badge>
+                      <span>{{ item.equipment }}</span>
                     </li>
                   </ul>
                 </div>
               </div>
 
-              <div class="flex items-center gap-2">
-                <CreditCard class="h-4 w-4" />
-                <span>Total: {{ selectedReservation.total }}</span>
+              <div class="flex items-center justify-end gap-2">
+                <Button as="a" :href="route('app.organizations.reservations.out.edit', selectedReservation)">
+                  Gérer la réservation
+                </Button>
               </div>
             </div>
           </div>

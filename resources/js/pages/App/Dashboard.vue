@@ -13,12 +13,6 @@
           </Link>
         </Button>
         <Button  asChild variant="outline" class="group">
-          <Link :href="route('app.organizations.reservations.out.create')" class="flex items-center">
-            <CalendarPlus class="i-lucide-calendar-plus mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
-            Créer une sortie de matériel
-          </Link>
-        </Button>
-        <Button  asChild variant="outline" class="group">
           <Link :href="route('app.organizations.settings.edit')" class="flex items-center">
             <Settings class="i-lucide-settings mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
             Gérer l'organisation
@@ -115,9 +109,6 @@
                         </Badge>
                         <span>{{ item.equipment.name }}</span>
                       </div>
-                      <Badge :class="item.status_color">
-                        {{ item.status_label }}
-                      </Badge>
                     </div>
                   </div>
                   <div class="mt-2 flex items-center justify-between border-t pt-2 text-sm">
@@ -177,9 +168,6 @@
                         </Badge>
                         <span>{{ item.equipment.name }}</span>
                       </div>
-                      <Badge :class="item.status_color">
-                        {{ item.status_label }}
-                      </Badge>
                     </div>
                   </div>
                   <div class="mt-2 flex items-center justify-between border-t pt-2 text-sm">
@@ -226,7 +214,7 @@
                     <div class="flex items-center gap-4 text-sm text-muted-foreground">
                       <span class="flex items-center gap-1">
                         <i class="i-lucide-box h-4 w-4" />
-                        {{ depot?.equipment_count ?? 0 }} équipements
+                        {{ depot?.equipments_count ?? 0 }} {{ depot?.equipments_count ?? 0 > 1 ? 'équipements' : 'équipement' }}
                       </span>
                     </div>
                   </div>
@@ -295,7 +283,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { PlusCircle, CalendarPlus, Settings } from 'lucide-vue-next'
+import { PlusCircle, Settings } from 'lucide-vue-next'
 
 const props = defineProps({
   organization: {

@@ -65,20 +65,6 @@
                   </Select>
                 </div>
 
-                <div>
-                  <Label for="availability" class="text-sm">Disponibilité</Label>
-                  <Select v-model="filters.availability" @update:modelValue="filter">
-                    <SelectTrigger class="h-9">
-                      <SelectValue placeholder="Tous" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem :value="null">Tous</SelectItem>
-                      <SelectItem value="available">Disponible</SelectItem>
-                      <SelectItem value="unavailable">Non disponible</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 <div class="flex gap-2 ml-auto">
                   <Button 
                     type="button" 
@@ -151,18 +137,6 @@
                     </TableHead>
                     <TableHead 
                       class="cursor-pointer hover:bg-muted/50"
-                      @click="sort('is_available')"
-                    >
-                      <div class="flex items-center space-x-2">
-                        <span>Dispo.</span>
-                        <component
-                          :is="getSortIcon('is_available')"
-                          class="w-4 h-4"
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead 
-                      class="cursor-pointer hover:bg-muted/50"
                       @click="sort('depot')"
                     >
                       <div class="flex items-center space-x-2">
@@ -197,19 +171,12 @@
                     <TableCell class="font-medium">
                       <div>
                         {{ item.name }}
-                        <p class="text-sm text-muted-foreground truncate max-w-60">
+                        <p class="text-sm text-muted-foreground truncate max-w-40 lg:max-w-96">
                           {{ item.description }}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>{{ item.category.name }}</TableCell>
-                    <TableCell class="text-center">
-                      <component
-                        :is="item.is_available ? CheckCircle : XCircle"
-                        :class="item.is_available ? 'text-success' : 'text-destructive'"
-                        class="w-4 h-4 mx-auto"
-                      />
-                    </TableCell>
                     <TableCell>
                       <div class="max-w-40 flex flex-col">
                         <span class="truncate font-medium">{{ item.depot.name }}</span>

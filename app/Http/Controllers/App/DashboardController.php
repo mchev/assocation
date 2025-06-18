@@ -66,7 +66,7 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get(),
             'depots' => $organization->depots()
-                ->withCount(['equipments'])
+                ->withCount('equipments')
                 ->latest()
                 ->take(5)
                 ->get(),

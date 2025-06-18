@@ -62,17 +62,17 @@ class CreateReservationFromCart
 
                 $reservation->calculateTotals();
 
+                // Notify borrower
+                foreach ($reservation->borrowerOrganization->users as $user) {
+                    $user->notify(new NewReservationForBorrowerNotification($reservation));
+                }
+
+                // Notify lender
+                foreach ($reservation->lenderOrganization->users as $user) {
+                    $user->notify(new NewReservationForLenderNotification($reservation));
+                }
+
             }
-        }
-
-        // Notify borrower
-        foreach ($reservation->borrowerOrganization->users as $user) {
-            $user->notify(new NewReservationForBorrowerNotification($reservation));
-        }
-
-        // Notify lender
-        foreach ($reservation->lenderOrganization->users as $user) {
-            $user->notify(new NewReservationForLenderNotification($reservation));
         }
 
         // Forget the cart

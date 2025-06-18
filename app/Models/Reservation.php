@@ -206,8 +206,9 @@ class Reservation extends Model
 
     public function canBeCompleted(): bool
     {
-        return $this->status === ReservationStatus::CONFIRMED &&
-            $this->items->every(fn ($item) => $item->isReturned());
+        // return $this->status === ReservationStatus::CONFIRMED &&
+        //     $this->items->every(fn ($item) => $item->isReturned());
+        return $this->status === ReservationStatus::CONFIRMED;
     }
 
     public function calculateTotals(): void

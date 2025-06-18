@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Depot extends Model
@@ -52,7 +53,7 @@ class Depot extends Model
         return $this->belongsTo(Organization::class);
     }
 
-    public function equipments()
+    public function equipments(): HasMany
     {
         return $this->hasMany(Equipment::class);
     }
