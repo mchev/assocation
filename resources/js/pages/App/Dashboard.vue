@@ -20,6 +20,25 @@
         </Button>
       </div>
 
+      <div v-if="depotsWithInvalidAddress.length > 0">
+        <Alert class="bg-yellow-500/10 border-yellow-500 text-yellow-900 dark:text-yellow-500" v-for="depot in depotsWithInvalidAddress" :key="depot.id">
+          <AlertTitle>
+            Votre lieu de stockage <strong>"{{ depot.name }}"</strong> a besoin d'une adresse valide
+          </AlertTitle>
+          <AlertDescription>
+            Les adresses permettent aux utilisateurs de trouver vos équipements par proximité géographique. 
+            <span class="block italic">
+              Note : Les adresses exactes ne sont jamais affichées publiquement, elles servent uniquement au calcul de distance.
+            </span>
+            <Button asChild size="sm" class="mt-3">
+              <Link :href="route('app.organizations.depots.edit', depot.id)" class="flex items-center">
+                Ajouter l'adresse
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -277,6 +296,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -316,6 +336,10 @@ const props = defineProps({
     default: () => []
   },
   upcomingReservations: {
+    type: Array,
+    default: () => []
+  },
+  depotsWithInvalidAddress: {
     type: Array,
     default: () => []
   }

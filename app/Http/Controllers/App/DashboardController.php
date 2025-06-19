@@ -70,6 +70,9 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get(),
+            'depotsWithInvalidAddress' => $organization->depots()
+                ->hasInvalidAddress()
+                ->get(),
         ]);
     }
 }
