@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,6 +16,7 @@ class CalendarController extends Controller
 
         // Get only outgoing reservations (where we are lending equipment)
         $reservations = $organization->lentReservations()
+            ->whereIn('status', [ReservationStatus::PENDING, ReservationStatus::CONFIRMED, ReservationStatus::COMPLETED])
             ->with([
                 'items.equipment',
                 'borrowerOrganization',

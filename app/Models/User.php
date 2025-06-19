@@ -30,6 +30,14 @@ class User extends Authenticatable
         'preferred_language',
         'preferences',
         'current_organization_id',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
+        'google_avatar',
+        'google_avatar_url',
+        'helloasso_id',
+        'helloasso_token',
+        'helloasso_refresh_token',
     ];
 
     /**
