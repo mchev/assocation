@@ -10,7 +10,6 @@ use App\Http\Controllers\Public\InvitationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/equipments', [EquipmentController::class, 'index'])->name('equipments.index');
 Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
 
 // Member invitations
@@ -29,9 +28,14 @@ Route::prefix('carts')->name('carts.')->group(function () {
 Route::controller(PageController::class)->group(function () {
     Route::get('/decouvrir', 'discover')->name('discover');
     Route::get('/comment-ca-marche', 'howItWorks')->name('how-it-works');
+    Route::get('/faq', 'faq')->name('faq');
     Route::get('/mentions-legales', 'terms')->name('terms');
     Route::get('/politique-de-confidentialite', 'privacy')->name('privacy');
     Route::get('/conditions-generales-d-utilisation', 'conditions')->name('conditions');
+    Route::get('/sitemap.xml', 'sitemap')->name('sitemap');
+    Route::get('/sitemap-index.xml', 'sitemapIndex')->name('sitemap.index');
+    Route::get('/sitemap-static.xml', 'sitemapStatic')->name('sitemap.static');
+    Route::get('/sitemap-{type}-{page}.xml', 'sitemapDynamic')->name('sitemap.dynamic');
 });
 
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');

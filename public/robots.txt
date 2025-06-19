@@ -1,2 +1,30 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://assocation.fr/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /app/
+Disallow: /settings/
+Disallow: /auth/
+Disallow: /api/
+
+# Allow public assets
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /storage/
+
+# Disallow temporary and system files
+Disallow: /vendor/
+Disallow: /node_modules/
+
+# Allow important public pages
+Allow: /
+Allow: /decouvrir
+Allow: /comment-ca-marche
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1

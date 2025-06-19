@@ -12,6 +12,7 @@
             <div class="flex flex-wrap justify-center gap-4 mt-4">
                 <a href="/decouvrir" class="text-sm text-gray-500 dark:text-gray-400">Découvrir</a>
                 <a href="/comment-ca-marche" class="text-sm text-gray-500 dark:text-gray-400">Comment ça marche</a>
+                <a href="/faq" class="text-sm text-gray-500 dark:text-gray-400">FAQ</a>
                 <a href="/mentions-legales" class="text-sm text-gray-500 dark:text-gray-400">Mentions légales</a>
                 <a href="/politique-de-confidentialite" class="text-sm text-gray-500 dark:text-gray-400">Politique de confidentialité</a>
                 <a href="/conditions-generales-d-utilisation" class="text-sm text-gray-500 dark:text-gray-400">Conditions générales d'utilisation</a>

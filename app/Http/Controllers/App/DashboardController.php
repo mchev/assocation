@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
@@ -14,8 +15,8 @@ class DashboardController extends Controller
         return Inertia::render('App/Dashboard', [
             'stats' => [
                 'equipment_count' => $organization->equipments()->count(),
-                'total_borrowed_count' => $organization->borrowedReservations()->count(),
-                'total_lent_count' => $organization->lentReservations()->count(),
+                'total_borrowed_count' => $organization->borrowedReservations()->whereIn('status', [ReservationStatus::CONFIRMED, ReservationStatus::COMPLETED])->count(),
+                'total_lent_count' => $organization->lentReservations()->whereIn('status', [ReservationStatus::CONFIRMED, ReservationStatus::COMPLETED])->count(),
                 'depots_count' => $organization->depots()->count(),
             ],
             'lentReservations' => $organization->lentReservations()

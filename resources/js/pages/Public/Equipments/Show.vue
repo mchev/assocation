@@ -1,5 +1,5 @@
 <template>
-    <PublicLayout :title="equipment.name" :description="equipment.description">
+    <AppLayout :title="equipment.name" :description="equipment.description">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Main Content -->
@@ -94,11 +94,11 @@
                 </div>
             </div>
         </div>
-    </PublicLayout>
+    </AppLayout>
 </template>
 
 <script setup>
-import PublicLayout from '@/layouts/PublicLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import {
     Card,
     CardContent,
