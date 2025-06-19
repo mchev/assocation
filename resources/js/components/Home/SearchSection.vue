@@ -18,7 +18,7 @@
               <Label class="text-sm font-medium mb-2 text-gray-700 dark:text-white">Dans quel secteur ?</Label>
               <CityInput 
                 v-model="form.city"
-                @update:modelValue="handleCity"
+                @selected="handleCity"
                 placeholder="Entrez une ville ou un code postal"
               />
             </div>
@@ -269,5 +269,6 @@ const handleCity = (cityInfo) => {
     lng: cityInfo.lng
   };
   form.radius = form.radius || 5;
+  handleSearch();
 };
 </script> 

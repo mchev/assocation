@@ -5,7 +5,6 @@
                 v-model="addressQuery"
                 type="text"
                 :placeholder="placeholder"
-                :disabled="isLoading"
                 :aria-expanded="showSuggestions"
                 :aria-controls="dropdownId"
                 :aria-describedby="error ? `${dropdownId}-error` : undefined"

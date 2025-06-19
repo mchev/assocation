@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Equipment;
@@ -77,6 +78,7 @@ class HomeController extends Controller
         // Availability filter
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereDoesntHave('reservations', function ($query) use ($request) {
+                $query->whereIn('reservations.status', [ReservationStatus::CONFIRMED, ReservationStatus::PENDING]);
                 $query->whereBetween('start_date', [$request->start_date, $request->end_date]);
                 $query->orWhereBetween('end_date', [$request->start_date, $request->end_date]);
             });

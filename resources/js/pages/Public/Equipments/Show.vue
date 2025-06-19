@@ -106,7 +106,6 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import ImageGallery from '@/components/ImageGallery.vue';
 import ReservationForm from '@/components/ReservationForm.vue';
 import EquipmentMiniMap from '@/components/EquipmentMiniMap.vue';

@@ -11,8 +11,6 @@
             type="text"
             class="flex-1 h-12 px-3 bg-transparent focus:outline-none"
             placeholder="Ajouter une localisation"
-            :disabled="isLoading"
-            @focus="showSuggestions = true"
           />
           <button
             v-if="cityQuery"
@@ -70,13 +68,14 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'coordinates', 'city']);
+const emit = defineEmits(['update:modelValue', 'selected']);
 
 const cityQuery = ref(props.modelValue);
 const suggestions = ref([]);
 const showSuggestions = ref(false);
 const isLoading = ref(false);
 const error = ref('');
+const selectedSuggestion = ref(null);
 
 // Debounced function to fetch city suggestions
 const fetchCitySuggestions = debounce(async (query) => {
@@ -117,12 +116,12 @@ const fetchCitySuggestions = debounce(async (query) => {
   } finally {
     isLoading.value = false;
   }
-}, 300);
+}, 150);
 
 // Watch for input changes to show suggestions
 watch(cityQuery, (newValue) => {
   emit('update:modelValue', newValue);
-  if (newValue.length >= 3) {
+  if (newValue.length >= 3 && newValue !== selectedSuggestion.value) {
     fetchCitySuggestions(newValue);
   } else {
     suggestions.value = [];
@@ -132,16 +131,18 @@ watch(cityQuery, (newValue) => {
 
 // Handle suggestion selection
 const selectSuggestion = (suggestion) => {
-  cityQuery.value = suggestion.name;
-  showSuggestions.value = false;
+  selectedSuggestion.value = suggestion.name + ' (' + suggestion.postcode + ')';
+  cityQuery.value = selectedSuggestion.value;
   error.value = '';
-  emit('update:modelValue', {
+  let cityInfos = {
     name: suggestion.name,
     lat: suggestion.coordinates.lat,
     lng: suggestion.coordinates.lng,
     postcode: suggestion.postcode,
     departement: suggestion.postcode.substring(0, 2)
-  });
+  };
+  emit('selected', cityInfos);
+  showSuggestions.value = false;
 };
 
 // Reset search
@@ -150,6 +151,8 @@ const resetSearch = () => {
   suggestions.value = [];
   showSuggestions.value = false;
   error.value = '';
+  selectedSuggestion.value = null;
   emit('update:modelValue', '');
+  emit('selected', null);
 };
 </script>
