@@ -54,6 +54,7 @@
                             </div>
                         </CardContent>
                     </Card>
+                    <EquipmentMiniMap :city="equipment.depot?.city" />
                 </div>
 
                 <!-- Sidebar -->
@@ -80,14 +81,12 @@
                         <ReservationForm :equipment="equipment" />
                     </div>
 
-                    <!-- Location Card -->
+                    <!-- Availability Calendar Card -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Localisation : {{ equipment.depot?.city }}</CardTitle>
+                            <CardTitle>Disponibilités</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
-                            <EquipmentMiniMap :city="equipment.depot?.city" />
-                            <Separator />
                             <EquipmentCalendar :equipment="equipment" />
                         </CardContent>
                     </Card>

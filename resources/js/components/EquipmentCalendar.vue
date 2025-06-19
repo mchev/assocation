@@ -1,7 +1,5 @@
 <template>
     <div class="space-y-4 availability-calendar-container">
-        <h4 class="font-medium">Disponibilités</h4>
-
         <FullCalendar
           :options="calendarOptions"
         />
