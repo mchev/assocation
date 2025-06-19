@@ -4,7 +4,7 @@
     description="Trouvez toutes les réponses à vos questions sur la location et le prêt de matériel événementiel entre associations. Comment ça marche, tarifs, sécurité et plus encore."
   >
     <Head>
-      <component is="script" type="application/ld+json">
+      <component v-bind:is="script" type="application/ld+json">
         {{ schemaMarkup }}
       </component>
     </Head>
