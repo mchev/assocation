@@ -39,7 +39,9 @@ const initializeMap = async () => {
     const coordinates = await getCityCoordinates(props.city);
     
     // Initialize map
-    map = L.map(mapContainer.value).setView(coordinates, 13);
+    map = L.map(mapContainer.value, {
+        scrollWheelZoom: false
+    }).setView(coordinates, 13);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);

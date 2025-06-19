@@ -14,6 +14,11 @@ defineProps({
   description: {
     type: String,
     required: false
+  },
+  image: {
+    type: String,
+    required: false,
+    default: '/screenshot.png'
   }
 })
 </script>
@@ -26,7 +31,7 @@ defineProps({
       <meta v-if="title" head-key="og:title" property="og:title" :content="title" />
       <link rel="canonical" head-key="canonical" :href="page.props.canonical" />
       <meta v-if="description" head-key="og:description" property="og:description" :content="description" />
-      <meta head-key="og:image" property="og:image" :content="page.props.app_url + '/android-chrome-512x512.png'" />
+      <meta head-key="og:image" property="og:image" :content="image" />
       <meta head-key="og:url" property="og:url" :content="page.props.canonical" />
       <meta head-key="og:type" property="og:type" content="website" />
       <meta head-key="og:site_name" property="og:site_name" :content="page.props.name" />

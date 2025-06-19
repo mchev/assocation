@@ -125,7 +125,7 @@ onUnmounted(() => {
 <template>
     <div class="space-y-6">
         <!-- Images Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-3 gap-2 sm:gap-4">
             <!-- Actual Images -->
             <Card 
                 v-for="image in allImages" 
@@ -141,7 +141,7 @@ onUnmounted(() => {
                         loading="lazy"
                     >
                     <div class="absolute inset-0 bg-black/40 dark:bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <ZoomIn class="w-6 h-6 text-white dark:text-black" />
+                        <ZoomIn class="w-4 h-4 sm:w-6 sm:h-6 text-white dark:text-black" />
                     </div>
                 </CardContent>
             </Card>
@@ -150,12 +150,12 @@ onUnmounted(() => {
             <Card 
                 v-for="i in placeholderCount" 
                 :key="`placeholder-${i}`"
-                class="hidden lg:block overflow-hidden bg-gray-50/50 dark:bg-gray-900/50"
+                class="overflow-hidden bg-gray-50/50 dark:bg-gray-900/50"
             >
                 <CardContent class="p-0">
                     <AspectRatio :ratio="4/3">
                         <div class="w-full h-full flex items-center justify-center">
-                            <Image class="w-8 h-8 text-gray-200 dark:text-gray-700" />
+                            <Image class="w-4 h-4 sm:w-8 sm:h-8 text-gray-200 dark:text-gray-700" />
                         </div>
                     </AspectRatio>
                 </CardContent>
