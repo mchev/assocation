@@ -163,7 +163,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Image Dialog -->
-        <Dialog v-model:open="isDialogOpen">
+        <Dialog v-model:open="isDialogOpen" class="z-50">
             <DialogContent 
                 class="max-w-screen-xl p-0"
                 @touchstart="handleTouchStart"

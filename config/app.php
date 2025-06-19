@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
     'version' => env('APP_VERSION', '1.0.0'),
+    'url' => env('APP_URL', 'http://localhost'),
+    'description' => env('APP_DESCRIPTION', env('APP_NAME').' facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.'),
 
     /*
     |--------------------------------------------------------------------------

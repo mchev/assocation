@@ -31,11 +31,18 @@
         </style>
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <meta inertia name="description" content="{{ config('app.description') }}">
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+        <meta inertia name="og:image" content="{{ asset('screenshot.png') }}">
+        <meta inertia name="og:title" content="{{ config('app.name') }}">
+        <meta inertia name="og:description" content="{{ config('app.description') }}">
+        <meta inertia name="og:url" content="{{ config('app.url') }}">
+        <meta inertia name="og:type" content="website">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=open-sans:400,500,600" rel="stylesheet" />
