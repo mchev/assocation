@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { Search, HelpCircle, X } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -185,9 +185,8 @@ const form = useForm({
 });
 
 const handleSearch = () => {
-  if (!form.isDirty) {
-    return;
-  }
+  if (!form.isDirty) return;
+
   isSearching.value = true;
   emit('searching', isSearching.value);
   form.get(route('home'), {
@@ -200,48 +199,6 @@ const handleSearch = () => {
     }
   });
 };
-
-// Load filters from localStorage
-const loadFiltersFromStorage = () => {
-  const savedFilters = localStorage.getItem('search_filters');
-  if (savedFilters) {
-    try {
-      const parsedFilters = JSON.parse(savedFilters);
-      // Only update city, coordinates, and radius
-      form.city = parsedFilters.city || null;
-      form.coordinates = parsedFilters.coordinates || null;
-      form.radius = parsedFilters.radius || 50;
-      form.postcode = parsedFilters.postcode || null;
-    } catch (e) {
-      console.error('Error loading filters from localStorage:', e);
-    }
-  }
-};
-
-// Save filters to localStorage
-const saveFiltersToStorage = (filters) => {
-  try {
-    const filtersToSave = {
-      city: filters.city,
-      coordinates: filters.coordinates,
-      radius: filters.radius,
-      postcode: filters.postcode
-    };
-    localStorage.setItem('search_filters', JSON.stringify(filtersToSave));
-  } catch (e) {
-    console.error('Error saving filters to localStorage:', e);
-  }
-};
-
-// Watch for changes in form values and save to localStorage
-watch(form, (newValue) => {
-  saveFiltersToStorage(newValue);
-}, { deep: true });
-
-// Load saved filters on component mount
-onMounted(() => {
-  loadFiltersFromStorage();
-});
 
 const resetFilters = () => {
   dateRange.value = {
@@ -258,8 +215,6 @@ const resetFilters = () => {
     city: null,
     postcode: null
   });
-  // Clear localStorage when resetting filters
-  localStorage.removeItem('search_filters');
   handleSearch();
 };
 
