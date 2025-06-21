@@ -33,8 +33,6 @@
               />
             </div>
 
-
-
             <!-- Search Button -->
             <div class="flex items-end">
               <Button
@@ -57,12 +55,6 @@
           <div class="px-6 pb-6">
             <div class="">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <!-- Category Select -->
-                <CategoryTreeSelectSimple
-                  v-model="form.category"
-                  :categories="stats.categories"
-                  @update:modelValue="handleSearch"
-                />
 
                 <!-- Radius Select -->
                 <div class="space-y-2">
@@ -79,7 +71,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Select v-model="form.radius">
+                  <Select v-model="form.radius" @update:model-value="handleSearch">
                     <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Sélectionner un rayon" />
                     </SelectTrigger>
@@ -91,6 +83,15 @@
                       <SelectItem value="100">100 km</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <!-- Category Select -->
+                <div class="space-y-2">
+                  <Label>Catégories</Label>
+                  <CategoryFilter
+                    v-model="form.categories"
+                    @update:model-value="handleSearch"
+                  />
                 </div>
 
                 <!-- Organization Filter -->
@@ -131,10 +132,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import CategoryTreeSelectSimple from '@/components/CategoryTreeSelectSimple.vue';
 import SearchInput from './SearchInput.vue';
 import CityInput from './CityInput.vue';
 import OrganizationFilter from '@/components/OrganizationFilter.vue';
+import CategoryFilter from '@/components/CategoryFilter.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -158,7 +159,7 @@ const isSearching = ref(false);
 const form = useForm({
   search: props.filters.search || '',
   radius: props.filters.radius || 50,
-  category: props.filters.category || 'all',
+  categories: props.filters.categories || [],
   organizations: props.filters.organizations || [],
   coordinates: props.filters.coordinates || null,
   city: props.filters.city || null,
@@ -166,6 +167,7 @@ const form = useForm({
 });
 
 const handleSearch = () => {
+  console.log(form.categories);
   if (!form.isDirty) return;
 
   isSearching.value = true;
@@ -185,7 +187,7 @@ const resetFilters = () => {
   form.reset({
     search: '',
     radius: 50,
-    category: 'all',
+    categories: [],
     organizations: [],
     coordinates: null,
     city: null,

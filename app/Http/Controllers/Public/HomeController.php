@@ -48,15 +48,12 @@ class HomeController extends Controller
         }
 
         // Apply category filter
-        if ($request->filled('category') && $request->category !== 'all') {
-            $category = Category::find($request->category);
-            if ($category) {
-                $query->where(function ($q) use ($category) {
-                    $q->where('category_id', $category->id)
-                        ->orWhereIn('category_id', $category->children()->pluck('id'))
-                        ->orWhereIn('category_id', $category->parent()->pluck('id'));
-                });
-            }
+        if ($request->filled('categories')) {
+            $categories = Category::whereIn('id', $request->categories)->with('children')->get();
+            $query->where(function ($q) use ($categories) {
+                $q->whereIn('category_id', $categories->pluck('id'))
+                    ->orWhereIn('category_id', $categories->pluck('children')->flatten()->pluck('id'));
+            });
         }
 
         // Apply location filter if preferences exist
@@ -83,7 +80,7 @@ class HomeController extends Controller
             'equipments' => $query->paginate(12),
             'filters' => [
                 'search' => $request->search,
-                'category' => $request->category,
+                'categories' => $request->categories,
                 'organizations' => $request->organizations,
                 'coordinates' => $locationPreferences['coordinates'] ?? null,
                 'radius' => $locationPreferences['radius'] ?? null,
