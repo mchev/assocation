@@ -132,7 +132,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 
-const props = defineProps({
+defineProps({
     stats: {
         type: Object,
         required: true,

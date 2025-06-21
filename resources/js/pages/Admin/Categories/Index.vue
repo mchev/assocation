@@ -138,7 +138,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-const props = defineProps({
+defineProps({
   categories: {
     type: Array,
     required: true,

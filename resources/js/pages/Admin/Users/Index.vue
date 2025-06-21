@@ -103,22 +103,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Pagination from '@/components/Pagination.vue'
 
-const props = defineProps({
+defineProps({
   users: {
     type: Object,
     required: true,
   },
 })
-
-const getInitials = (name) => {
-  if (!name) return '?'
-  return name
-    .split(' ')
-    .map(word => word.charAt(0))
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
 
 const deleteUser = (userId) => {
   if (confirm('Are you sure you want to delete this user?')) {

@@ -135,7 +135,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const props = defineProps({
+defineProps({
   organizations: {
     type: Array,
     required: true,
