@@ -79,7 +79,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Select v-model="form.radius" @update:modelValue="handleSearch">
+                  <Select v-model="form.radius">
                     <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Sélectionner un rayon" />
                     </SelectTrigger>
@@ -108,7 +108,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <DateRangePicker v-model="dateRange" @update:modelValue="handleSearch" />
+                  <DateRangePicker v-model="dateRange" />
                 </div>
                 <div class="flex justify-end items-end">
                 <Button 
@@ -185,6 +185,9 @@ const form = useForm({
 });
 
 const handleSearch = () => {
+  if (!form.isDirty) {
+    return;
+  }
   isSearching.value = true;
   emit('searching', isSearching.value);
   form.get(route('home'), {
