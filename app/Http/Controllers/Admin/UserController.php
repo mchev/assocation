@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('organization')
+        $users = User::with('organizations')
             ->paginate(10);
 
         return Inertia::render('Admin/Users/Index', [
@@ -21,7 +22,11 @@ class UserController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/Users/Create');
+        $organizations = Organization::all();
+
+        return Inertia::render('Admin/Users/Create', [
+            'organizations' => $organizations,
+        ]);
     }
 
     public function store(Request $request)
@@ -34,7 +39,16 @@ class UserController extends Controller
             'is_admin' => 'boolean',
         ]);
 
-        $user = User::create($validated);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'is_admin' => $validated['is_admin'] ?? false,
+        ]);
+
+        // Attach user to organization
+        $user->organizations()->attach($validated['organization_id'], ['role' => 'member']);
+        $user->update(['current_organization_id' => $validated['organization_id']]);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
@@ -42,8 +56,11 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        $organizations = Organization::all();
+
         return Inertia::render('Admin/Users/Edit', [
-            'user' => $user->load('organization'),
+            'user' => $user->load('organizations'),
+            'organizations' => $organizations,
         ]);
     }
 
@@ -56,7 +73,15 @@ class UserController extends Controller
             'is_admin' => 'boolean',
         ]);
 
-        $user->update($validated);
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'is_admin' => $validated['is_admin'] ?? false,
+        ]);
+
+        // Update organization membership
+        $user->organizations()->sync([$validated['organization_id'] => ['role' => 'member']]);
+        $user->update(['current_organization_id' => $validated['organization_id']]);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');

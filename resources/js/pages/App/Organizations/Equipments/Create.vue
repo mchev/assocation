@@ -307,7 +307,7 @@
                     <Label class="text-base">Prix d'achat</Label>
                     <div class="relative mt-2">
                       <Input
-                        v-model="form.purchase_price"
+                        :value="form.purchase_price"
                         type="text"
                         inputmode="decimal"
                         class="pl-7"
@@ -322,7 +322,7 @@
                     <Label class="text-base">Prix de location</Label>
                     <div class="relative mt-2">
                       <Input
-                        v-model="form.rental_price"
+                        :value="form.rental_price"
                         type="text"
                         inputmode="decimal"
                         class="pl-7"
@@ -338,7 +338,7 @@
                     <Label class="text-base">Montant de la caution</Label>
                     <div class="relative mt-2">
                       <Input
-                        v-model="form.deposit_amount"
+                        :value="form.deposit_amount"
                         type="text"
                         inputmode="decimal"
                         class="pl-7"
@@ -592,31 +592,39 @@ const handleFilePondReorderFiles = (files) => {
 }
 
 const handlePriceInput = (e, field) => {
-  let value = e.target.value
-  
-  // Replace commas with dots for standardization
-  value = value.replace(',', '.')
-  
-  // Remove any non-numeric characters except dots
-  value = value.replace(/[^\d.]/g, '')
-  
-  // Ensure only one decimal point
-  const parts = value.split('.')
+  let value = e.target.value;
+
+  // Replace commas with dots and remove non-numeric characters except for one dot
+  value = value.replace(',', '.').replace(/[^\d.]/g, '');
+  const parts = value.split('.');
   if (parts.length > 2) {
-    value = parts[0] + '.' + parts.slice(1).join('')
+    value = parts[0] + '.' + parts.slice(1).join('');
   }
-  
-  // Format the display value with comma
-  const displayValue = value ? value.replace('.', ',') : '0,00'
-  
-  // Store the raw value
-  form[field] = value || '0.00'
-  e.target.value = displayValue
-}
+
+  // Update form model
+  form[field] = value;
+
+  // Format for display
+  e.target.value = value.replace('.', ',');
+};
 
 const submit = () => {
+  const data = { ...form };
+  
+  Object.keys(data).forEach(key => {
+    if (key.endsWith('_price') || key.endsWith('_amount')) {
+      if (data[key] === '' || data[key] === null) {
+        data[key] = '0.00';
+      } else {
+        data[key] = String(data[key]).replace(',', '.');
+      }
+    }
+  });
+
   // Send raw values to server, Laravel will handle the conversion
-  form.post(route('app.organizations.equipments.store', props.organization))
+  form
+    .transform(() => data)
+    .post(route('app.organizations.equipments.store', props.organization));
 }
 </script>
 

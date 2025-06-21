@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Jobs\NotifyAdminUserCreated;
 use App\Traits\HasOrganizations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,6 +27,7 @@ class User extends Authenticatable
         'phone',
         'avatar_path',
         'is_active',
+        'is_admin',
         'last_login_at',
         'preferred_language',
         'preferences',
@@ -85,6 +87,7 @@ class User extends Authenticatable
 
         static::created(function ($user) {
             $user->ensurePrimaryOrganization();
+            dispatch(new NotifyAdminUserCreated($user));
         });
     }
 }

@@ -18,7 +18,7 @@ class DashboardController extends Controller
                 'organizations_count' => Organization::count(),
                 'equipment_count' => Equipment::count(),
             ],
-            'recent_users' => User::with('organization')
+            'recent_users' => User::with('organizations')
                 ->latest()
                 ->take(5)
                 ->get(),

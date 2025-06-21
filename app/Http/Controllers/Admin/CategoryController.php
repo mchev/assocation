@@ -31,7 +31,14 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Categories/Create');
+        $categories = Category::with('children')
+            ->whereNull('parent_id')
+            ->orderBy('order')
+            ->get();
+
+        return Inertia::render('Admin/Categories/Create', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -59,8 +66,14 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        $categories = Category::with('children')
+            ->whereNull('parent_id')
+            ->orderBy('order')
+            ->get();
+
         return Inertia::render('Admin/Categories/Edit', [
             'category' => $category->load(['children', 'parent']),
+            'categories' => $categories,
         ]);
     }
 
