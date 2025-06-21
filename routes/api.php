@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\EquipmentController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,3 +43,5 @@ Route::apiResource('categories', CategoryController::class);
 Route::get('categories/tree', [CategoryController::class, 'tree']);
 
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('api.search.suggestions');
+
+Route::get('/organizations', [OrganizationController::class, 'index'])->name('api.organizations.index');

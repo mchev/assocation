@@ -1,157 +1,79 @@
 <template>
-  <div 
-    class="group relative bg-card rounded-xl shadow-sm border border-border/50 overflow-hidden hover:shadow-lg transition-all duration-200"
+  <Link
+    :href="route('equipments.show', equipment)"
+    class="group relative flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:shadow-lg"
   >
-    <!-- Equipment Image -->
-    <Link 
-      :href="route('equipments.show', equipment)"
-      class="block aspect-[16/9] bg-accent/10 relative overflow-hidden"
+    <div
+      class="relative block aspect-[4/3] overflow-hidden"
+      :class="{ 'shimmer': hasImage && !imageLoaded }"
     >
       <img
-        v-if="equipment.images && equipment.images.length > 0"
+        v-if="hasImage"
         :src="equipment.images[0].url"
         :alt="equipment.name"
         loading="lazy"
-        placeholder="blur"
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+        class="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
+        :class="{ 'opacity-0': !imageLoaded }"
+        @load="onImageLoad"
       />
-      <div 
-        v-else 
-        class="w-full h-full flex items-center justify-center text-muted-foreground/30"
+      <div
+        v-else
+        class="flex h-full w-full items-center justify-center bg-accent/10 text-muted-foreground/30"
       >
-        <Tag class="w-12 h-12" />
-      </div>
-    </Link>
-
-    <div class="p-6">
-      <!-- Header -->
-      <div class="flex items-start justify-between gap-4">
-        <Link 
-          :href="route('equipments.show', equipment)"
-          class="block"
-        >
-          <h3 class="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">
-            {{ equipment.name }}
-          </h3>
-        </Link>
-      </div>
-
-      <!-- Info Grid -->
-      <div class="mt-4 space-y-3">
-        <div class="flex items-center text-sm text-muted-foreground">
-          <MapPin class="h-4 w-4 mr-2 text-primary/70 flex-shrink-0" />
-          <span class="truncate">{{ equipment.depot?.city || 'Non localisé' }}</span>
-        </div>
-        <div class="flex items-center text-sm text-muted-foreground">
-          <Tag class="h-4 w-4 mr-2 text-primary/70 flex-shrink-0" />
-          <span class="truncate">{{ equipment.category?.name || 'Sans catégorie' }}</span>
-        </div>
-        <div class="flex items-center text-sm text-muted-foreground">
-          <Euro class="h-4 w-4 mr-2 text-primary/70 flex-shrink-0" />
-          <span>{{ formatPrice(equipment.rental_price) }} / jour</span>
-        </div>
-      </div>
-
-      <!-- Rental Period Info -->
-      <div 
-        v-if="rentalPeriod"
-        class="mt-4 p-3 bg-accent/50 rounded-lg space-y-2"
-      >
-        <div class="flex items-center text-sm">
-          <Calendar class="h-4 w-4 mr-2 text-primary/70" />
-          <span class="text-muted-foreground">
-            {{ rentalPeriod.start }} - {{ rentalPeriod.end }}
-          </span>
-        </div>
-        <div class="flex items-center justify-between text-sm font-medium">
-          <span>Total ({{ rentalPeriod.days }} jour{{ rentalPeriod.days > 1 ? 's' : '' }})</span>
-          <span class="text-foreground">{{ formatPrice(calculateTotalPrice) }}</span>
-        </div>
-      </div>
-
-      <!-- Description -->
-      <p v-if="equipment.description" class="mt-4 text-sm text-muted-foreground line-clamp-1">
-        {{ equipment.description }}
-      </p>
-      <p v-else class="mt-4 text-sm text-muted-foreground line-clamp-2">
-        Aucune description
-      </p>
-
-      <!-- Actions -->
-      <div class="mt-6">
-        <Button
-          asChild
-          class="w-full group/button"
-        >
-          <Link :href="route('equipments.show', equipment)">
-            Voir les détails
-            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover/button:translate-x-1" />
-          </Link>
-        </Button>
+        <ImageIcon class="h-12 w-12" />
       </div>
     </div>
-  </div>
+
+    <div class="flex flex-grow flex-col p-4">
+      <div class="flex-grow">
+        <h3 class="line-clamp-1 font-semibold text-foreground transition-colors duration-200 group-hover:text-primary">
+          {{ equipment.name }}
+        </h3>
+        <div class="text-sm">
+          <span class="font-semibold text-foreground">{{ formatPrice(equipment.rental_price) }}</span>
+          <span class="text-sm text-muted-foreground"> / jour</span>
+        </div>
+
+        <div class="mt-2 space-y-2 text-xs text-muted-foreground">
+          <span class="truncate">{{ equipment.organization?.name || 'Particulier' }} - {{ equipment.depot?.city || 'Non localisé' }}</span>
+        </div>
+        <div class="mt-2 flex items-center text-xs text-muted-foreground">
+          <Tag class="mr-2 h-4 w-4" />
+          <span class="truncate">{{ equipment.category?.name || 'Sans catégorie' }}</span>
+        </div>
+      </div>
+    </div>
+  </Link>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
-import { Button } from '@/components/ui/button';
-import { 
-  MapPin, 
-  Tag, 
-  Euro, 
-  Calendar,
-  ArrowRight,
-} from 'lucide-vue-next';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { Link } from '@inertiajs/vue3'
+import {
+  Image as ImageIcon,
+  Tag,
+} from 'lucide-vue-next'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   equipment: {
     type: Object,
-    required: true
+    required: true,
   },
-  startDate: {
-    type: String,
-    default: ''
-  },
-  endDate: {
-    type: String,
-    default: ''
-  }
-});
+})
 
-const calculateTotalPrice = computed(() => {
-  if (!props.startDate || !props.endDate) {
-    return props.equipment.rental_price;
-  }
+const imageLoaded = ref(false)
+const hasImage = computed(() => props.equipment.images && props.equipment.images.length > 0)
 
-  const start = new Date(props.startDate);
-  const end = new Date(props.endDate);
-  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-  
-  return (props.equipment.rental_price * days).toFixed(2);
-});
+const onImageLoad = () => {
+  imageLoaded.value = true
+}
 
 const formatPrice = (price) => {
+  if (price === null || price === undefined)
+    return ''
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
-  }).format(price);
-};
-
-const rentalPeriod = computed(() => {
-  if (!props.startDate || !props.endDate) return null;
-  
-  const start = new Date(props.startDate);
-  const end = new Date(props.endDate);
-  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-  
-  return {
-    start: format(start, 'dd MMM yyyy', { locale: fr }),
-    end: format(end, 'dd MMM yyyy', { locale: fr }),
-    days
-  };
-});
+    currency: 'EUR',
+  }).format(price)
+}
 </script> 

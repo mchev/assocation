@@ -93,23 +93,17 @@
                   </Select>
                 </div>
 
-                <!-- Date Range -->
+                <!-- Organization Filter -->
                 <div class="space-y-2">
                   <Label class="flex items-center gap-2">
-                    Période de location
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <HelpCircle class="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Période de location souhaitée</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    Filtrer par organisation
                   </Label>
-                  <DateRangePicker v-model="dateRange" />
+                  <OrganizationFilter 
+                    v-model="form.organizations"
+                    @update:model-value="handleSearch"
+                  />
                 </div>
+
                 <div class="flex justify-end items-end">
                 <Button 
                   variant="outline"
@@ -131,17 +125,16 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Search, HelpCircle, X } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CategoryTreeSelectSimple from '@/components/CategoryTreeSelectSimple.vue';
-import { parseDate, getLocalTimeZone } from '@internationalized/date';
 import SearchInput from './SearchInput.vue';
 import CityInput from './CityInput.vue';
-import DateRangePicker from '@/components/DateRangePicker.vue';
+import OrganizationFilter from '@/components/OrganizationFilter.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -162,23 +155,11 @@ const emit = defineEmits(['searching']);
 
 const isSearching = ref(false);
 
-const dateRange = ref({
-  from: props.filters.start_date ? parseDate(props.filters.start_date) : undefined,
-  to: props.filters.end_date ? parseDate(props.filters.end_date) : undefined
-});
-
-// Watch for date range changes and update form values
-watch(dateRange, (newRange) => {
-  form.start_date = newRange.from ? newRange.from.toDate(getLocalTimeZone()).toISOString().split('T')[0] : '';
-  form.end_date = newRange.to ? newRange.to.toDate(getLocalTimeZone()).toISOString().split('T')[0] : '';
-}, { deep: true });
-
 const form = useForm({
   search: props.filters.search || '',
   radius: props.filters.radius || 50,
   category: props.filters.category || 'all',
-  start_date: props.filters.start_date || '',
-  end_date: props.filters.end_date || '',
+  organizations: props.filters.organizations || [],
   coordinates: props.filters.coordinates || null,
   city: props.filters.city || null,
   postcode: props.filters.postcode || null
@@ -201,16 +182,11 @@ const handleSearch = () => {
 };
 
 const resetFilters = () => {
-  dateRange.value = {
-    from: undefined,
-    to: undefined
-  };
   form.reset({
     search: '',
     radius: 50,
     category: 'all',
-    start_date: '',
-    end_date: '',
+    organizations: [],
     coordinates: null,
     city: null,
     postcode: null

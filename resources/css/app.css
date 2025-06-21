@@ -118,6 +118,36 @@
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
       'Noto Color Emoji';
   }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: hsl(var(--muted));
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent 0,
+      hsl(var(--accent-raw) / 0.1) 20%,
+      hsl(var(--accent-raw) / 0.1) 60%,
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 :root {
@@ -135,7 +165,8 @@
   --success-foreground: hsl(210 20% 98%);
   --muted: hsl(220 14% 96%);
   --muted-foreground: hsl(220 9% 46%);
-  --accent: hsl(262, 83%, 58%);
+  --accent: hsl(262 83% 58%);
+  --accent-raw: 262 83% 58%;
   --accent-foreground: hsl(210 20% 98%);
   --warning: hsl(34 100% 50%);
   --warning-foreground: hsl(210 20% 98%);
@@ -177,6 +208,7 @@
   --muted: hsl(223 47% 11%);
   --muted-foreground: hsl(220 9% 70%);
   --accent: hsl(262 83% 68%);
+  --accent-raw: 262 83% 68%;
   --accent-foreground: hsl(210 20% 98%);
   --warning: hsl(34 100% 50%);
   --warning-foreground: hsl(210 20% 98%);
@@ -203,7 +235,7 @@
 
 @layer base {
     * {
-        @apply border-border;
+        @apply border-border outline-ring/50;
     }
 
     body {
@@ -228,5 +260,35 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  .shimmer {
+      position: relative;
+      overflow: hidden;
+      background-color: hsl(var(--muted));
+  }
+
+  .shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+          90deg,
+          transparent 0,
+          hsla(var(--accent-raw), 0.2) 20%,
+          hsla(var(--accent-raw), 0.2) 60%,
+          transparent
+      );
+      animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+      100% {
+          transform: translateX(100%);
+      }
   }
 }
