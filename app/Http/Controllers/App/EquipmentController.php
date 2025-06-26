@@ -7,7 +7,6 @@ use App\Actions\Equipment\UpdateEquipmentAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
-use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -90,7 +89,6 @@ class EquipmentController extends Controller
 
         return Inertia::render('App/Organizations/Equipments/Create', [
             'organization' => $organization,
-            'categories' => Category::orderBy('name')->get(['id', 'name']),
             'depots' => $organization->depots()->orderBy('name')->get(['id', 'name', 'city']),
         ]);
     }
@@ -121,7 +119,6 @@ class EquipmentController extends Controller
         return Inertia::render('App/Organizations/Equipments/Edit', [
             'equipment' => $equipment,
             'organization' => $organization,
-            'categories' => Category::orderBy('name')->get(['id', 'name']),
             'depots' => $organization->depots()->orderBy('name')->get(['id', 'name', 'city']),
         ]);
     }

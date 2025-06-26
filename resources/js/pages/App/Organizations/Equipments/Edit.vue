@@ -139,16 +139,10 @@
                   Catégorie
                   <span class="text-destructive" aria-hidden="true">*</span>
                 </Label>
-                <Select v-model="form.category_id" required class="mt-2">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez une catégorie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
-                      {{ category.name }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <CategorySelect
+                  v-model="form.category_id"
+                  required
+                />
                 <p v-if="form.errors.category_id" class="mt-2 text-sm text-destructive">{{ form.errors.category_id }}</p>
               </div>
 
@@ -450,6 +444,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import CategorySelect from '@/components/CategorySelect.vue'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
