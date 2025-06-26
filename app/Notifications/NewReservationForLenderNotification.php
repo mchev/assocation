@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class NewReservationForLenderNotification extends Notification implements ShouldQueue
 {
@@ -27,6 +28,14 @@ class NewReservationForLenderNotification extends Notification implements Should
             ->subject($this->reservation->lenderOrganization->name.' - Nouvelle réservation')
             ->greeting('Bonjour '.$notifiable->name.',')
             ->line("Une nouvelle demande de réservation a été créée par {$this->reservation->user->name} de {$this->reservation->borrowerOrganization->name}.")
+            ->line('--------------------------------')
+            ->line('Message de la demande :')
+            ->line(new HtmlString(
+                '<pre style="white-space:pre-wrap;font-family:monospace">'.
+                    e($this->reservation->notes).
+                '</pre>'
+            ))
+            ->line('--------------------------------')
             ->line("Équipements demandés : {$this->reservation->items->map(fn ($item) => "{$item->equipment->name} (x{$item->quantity})")->join(', ')}")
             ->line("Période : du {$this->reservation->start_date->format('d/m/Y')} au {$this->reservation->end_date->format('d/m/Y')}")
             ->action('Gérer la réservation', route('app.organizations.reservations.out.edit', $this->reservation))

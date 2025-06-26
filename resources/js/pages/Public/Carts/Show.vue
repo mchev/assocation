@@ -236,14 +236,16 @@
                                     <p class="text-sm">Les paiements et arrangements financiers se font directement avec les propriétaires des équipements, en dehors de la plateforme.</p>
                                 </div>
                             </div>
+                            <form class="space-y-2" id="reservation-message-form" @submit.prevent="confirmReservation">
+                                <p class="text-sm font-bold">Laissez un message pour présenter votre projet :</p>
+                                <Textarea v-model="form.message" rows="6" placeholder="Présentez-vous, donnez du contexte, etc." :error="form.errors.message" required />
+                            </form>
                             <DialogFooter>
                                 <Button variant="outline" @click="showConfirmationModal = false">
                                     Annuler
                                 </Button>
-                                <Button asChild>
-                                    <Link :href="route('app.organizations.reservations.in.create')">
-                                        Je confirme ma demande
-                                    </Link>
+                                <Button type="submit" form="reservation-message-form" :disabled="isProcessing">
+                                    Je confirme ma demande
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -257,9 +259,10 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage, useForm } from '@inertiajs/vue3';
 import { Truck, Minus, Plus, Trash, AlertTriangle, CreditCard, Camera, Users, Shield, FileText, AlertCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -269,6 +272,18 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
 const isProcessing = ref(false);
 const showConfirmationModal = ref(false);
 const items = computed(() => usePage().props.items);
+
+const form = useForm({
+    message: ''
+});
+
+const confirmReservation = () => {
+    form.post(route('app.organizations.reservations.in.store'), {
+        onSuccess: () => {
+            showConfirmationModal.value = false;
+        }
+    });
+};
 
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString('fr-FR', {

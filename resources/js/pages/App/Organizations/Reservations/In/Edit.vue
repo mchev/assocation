@@ -139,6 +139,16 @@
           </Card>
         </div>
 
+        <Alert class="mb-6">
+          <MessageSquareQuote class="h-4 w-4" />
+          <AlertTitle>Message de la demande</AlertTitle>
+          <AlertDescription>
+            <div class="text-sm whitespace-pre-wrap">
+              {{ reservation.notes }}
+            </div>
+          </AlertDescription>
+        </Alert>
+
         <Alert variant="warning" class="mb-6">
           <AlertCircleIcon class="h-4 w-4" />
           <AlertTitle>Information importante</AlertTitle>
@@ -207,7 +217,7 @@ import ReservationLayout from '@/pages/App/Organizations/Reservations/Layout.vue
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircleIcon, CalendarIcon, BuildingIcon, ClockIcon, XIcon, ArrowLeftIcon, PlusIcon, PencilIcon, UserIcon, MailIcon, PhoneIcon } from 'lucide-vue-next'
+import { AlertCircleIcon, CalendarIcon, BuildingIcon, ClockIcon, XIcon, ArrowLeftIcon, PlusIcon, PencilIcon, UserIcon, MailIcon, PhoneIcon, MessageSquareQuote } from 'lucide-vue-next'
 import { router } from '@inertiajs/vue3'
 import { Trash2Icon } from 'lucide-vue-next'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'

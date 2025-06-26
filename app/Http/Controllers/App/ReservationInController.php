@@ -38,8 +38,12 @@ class ReservationInController extends Controller
         ]);
     }
 
-    public function create(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
+        $request->validate([
+            'message' => 'required|string|max:65535',
+        ]);
+
         $reservation = (new CreateReservationFromCart)->handle($request);
 
         return redirect()->route('app.organizations.reservations.in.edit', $reservation)
@@ -62,6 +66,7 @@ class ReservationInController extends Controller
                 'created_at' => $reservation->created_at->locale('fr')->isoFormat('D MMMM YYYY HH:mm'),
                 'updated_at' => $reservation->updated_at->locale('fr')->isoFormat('D MMMM YYYY HH:mm'),
                 'duration' => $reservation->duration,
+                'notes' => $reservation->notes,
                 'from_organization' => [
                     'id' => $reservation->fromOrganization->id,
                     'name' => $reservation->fromOrganization->name,

@@ -157,6 +157,7 @@ class ReservationOutController extends Controller
                 'duration' => $reservation->duration,
                 'deadline' => $reservation->deadline,
                 'deadline_for_human' => $reservation->deadline_for_human,
+                'notes' => $reservation->notes,
                 'from_organization' => [
                     'id' => $reservation->fromOrganization->id,
                     'name' => $reservation->fromOrganization->name,

@@ -14,281 +14,300 @@
           </Button>
         </div>
 
-        <!-- Header Section -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
-          <div class="flex-1">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
-              Réservation du {{ reservation.start_date }} au {{ reservation.end_date }}
-            </h1>
-            <div class="flex items-center gap-2 mt-2">
-              <BuildingIcon class="h-4 w-4 text-gray-500" />
-              <h2 class="text-lg sm:text-xl font-semibold text-gray-600">
-                {{ reservation.to_organization.name }}
-              </h2>
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Left column -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- Header Section -->
+            <div class="mb-6">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                Réservation du {{ reservation.start_date }} au {{ reservation.end_date }}
+              </h1>
+              <div class="flex items-center gap-2 mt-2">
+                <BuildingIcon class="h-4 w-4 text-gray-500" />
+                <h2 class="text-lg sm:text-xl font-semibold text-gray-600">
+                  {{ reservation.to_organization.name }}
+                </h2>
+              </div>
             </div>
+
+            <!-- Status Management Section -->
+            <Card>
+              <CardHeader class="flex items-center justify-between">
+                <CardTitle class="text-lg">Gestion de la réservation</CardTitle>
+                <Badge :class="`${reservation.status_color}`">
+                  {{ reservation.status_label }}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <div class="space-y-4">
+                  <!-- Pending Status Actions -->
+                  <div v-if="reservation.status === 'pending'" class="space-y-4">
+                    <div class="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <ClockIcon class="h-5 w-5 text-yellow-600" />
+                      <div class="flex-1">
+                        <h3 class="font-medium text-yellow-800">Réservation en attente</h3>
+                        <p class="text-sm text-yellow-700">Cette réservation attend votre validation</p>
+                        <p class="text-sm text-yellow-700">Vous avez {{ reservation.deadline_for_human }} pour valider ou refuser la réservation. Au delà de ce délai, la réservation sera automatiquement annulée.</p>
+                      </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        @click="confirmReservation"
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        :disabled="isProcessing"
+                      >
+                        <CheckIcon class="h-4 w-4 mr-2" />
+                        <span v-if="isProcessing">Traitement...</span>
+                        <span v-else>Accepter la réservation</span>
+                      </Button>
+                      
+                      <Button 
+                        @click="rejectReservation"
+                        variant="destructive"
+                        class="flex-1"
+                        :disabled="isProcessing"
+                      >
+                        <XIcon class="h-4 w-4 mr-2" />
+                        <span v-if="isProcessing">Traitement...</span>
+                        <span v-else>Refuser la réservation</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <!-- Confirmed Status Actions -->
+                  <div v-else-if="reservation.status === 'confirmed'" class="space-y-4">
+                    <div class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <CheckCircleIcon class="h-5 w-5 text-green-600" />
+                      <div class="flex-1">
+                        <h3 class="font-medium text-green-800">Réservation confirmée</h3>
+                        <p class="text-sm text-green-700">Cette réservation a été acceptée</p>
+                      </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        @click="completeReservation"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                        :disabled="isProcessing"
+                      >
+                        <CheckCircleIcon class="h-4 w-4 mr-2" />
+                        <span v-if="isProcessing">Traitement...</span>
+                        <span v-else>Marquer comme terminée</span>
+                      </Button>
+                      
+                      <Button 
+                        @click="cancelReservation"
+                        variant="outline"
+                        class="flex-1 border-red-300 text-red-700 hover:bg-red-50"
+                        :disabled="isProcessing"
+                      >
+                        <XIcon class="h-4 w-4 mr-2" />
+                        <span v-if="isProcessing">Traitement...</span>
+                        <span v-else>Annuler la réservation</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <!-- Completed Status -->
+                  <div v-else-if="reservation.status === 'completed'" class="space-y-4">
+                    <div class="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <CheckCircleIcon class="h-5 w-5 text-blue-600" />
+                      <div class="flex-1">
+                        <h3 class="font-medium text-blue-800">Réservation terminée</h3>
+                        <p class="text-sm text-blue-700">Cette réservation a été complétée avec succès</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cancelled Status -->
+                  <div v-else-if="reservation.status === 'cancelled'" class="space-y-4">
+                    <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <XCircleIcon class="h-5 w-5 text-red-600" />
+                      <div class="flex-1">
+                        <h3 class="font-medium text-red-800">Réservation annulée</h3>
+                        <p class="text-sm text-red-700">Cette réservation a été annulée</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rejected Status -->
+                  <div v-else-if="reservation.status === 'rejected'" class="space-y-4">
+                    <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <XCircleIcon class="h-5 w-5 text-red-600" />
+                      <div class="flex-1">
+                        <h3 class="font-medium text-red-800">Réservation refusée</h3>
+                        <p class="text-sm text-red-700">Cette réservation a été refusée</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Message Card -->
+            <Card class="mb-6 lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Message de {{ reservation.from_organization.name }}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div class="text-sm whitespace-pre-wrap">
+                  {{ reservation.notes }}
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Equipment Section -->
+            <Card class="lg:col-span-2">
+              <CardHeader>
+                <div class="flex justify-between items-center">
+                  <CardTitle>Liste des équipements demandés</CardTitle>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600">Prix total</p>
+                    <p class="text-xl font-bold text-gray-900">{{ reservation.total }} €</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Équipement</TableHead>
+                      <TableHead>Quantité</TableHead>
+                      <TableHead>Prix/jour</TableHead>
+                      <TableHead>Caution</TableHead>
+                      <TableHead>Emplacement</TableHead>
+                      <TableHead v-if="reservation.status === 'pending'" class="w-[100px]"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow v-for="item in reservation.items" :key="item.id">
+                      <TableCell class="font-medium">{{ item.equipment.name }}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" class="text-sm font-medium">
+                          {{ item.quantity }}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{{ item.price }} €</TableCell>
+                      <TableCell>{{ item.equipment.deposit_amount }} €</TableCell>
+                      <TableCell>{{ item.city }}</TableCell>
+                      <TableCell v-if="reservation.status === 'pending'">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          class="text-destructive hover:text-destructive/90"
+                          @click="removeItem(item.id)"
+                        >
+                          <Trash2Icon class="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
           </div>
-          <div class="flex flex-col items-start sm:items-end gap-2">
-            <Badge :class="`${reservation.status_color}`">
-              {{ reservation.status_label }}
-            </Badge>
+
+          <!-- Right sidebar -->
+          <div class="lg:col-span-1 space-y-6">
+
+            <!-- Détails de la réservation (amélioré) -->
+            <Card>
+              <CardHeader>
+                <CardTitle class="text-lg flex items-center gap-2">
+                  <CalendarIcon class="h-5 w-5 text-primary" />
+                  Détails de la réservation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul class="divide-y divide-gray-100">
+                  <li class="py-3 flex items-center gap-3">
+                    <CalendarIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Récupération</span>
+                      <span class="font-medium text-gray-900">{{ reservation.start_date }}</span>
+                    </div>
+                  </li>
+                  <li class="py-3 flex items-center gap-3">
+                    <CalendarIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Retour</span>
+                      <span class="font-medium text-gray-900">{{ reservation.end_date }}</span>
+                    </div>
+                  </li>
+                  <li class="py-3 flex items-center gap-3">
+                    <ClockIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Durée</span>
+                      <span class="font-medium text-gray-900">{{ reservation.duration }} {{ reservation.duration > 1 ? 'jours' : 'jour' }}</span>
+                    </div>
+                  </li>
+                  <li class="py-3 flex items-center gap-3">
+                    <BuildingIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Organisation prêteuse</span>
+                      <span class="font-medium text-gray-900">{{ reservation.from_organization.name }}</span>
+                    </div>
+                  </li>
+                  <li class="py-3 flex items-center gap-3">
+                    <PlusIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Créée le</span>
+                      <span class="font-medium text-gray-900">{{ reservation.created_at }}</span>
+                    </div>
+                  </li>
+                  <li class="py-3 flex items-center gap-3">
+                    <PencilIcon class="h-5 w-5 text-gray-500" />
+                    <div>
+                      <span class="block text-xs text-gray-500">Dernière mise à jour</span>
+                      <span class="font-medium text-gray-900">{{ reservation.updated_at }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <!-- Contact Section -->
+            <Card>
+              <CardHeader>
+                <CardTitle class="text-lg">Contact emprunteur</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div class="grid grid-cols-1 gap-6">
+                  <div class="flex items-start gap-3">
+                    <UserIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h3 class="text-sm font-medium text-gray-500">Nom</h3>
+                      <p class="text-gray-900">{{ reservation.user.name }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <MailIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h3 class="text-sm font-medium text-gray-500">Email</h3>
+                      <p class="text-gray-900">{{ reservation.user.email }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <PhoneIcon class="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h3 class="text-sm font-medium text-gray-500">Téléphone</h3>
+                      <p class="text-gray-900">{{ reservation.user.phone || 'Non renseigné' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
           </div>
+
         </div>
-
-        <!-- Status Management Section -->
-        <Card class="mb-6">
-          <CardHeader>
-            <CardTitle class="text-lg">Gestion de la réservation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <!-- Pending Status Actions -->
-              <div v-if="reservation.status === 'pending'" class="space-y-4">
-                <div class="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <ClockIcon class="h-5 w-5 text-yellow-600" />
-                  <div class="flex-1">
-                    <h3 class="font-medium text-yellow-800">Réservation en attente</h3>
-                    <p class="text-sm text-yellow-700">Cette réservation attend votre validation</p>
-                    <p class="text-sm text-yellow-700">Vous avez {{ reservation.deadline_for_human }} pour valider ou refuser la réservation. Au delà de ce délai, la réservation sera automatiquement annulée.</p>
-                  </div>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <Button 
-                    @click="confirmReservation"
-                    class="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    :disabled="isProcessing"
-                  >
-                    <CheckIcon class="h-4 w-4 mr-2" />
-                    <span v-if="isProcessing">Traitement...</span>
-                    <span v-else>Accepter la réservation</span>
-                  </Button>
-                  
-                  <Button 
-                    @click="rejectReservation"
-                    variant="destructive"
-                    class="flex-1"
-                    :disabled="isProcessing"
-                  >
-                    <XIcon class="h-4 w-4 mr-2" />
-                    <span v-if="isProcessing">Traitement...</span>
-                    <span v-else>Refuser la réservation</span>
-                  </Button>
-                </div>
-              </div>
-
-              <!-- Confirmed Status Actions -->
-              <div v-else-if="reservation.status === 'confirmed'" class="space-y-4">
-                <div class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircleIcon class="h-5 w-5 text-green-600" />
-                  <div class="flex-1">
-                    <h3 class="font-medium text-green-800">Réservation confirmée</h3>
-                    <p class="text-sm text-green-700">Cette réservation a été acceptée</p>
-                  </div>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <Button 
-                    @click="completeReservation"
-                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                    :disabled="isProcessing"
-                  >
-                    <CheckCircleIcon class="h-4 w-4 mr-2" />
-                    <span v-if="isProcessing">Traitement...</span>
-                    <span v-else>Marquer comme terminée</span>
-                  </Button>
-                  
-                  <Button 
-                    @click="cancelReservation"
-                    variant="outline"
-                    class="flex-1 border-red-300 text-red-700 hover:bg-red-50"
-                    :disabled="isProcessing"
-                  >
-                    <XIcon class="h-4 w-4 mr-2" />
-                    <span v-if="isProcessing">Traitement...</span>
-                    <span v-else>Annuler la réservation</span>
-                  </Button>
-                </div>
-              </div>
-
-              <!-- Completed Status -->
-              <div v-else-if="reservation.status === 'completed'" class="space-y-4">
-                <div class="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <CheckCircleIcon class="h-5 w-5 text-blue-600" />
-                  <div class="flex-1">
-                    <h3 class="font-medium text-blue-800">Réservation terminée</h3>
-                    <p class="text-sm text-blue-700">Cette réservation a été complétée avec succès</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Cancelled Status -->
-              <div v-else-if="reservation.status === 'cancelled'" class="space-y-4">
-                <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <XCircleIcon class="h-5 w-5 text-red-600" />
-                  <div class="flex-1">
-                    <h3 class="font-medium text-red-800">Réservation annulée</h3>
-                    <p class="text-sm text-red-700">Cette réservation a été annulée</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Rejected Status -->
-              <div v-else-if="reservation.status === 'rejected'" class="space-y-4">
-                <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <XCircleIcon class="h-5 w-5 text-red-600" />
-                  <div class="flex-1">
-                    <h3 class="font-medium text-red-800">Réservation refusée</h3>
-                    <p class="text-sm text-red-700">Cette réservation a été refusée</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <!-- Dates Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle class="text-lg">Détails de la réservation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="flex items-start gap-3">
-                  <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Récupération</h3>
-                    <p class="text-gray-900">{{ reservation.start_date }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <CalendarIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Retour</h3>
-                    <p class="text-gray-900">{{ reservation.end_date }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <ClockIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Durée</h3>
-                    <p class="text-gray-900">{{ reservation.duration }} {{ reservation.duration > 1 ? 'jours' : 'jour' }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <BuildingIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Organisation prêteuse</h3>
-                    <p class="text-gray-900">{{ reservation.from_organization.name }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <PlusIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Créée le</h3>
-                    <p class="text-gray-900">{{ reservation.created_at }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <PencilIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Dernière mise à jour</h3>
-                    <p class="text-gray-900">{{ reservation.updated_at }}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <!-- Contact Section -->
-          <Card>
-            <CardHeader>
-              <CardTitle class="text-lg">Contact emprunteur</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div class="grid grid-cols-1 gap-6">
-                <div class="flex items-start gap-3">
-                  <UserIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Nom</h3>
-                    <p class="text-gray-900">{{ reservation.user.name }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <MailIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Email</h3>
-                    <p class="text-gray-900">{{ reservation.user.email }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                  <PhoneIcon class="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500">Téléphone</h3>
-                    <p class="text-gray-900">{{ reservation.user.phone || 'Non renseigné' }}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <!-- Equipment Section -->
-        <Card>
-          <CardHeader>
-            <div class="flex justify-between items-center">
-              <CardTitle class="text-lg">Matériel réservé</CardTitle>
-              <div class="text-right">
-                <p class="text-sm text-gray-600">Prix total</p>
-                <p class="text-xl font-bold text-gray-900">{{ reservation.total }} €</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Équipement</TableHead>
-                  <TableHead>Quantité</TableHead>
-                  <TableHead>Prix/jour</TableHead>
-                  <TableHead>Caution</TableHead>
-                  <TableHead>Emplacement</TableHead>
-                  <TableHead v-if="reservation.status === 'pending'" class="w-[100px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="item in reservation.items" :key="item.id">
-                  <TableCell class="font-medium">{{ item.equipment.name }}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" class="text-sm font-medium">
-                      {{ item.quantity }}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{{ item.price }} €</TableCell>
-                  <TableCell>{{ item.equipment.deposit_amount }} €</TableCell>
-                  <TableCell>{{ item.city }}</TableCell>
-                  <TableCell v-if="reservation.status === 'pending'">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      class="text-destructive hover:text-destructive/90"
-                      @click="removeItem(item.id)"
-                    >
-                      <Trash2Icon class="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </div>
     </div>
 

@@ -16,6 +16,7 @@ class CreateReservationFromCart
     {
         $cart = $request->session()->get('cart');
         $user = $request->user();
+        $notes = $request->message;
 
         // Group each equipment from the cart by organization
         $listByOrganization = [];
@@ -42,6 +43,7 @@ class CreateReservationFromCart
                     'status' => ReservationStatus::PENDING,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
+                    'notes' => $notes,
                 ]);
 
                 $days = $reservation->duration;

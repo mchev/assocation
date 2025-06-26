@@ -53,7 +53,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
     // (in) Reservations Management
     Route::prefix('reservations/in')->name('organizations.reservations.in.')->group(function () {
         Route::get('/', [ReservationInController::class, 'index'])->name('index');
-        Route::get('/create', [ReservationInController::class, 'create'])->name('create');
+        Route::post('/', [ReservationInController::class, 'store'])->name('store');
         Route::get('/{reservation}/edit', [ReservationInController::class, 'edit'])->name('edit');
         Route::delete('/{reservation}', [ReservationInController::class, 'destroy'])->name('destroy');
     });

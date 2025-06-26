@@ -4,6 +4,7 @@ namespace App\Actions\Reservations;
 
 use App\Enums\ReservationStatus;
 use App\Models\Reservation;
+use App\Notifications\CanceledReservationNotification;
 use Exception;
 use Illuminate\Support\Facades\Log;
 

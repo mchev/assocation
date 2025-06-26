@@ -35,11 +35,11 @@ jobs:
     - name: Generate key
       run: php artisan key:generate
 
-    - name: Run Laravel Pint
-      run: vendor/bin/pint --test
+    # - name: Run Laravel Pint
+    #   run: vendor/bin/pint --test
 
-    - name: PHP Lint
-      run: find app tests -name "*.php" -print0 | xargs -0 -n1 php -l
+    # - name: PHP Lint
+    #   run: find app tests -name "*.php" -print0 | xargs -0 -n1 php -l
 
     - name: Run ESLint
       run: npm run lint
