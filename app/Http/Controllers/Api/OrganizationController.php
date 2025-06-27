@@ -13,7 +13,10 @@ class OrganizationController extends Controller
         $search = $request->input('search', '');
         $ids = $request->input('ids', []);
 
-        $query = Organization::select('id', 'name');
+        $query = Organization::select('id', 'name')
+            ->whereHas('equipments', function ($equipmentQuery) {
+                $equipmentQuery->where('is_rentable', true);
+            });
 
         if (! empty($ids)) {
             return response()->json(['data' => $query->whereIn('id', $ids)->get()], 200);
