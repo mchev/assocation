@@ -42,8 +42,6 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
-import { Alert, AlertTitle } from '@/components/ui/alert';
-import { Info } from 'lucide-vue-next';
 
 defineProps({
   equipments: {

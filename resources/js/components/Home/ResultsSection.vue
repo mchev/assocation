@@ -74,7 +74,6 @@
 import { computed } from 'vue';
 import Pagination from '@/components/Pagination.vue';
 import EquipmentCard from './EquipmentCard.vue';
-import { Button } from '@/components/ui/button';
 import { SearchX, PackageSearch } from 'lucide-vue-next';
 
 const props = defineProps({
