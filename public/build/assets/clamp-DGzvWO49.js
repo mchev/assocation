@@ -1,0 +1,1 @@
+import{l as o}from"./useForwardPropsEmits-DV560IXF.js";import{i as a,l as u}from"./app-DjBZF9FK.js";function n(t){const e=o({nonce:a()});return u(()=>{var r;return(t==null?void 0:t.value)||((r=e.nonce)==null?void 0:r.value)})}function I(t,e=Number.NEGATIVE_INFINITY,r=Number.POSITIVE_INFINITY){return Math.min(r,Math.max(e,t))}export{I as c,n as u};

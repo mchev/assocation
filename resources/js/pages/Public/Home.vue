@@ -4,15 +4,6 @@
     :description="`${appName} facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.`"
   >
 
-      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 my-2">
-        <Alert class="bg-yellow-500/10 border-yellow-500 text-yellow-800">
-          <Info class="size-4" />
-          <AlertTitle>
-            {{ appName }} est actuellement en version beta - En cas de problème, n'hésitez pas à nous contacter sur <a href="mailto:contact@assocation.fr" class="underline hover:text-primary">contact@assocation.fr</a>.
-          </AlertTitle>
-        </Alert>
-      </div>
-
       <!-- Hero Section -->
       <template v-if="!user">
         <section class="relative">

@@ -48,7 +48,7 @@ const submit = () => {
                             Continuer avec Google
                         </a>
                     </Button>
-                    <div class="relative">
+                    <!-- <div class="relative">
                         <Button variant="outline" class="w-full" asChild disabled>
                             <a href="#" rel="nofollow">
                                 <img src="https://www.helloasso.com/favicon.ico" alt="HelloAsso" class="size-4 mr-2" />
@@ -58,7 +58,7 @@ const submit = () => {
                         <div class="absolute -top-1 -right-1 bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                             Prochainement
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="relative">

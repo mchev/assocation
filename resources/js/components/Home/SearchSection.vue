@@ -71,7 +71,7 @@
                       </Tooltip>
                     </TooltipProvider>
                   </Label>
-                  <Select v-model="form.radius" @update:model-value="handleSearch">
+                  <Select v-model="form.radius">
                     <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
                       <SelectValue placeholder="Sélectionner un rayon" />
                     </SelectTrigger>
@@ -90,7 +90,6 @@
                   <Label>Catégories</Label>
                   <CategoryFilter
                     v-model="form.categories"
-                    @update:model-value="handleSearch"
                   />
                 </div>
 
@@ -101,20 +100,7 @@
                   </Label>
                   <OrganizationFilter 
                     v-model="form.organizations"
-                    @update:model-value="handleSearch"
                   />
-                </div>
-
-                <div class="flex justify-end items-end">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  @click="resetFilters"
-                  class="text-sm hover:text-destructive hover:border-destructive dark:hover:text-destructive dark:hover:border-destructive"
-                >
-                  <X class="h-4 w-4 mr-1.5" />
-                  Réinitialiser les filtres
-                </Button>
                 </div>
 
               </div>
@@ -126,8 +112,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Search, HelpCircle, X } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+import { Search, HelpCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -166,8 +152,15 @@ const form = useForm({
   postcode: props.filters.postcode || null
 });
 
+watch(
+  [() => form.organizations, () => form.categories, () => form.radius],
+  () => {
+    handleSearch();
+  },
+  { deep: true }
+);
+
 const handleSearch = () => {
-  console.log(form.categories);
   if (!form.isDirty) return;
 
   isSearching.value = true;
@@ -181,19 +174,6 @@ const handleSearch = () => {
       emit('searching', isSearching.value);
     }
   });
-};
-
-const resetFilters = () => {
-  form.reset({
-    search: '',
-    radius: 50,
-    categories: [],
-    organizations: [],
-    coordinates: null,
-    city: null,
-    postcode: null
-  });
-  handleSearch();
 };
 
 // Handle city information

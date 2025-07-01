@@ -34,15 +34,6 @@
           : 'Utilisez la barre de recherche ci-dessus pour trouver l\'équipement dont vous avez besoin.'
         }}
       </p>
-
-      <div v-if="hasFilters" class="mt-6">
-        <Button 
-          variant="outline"
-          @click="$emit('reset-filters')"
-        >
-          Réinitialiser les filtres
-        </Button>
-      </div>
     </div>
 
     <!-- Results Grid -->
