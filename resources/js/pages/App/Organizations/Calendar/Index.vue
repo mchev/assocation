@@ -11,9 +11,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CalendarDays, User, Package, Building2, Phone, Mail } from 'lucide-vue-next'
+import ManualReservationForm from '@/components/ManualReservationForm.vue'
 
 const props = defineProps({
   reservations: {
+    type: Array,
+    required: true
+  },
+  equipments: {
     type: Array,
     required: true
   }
@@ -82,14 +87,22 @@ const handleDateSelect = (selectInfo) => {
   isNewReservationModalOpen.value = true
 }
 
-const createReservation = () => {
-  alert('Fonctionnalité non disponible pour le moment.')
-  // router.visit(route('organizations.reservations.create', organization.id), {
-  //   data: {
-  //     start_date: selectedDates.value.start,
-  //     end_date: selectedDates.value.end
-  //   }
-  // })
+const closeManualReservationModal = () => {
+  isNewReservationModalOpen.value = false
+  selectedDates.value = { start: null, end: null }
+}
+
+const showManualReservationModal = () => {
+  // Définir des dates par défaut (aujourd'hui + 1 jour)
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  
+  selectedDates.value = {
+    start: today.toISOString().split('T')[0],
+    end: tomorrow.toISOString().split('T')[0]
+  }
+  isNewReservationModalOpen.value = true
 }
 </script>
 
@@ -100,6 +113,10 @@ const createReservation = () => {
         <h2 class="font-semibold text-xl leading-tight">
           Calendrier des locations de {{ organization.name }}
         </h2>
+        <Button @click="showManualReservationModal">
+          <CalendarDays class="w-4 h-4 mr-2" />
+          Réservation manuelle
+        </Button>
       </div>
     </template>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
@@ -223,26 +240,19 @@ const createReservation = () => {
       </Dialog>
 
       <!-- Modal nouvelle réservation -->
-      <Dialog :open="isNewReservationModalOpen" @update:open="isNewReservationModalOpen = false">
-        <DialogContent class="sm:max-w-[500px]">
+      <Dialog :open="isNewReservationModalOpen" @update:open="closeManualReservationModal">
+        <DialogContent class="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Nouvelle réservation</DialogTitle>
+            <DialogTitle>Nouvelle réservation manuelle</DialogTitle>
           </DialogHeader>
 
-          <div class="space-y-6">
-            <div class="flex items-center gap-2">
-              <CalendarDays class="h-4 w-4" />
-              <span>Du {{ new Date(selectedDates.start).toLocaleDateString() }} au {{ new Date(selectedDates.end).toLocaleDateString() }}</span>
-            </div>
-
-            <div class="flex justify-end gap-2">
-              <Button variant="outline" @click="isNewReservationModalOpen = false">
-                Annuler
-              </Button>
-              <Button @click="createReservation">
-                Créer la location
-              </Button>
-            </div>
+          <div v-if="selectedDates.start && selectedDates.end">
+            <ManualReservationForm
+              :start-date="selectedDates.start"
+              :end-date="selectedDates.end"
+              :equipments="equipments"
+              @cancel="closeManualReservationModal"
+            />
           </div>
         </DialogContent>
       </Dialog>

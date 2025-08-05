@@ -9,7 +9,7 @@
     >
       <img
         v-if="hasImage"
-        :src="equipment.images[0].url"
+        :src="equipment.images[0]?.url"
         :alt="equipment.name"
         loading="lazy"
         class="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"

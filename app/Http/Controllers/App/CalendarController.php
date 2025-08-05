@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Reservations\CreateManualReservation;
 use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Reservation\ManualReservationRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -58,8 +60,26 @@ class CalendarController extends Controller
                 ];
             });
 
+        // Get available equipments for manual reservations
+        $equipments = $organization->equipments()
+            ->where('is_available', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'is_available']);
+
         return Inertia::render('App/Organizations/Calendar/Index', [
             'reservations' => $reservations,
+            'equipments' => $equipments,
         ]);
+    }
+
+    public function storeManualReservation(ManualReservationRequest $request)
+    {
+        $organization = $request->user()->currentOrganization;
+
+        $validated = $request->validated();
+
+        $reservation = app(CreateManualReservation::class)->handle($validated, $organization);
+
+        return redirect()->back()->with('success', 'Réservation manuelle créée avec succès.');
     }
 }

@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
 
     Route::resource('organizations', OrganizationController::class)->only(['create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('/calendar', [CalendarController::class, 'index'])->name('organizations.calendar');
+    Route::post('/calendar/manual-reservation', [CalendarController::class, 'storeManualReservation'])->name('organizations.calendar.manual-reservation');
 
     // Equipments Management
     Route::prefix('equipments')->name('organizations.equipments.')->group(function () {
