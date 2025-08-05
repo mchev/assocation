@@ -76,6 +76,8 @@
           data: {
             page: equipments.current_page + 1,
           },
+          preserveState: true,
+          preserveScroll: true,
           only: ['equipments'],
         }"
         class="mt-12 flex justify-center"

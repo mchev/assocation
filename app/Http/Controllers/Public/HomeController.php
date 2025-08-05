@@ -42,6 +42,13 @@ class HomeController extends Controller
                 $perPage,
                 $currentPage
             );
+        } else {
+            // Infinite scroll request - use Inertia::merge for automatic merging
+            $currentPage = $request->input('page', 1);
+            if ($currentPage > 1) {
+                $equipments = $this->getFilteredEquipments($request, $locationPreferences, $currentPage, 10);
+                return Inertia::merge(['equipments' => $equipments]);
+            }
         }
 
         return Inertia::render('Public/Home', [
