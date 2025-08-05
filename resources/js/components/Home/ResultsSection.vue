@@ -72,15 +72,12 @@
       <!-- Infinite Load with WhenVisible -->
       <WhenVisible
         v-if="equipments.has_more || equipments.next_page_url"
-        :href="route('home')"
-        :params="loadMoreParams"
-        :method="'get'"
-        :preserve-state="true"
-        :preserve-scroll="true"
-        :only="['equipments']"
-        @before="onBeforeLoad"
-        @success="onLoadSuccess"
-        @error="onLoadError"
+        :params="{
+          data: {
+            page: equipments.current_page + 1,
+          },
+          only: ['equipments'],
+        }"
         class="mt-12 flex justify-center"
       >
         <template #default="{ loading }">
@@ -130,13 +127,6 @@ import EquipmentCard from './EquipmentCard.vue';
 import { SearchX, PackageSearch, Loader2 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
-// Debug: Vérifier que WhenVisible est bien importé
-onMounted(() => {
-  console.log('WhenVisible component available:', !!WhenVisible);
-  console.log('Current equipments:', props.equipments);
-  console.log('Has more pages:', props.equipments.has_more || props.equipments.next_page_url);
-});
-
 const props = defineProps({
   equipments: {
     type: Object,
@@ -160,32 +150,12 @@ const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
 const showSuccessMessage = ref(false);
 
-// Paramètres pour charger plus d'équipements
-const loadMoreParams = computed(() => {
-  const nextPage = props.equipments.current_page + 1;
-  return {
-    page: nextPage,
-    ...(props.startDate && { start_date: props.startDate }),
-    ...(props.endDate && { end_date: props.endDate })
-  };
+// Debug: Vérifier que WhenVisible est bien importé
+onMounted(() => {
+  console.log('WhenVisible component available:', !!WhenVisible);
+  console.log('Current equipments:', props.equipments);
+  console.log('Has more pages:', props.equipments.has_more || props.equipments.next_page_url);
 });
-
-// Callbacks pour WhenVisible
-const onBeforeLoad = () => {
-  console.log('WhenVisible: Chargement en cours...');
-};
-
-const onLoadSuccess = (event) => {
-  console.log('WhenVisible: Chargement réussi:', event);
-  showSuccessMessage.value = true;
-  setTimeout(() => {
-    showSuccessMessage.value = false;
-  }, 2000);
-};
-
-const onLoadError = (error) => {
-  console.error('WhenVisible: Erreur lors du chargement:', error);
-};
 </script>
 
 <style scoped>

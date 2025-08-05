@@ -24,6 +24,26 @@ class HomeController extends Controller
 
         $equipments = $this->getFilteredEquipments($request, $locationPreferences);
 
+        // Handle full page load vs. infinite scroll request
+        if (!request()->header('X-Inertia')) {
+            // Full page load - fetch all pages up to current
+            $currentPage = $request->input('page', 1);
+            $perPage = 10;
+            $allResults = collect();
+
+            for ($page = 1; $page <= $currentPage; $page++) {
+                $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
+                $allResults = $allResults->concat($pageResults->items());
+            }
+
+            $equipments = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allResults,
+                $this->getFilteredEquipments($request, $locationPreferences)->total(),
+                $perPage,
+                $currentPage
+            );
+        }
+
         return Inertia::render('Public/Home', [
             'equipments' => $equipments,
             'filters' => [
@@ -48,7 +68,7 @@ class HomeController extends Controller
         ]);
     }
 
-    private function getFilteredEquipments(Request $request, $locationPreferences)
+    private function getFilteredEquipments(Request $request, $locationPreferences, $page = null, $perPage = 10)
     {
         $query = Equipment::query()
             ->select([
@@ -104,6 +124,10 @@ class HomeController extends Controller
             $q->whereIn('organization_id', $request->organizations);
         });
 
-        return $query->paginate(10);
+        if ($page) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->paginate($perPage);
     }
 }

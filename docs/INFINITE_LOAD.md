@@ -1,26 +1,26 @@
-# Infinite Load Implementation avec WhenVisible d'Inertia.js
+# Infinite Load Implementation avec WhenVisible d'Inertia.js v2.0
 
 ## Vue d'ensemble
 
-Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0+ pour créer un infinite load on scroll pour la liste des équipements.
+Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour créer un infinite load on scroll pour la liste des équipements, basée sur l'exemple de [Bilal Haidar sur dev.to](https://dev.to/bhaidar/implementing-infinite-scrolling-with-laravel-inertiajs-v20-and-vue-3-3il).
 
 ## Fonctionnalités
 
 - **Infinite Load Automatique** : Chargement automatique des nouveaux éléments quand l'utilisateur atteint le bas de la liste
-- **WhenVisible Component** : Utilisation du composant officiel d'Inertia.js pour la détection de visibilité
+- **WhenVisible Component** : Utilisation du composant officiel d'Inertia.js v2.0 pour la détection de visibilité
 - **Fallback Manuel** : Bouton "Charger plus" en cas de problème avec la détection automatique
 - **Animations** : Transitions fluides pour les nouveaux éléments qui apparaissent
 - **États de Chargement** : Indicateurs visuels pendant le chargement
-- **Messages de Succès** : Feedback utilisateur quand de nouveaux éléments sont chargés
+- **Gestion Full Page Load** : Support des rechargements de page avec maintien de la position de scroll
 
 ## Architecture
 
 ### Backend (Laravel)
 
 **HomeController.php**
-- Méthode `index()` simplifiée pour supporter les requêtes Inertia.js
-- Méthode privée `getFilteredEquipments()` pour la réutilisation du code
-- Gestion automatique de la pagination par Inertia.js
+- Gestion intelligente des requêtes full page vs infinite scroll
+- Chargement de toutes les pages précédentes lors d'un rechargement
+- Méthode `getFilteredEquipments()` optimisée pour la pagination
 
 ### Frontend (Vue.js)
 
@@ -29,20 +29,9 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0+ pour
 - Passage direct des props d'équipements
 
 **ResultsSection.vue**
-- Utilisation du composant `WhenVisible` d'Inertia.js
+- Utilisation du composant `WhenVisible` d'Inertia.js v2.0
+- Configuration avec `:params` au lieu de `:data`
 - Gestion automatique des états de chargement
-- Animations CSS pour les nouveaux éléments
-- Fallback manuel avec bouton
-
-## Utilisation
-
-### Déclenchement Automatique
-
-Le composant `WhenVisible` se déclenche automatiquement quand l'utilisateur fait défiler jusqu'à l'élément de déclenchement.
-
-### Déclenchement Manuel
-
-Si la détection automatique ne fonctionne pas, un bouton "Charger plus d'équipements" est disponible.
 
 ## Configuration
 
@@ -51,15 +40,12 @@ Si la détection automatique ne fonctionne pas, un bouton "Charger plus d'équip
 ```vue
 <WhenVisible
   v-if="equipments.has_more || equipments.next_page_url"
-  :href="route('home')"
-  :params="loadMoreParams"
-  :method="'get'"
-  :preserve-state="true"
-  :preserve-scroll="true"
-  :only="['equipments']"
-  @before="onBeforeLoad"
-  @success="onLoadSuccess"
-  @error="onLoadError"
+  :params="{
+    data: {
+      page: equipments.current_page + 1,
+    },
+    only: ['equipments'],
+  }"
 >
   <template #default="{ loading }">
     <!-- Contenu du bouton/indicateur -->
@@ -67,35 +53,27 @@ Si la détection automatique ne fonctionne pas, un bouton "Charger plus d'équip
 </WhenVisible>
 ```
 
-### Paramètres de Chargement
+### Backend Pagination Handling
 
-```javascript
-const loadMoreParams = computed(() => {
-  const nextPage = props.equipments.current_page + 1;
-  return {
-    page: nextPage,
-    ...(props.startDate && { start_date: props.startDate }),
-    ...(props.endDate && { end_date: props.endDate })
-  };
-});
-```
+```php
+// Handle full page load vs. infinite scroll request
+if (!request()->header('X-Inertia')) {
+    // Full page load - fetch all pages up to current
+    $currentPage = $request->input('page', 1);
+    $perPage = 10;
+    $allResults = collect();
 
-### Animations CSS
+    for ($page = 1; $page <= $currentPage; $page++) {
+        $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
+        $allResults = $allResults->concat($pageResults->items());
+    }
 
-```css
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+    $equipments = new \Illuminate\Pagination\LengthAwarePaginator(
+        $allResults,
+        $this->getFilteredEquipments($request, $locationPreferences)->total(),
+        $perPage,
+        $currentPage
+    );
 }
 ```
 
@@ -105,8 +83,8 @@ const loadMoreParams = computed(() => {
 2. **UX** : Expérience fluide sans rechargement de page
 3. **Accessibilité** : Fallback manuel disponible
 4. **Maintenabilité** : Code modulaire et réutilisable
-5. **Feedback** : Indicateurs visuels clairs pour l'utilisateur
-6. **Intégration Native** : Utilisation des composants officiels d'Inertia.js
+5. **SEO Friendly** : Support des rechargements de page
+6. **Intégration Native** : Utilisation des composants officiels d'Inertia.js v2.0
 
 ## Dependencies
 
@@ -117,16 +95,14 @@ const loadMoreParams = computed(() => {
 
 Pour tester l'implémentation :
 
-1. Aller sur la page d'accueil
-2. Faire défiler jusqu'en bas de la liste
+1. Aller sur la page d'accueil (`/`)
+2. Faire défiler jusqu'en bas de la liste d'équipements
 3. Vérifier que de nouveaux éléments se chargent automatiquement
 4. Vérifier les indicateurs de chargement
 5. Tester le bouton de chargement manuel si nécessaire
-6. Vérifier les messages de succès dans la console
+6. Recharger la page et vérifier que la position de scroll est maintenue
 
-## Différences avec l'ancienne implémentation
+## Références
 
-- **Suppression de l'Intersection Observer manuel** : Remplacé par le composant `WhenVisible`
-- **Simplification du backend** : Plus besoin de gérer les requêtes AJAX séparément
-- **Gestion automatique des états** : Inertia.js gère automatiquement la fusion des données
-- **Code plus propre** : Moins de logique personnalisée, plus de composants officiels 
+- [Article original de Bilal Haidar](https://dev.to/bhaidar/implementing-infinite-scrolling-with-laravel-inertiajs-v20-and-vue-3-3il)
+- [Documentation Inertia.js](https://inertiajs.com/load-when-visible) 
