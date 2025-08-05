@@ -27,6 +27,7 @@ class UpdateRequest extends FormRequest
             'brand' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:categories,id'],
+            'organization_id' => ['required', 'exists:organizations,id'],
 
             // Step 2: État et stockage
             'condition' => ['required', 'string', 'in:new,good,fair,poor'],
@@ -62,6 +63,8 @@ class UpdateRequest extends FormRequest
             'brand.max' => 'La marque ne peut pas dépasser 255 caractères.',
             'category_id.required' => 'La catégorie est requise.',
             'category_id.exists' => 'La catégorie sélectionnée n\'existe pas.',
+            'organization_id.required' => 'L\'organisation propriétaire est requise.',
+            'organization_id.exists' => 'L\'organisation sélectionnée n\'existe pas.',
 
             // Step 2
             'condition.required' => 'L\'état est requis.',
@@ -91,5 +94,21 @@ class UpdateRequest extends FormRequest
             // Maintenance
             'next_maintenance_date.after_or_equal' => 'La date de maintenance suivante doit être postérieure ou égale à la dernière maintenance.',
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            // Vérifier que le dépôt appartient à l'organisation sélectionnée
+            if ($this->filled('organization_id') && $this->filled('depot_id')) {
+                $depot = \App\Models\Depot::find($this->depot_id);
+                if ($depot && $depot->organization_id != $this->organization_id) {
+                    $validator->errors()->add('depot_id', 'Le lieu de stockage doit appartenir à l\'organisation sélectionnée.');
+                }
+            }
+        });
     }
 }

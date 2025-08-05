@@ -112,14 +112,23 @@ class EquipmentController extends Controller
     public function edit(Request $request, Equipment $equipment)
     {
         $this->authorize('update', $equipment);
-        $organization = $request->user()->currentOrganization;
+        $user = $request->user();
 
         $equipment->load(['category', 'depot', 'images']);
 
+        // Get all organizations the user belongs to
+        $organizations = $user->organizations()->orderBy('name')->get(['organizations.id', 'organizations.name']);
+
+        // Get all depots from all organizations the user belongs to
+        $depots = \App\Models\Depot::whereIn('organization_id', $organizations->pluck('id'))
+            ->orderBy('name')
+            ->get(['id', 'name', 'city', 'organization_id']);
+
         return Inertia::render('App/Organizations/Equipments/Edit', [
             'equipment' => $equipment,
-            'organization' => $organization,
-            'depots' => $organization->depots()->orderBy('name')->get(['id', 'name', 'city']),
+            'organization' => $equipment->organization,
+            'organizations' => $organizations,
+            'depots' => $depots,
         ]);
     }
 

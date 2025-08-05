@@ -26,6 +26,7 @@ class UpdateEquipmentAction
             'brand' => $data['brand'] ?? null,
             'description' => $data['description'],
             'category_id' => $data['category_id'],
+            'organization_id' => $data['organization_id'],
             'condition' => $data['condition'],
             'quantity' => $data['quantity'] ?? 1,
             'depot_id' => $data['depot_id'],
@@ -53,7 +54,7 @@ class UpdateEquipmentAction
             $this->processImages($equipment, $images);
         }
 
-        return $equipment->load(['category', 'depot', 'images']);
+        return $equipment->load(['category', 'depot', 'images', 'organization']);
     }
 
     protected function processImages(Equipment $equipment, array $images): void

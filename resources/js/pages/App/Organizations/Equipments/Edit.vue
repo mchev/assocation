@@ -134,16 +134,19 @@
                 </div>
               </div>
 
-              <div>
-                <Label required class="text-base flex items-center gap-1">
-                  Catégorie
-                  <span class="text-destructive" aria-hidden="true">*</span>
-                </Label>
-                <CategorySelect
-                  v-model="form.category_id"
-                  required
-                />
-                <p v-if="form.errors.category_id" class="mt-2 text-sm text-destructive">{{ form.errors.category_id }}</p>
+              <div class="grid gap-8 sm:grid-cols-2">
+                <div>
+                  <Label required class="text-base flex items-center gap-1">
+                    Catégorie
+                    <span class="text-destructive" aria-hidden="true">*</span>
+                  </Label>
+                  <CategorySelect
+                    v-model="form.category_id"
+                    required
+                  />
+                  <p v-if="form.errors.category_id" class="mt-2 text-sm text-destructive">{{ form.errors.category_id }}</p>
+                </div>
+
               </div>
 
               <div>
@@ -223,30 +226,51 @@
                   <p v-if="form.errors.quantity" class="mt-2 text-sm text-destructive">{{ form.errors.quantity }}</p>
                 </div>
 
-                <div>
-                  <Label required class="text-base flex items-center gap-1">
-                    Lieu de stockage
-                    <span class="text-destructive" aria-hidden="true">*</span>
-                  </Label>
-                  <Select v-model="form.depot_id" required class="mt-2">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez un lieu de stockage" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="depot in depots" :key="depot.id" :value="depot.id">
-                        {{ depot.name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Link
-                    :href="route('app.organizations.depots.index', organization)"
-                    class="inline-flex items-center text-xs text-primary/80 hover:text-primary mt-2"
-                  >
-                    <Plus class="w-3 h-3 mr-1" />
-                    Ajouter un lieu de stockage
-                  </Link>
-                  <p v-if="form.errors.depot_id" class="mt-2 text-sm text-destructive">{{ form.errors.depot_id }}</p>
+                <div class="grid gap-8 sm:grid-cols-2">
+                  <div>
+                    <Label required class="text-base flex items-center gap-1">
+                      Organisation propriétaire
+                      <span class="text-destructive" aria-hidden="true">*</span>
+                    </Label>
+                    <Select v-model="form.organization_id" required class="mt-2" @update:model-value="handleOrganizationChange">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez une organisation" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="org in organizations" :key="org.id" :value="org.id">
+                          {{ org.name }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.organization_id" class="mt-2 text-sm text-destructive">{{ form.errors.organization_id }}</p>
+                  </div>
+
+                  <div>
+                    <Label required class="text-base flex items-center gap-1">
+                      Lieu de stockage
+                      <span class="text-destructive" aria-hidden="true">*</span>
+                    </Label>
+                    <Select v-model="form.depot_id" required class="mt-2">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez un lieu de stockage" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="depot in availableDepots" :key="depot.id" :value="depot.id">
+                          {{ depot.name }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Link
+                      :href="route('app.organizations.depots.index', selectedOrganization)"
+                      class="inline-flex items-center text-xs text-primary/80 hover:text-primary mt-2"
+                    >
+                      <Plus class="w-3 h-3 mr-1" />
+                      Ajouter un lieu de stockage
+                    </Link>
+                    <p v-if="form.errors.depot_id" class="mt-2 text-sm text-destructive">{{ form.errors.depot_id }}</p>
+                  </div>
                 </div>
+                
               </div>
             </section>
 
@@ -484,6 +508,10 @@ const props = defineProps({
   depots: {
     type: Array,
     required: true
+  },
+  organizations: {
+    type: Array,
+    required: true
   }
 })
 
@@ -493,6 +521,7 @@ const form = useForm({
   brand: props.equipment.brand,
   description: props.equipment.description,
   category_id: props.equipment.category_id,
+  organization_id: props.equipment.organization_id,
   condition: props.equipment.condition,
   quantity: props.equipment.quantity ?? 1,
   depot_id: props.equipment.depot_id,
@@ -517,6 +546,20 @@ const isUploadDisabled = computed(() => {
   const totalImages = displayedExistingImages.value.length + form.images.length
   return totalImages >= 10
 })
+
+// Computed properties for organization and depot management
+const selectedOrganization = computed(() => {
+  return props.organizations.find(org => org.id === form.organization_id) || props.organization
+})
+
+const availableDepots = computed(() => {
+  return props.depots.filter(depot => depot.organization_id === form.organization_id)
+})
+
+const handleOrganizationChange = () => {
+  // When organization changes, reset depot selection
+  form.depot_id = null
+}
 
 const handleImageUpload = (e) => {
   const files = Array.from(e.target.files || [])
