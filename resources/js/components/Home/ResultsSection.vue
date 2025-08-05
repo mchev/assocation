@@ -72,7 +72,8 @@
       <!-- Infinite Load with WhenVisible -->
       <WhenVisible
         v-if="equipments.has_more || equipments.next_page_url"
-        :href="loadMoreUrl"
+        :href="route('home')"
+        :params="loadMoreParams"
         :method="'get'"
         :preserve-state="true"
         :preserve-scroll="true"
@@ -159,16 +160,14 @@ const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
 const showSuccessMessage = ref(false);
 
-// URL pour charger plus d'équipements
-const loadMoreUrl = computed(() => {
+// Paramètres pour charger plus d'équipements
+const loadMoreParams = computed(() => {
   const nextPage = props.equipments.current_page + 1;
-  const params = new URLSearchParams({
-    page: nextPage.toString(),
+  return {
+    page: nextPage,
     ...(props.startDate && { start_date: props.startDate }),
     ...(props.endDate && { end_date: props.endDate })
-  });
-  
-  return `${route('home')}?${params.toString()}`;
+  };
 });
 
 // Callbacks pour WhenVisible

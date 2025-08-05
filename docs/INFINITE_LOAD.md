@@ -51,7 +51,8 @@ Si la détection automatique ne fonctionne pas, un bouton "Charger plus d'équip
 ```vue
 <WhenVisible
   v-if="equipments.has_more || equipments.next_page_url"
-  :href="loadMoreUrl"
+  :href="route('home')"
+  :params="loadMoreParams"
   :method="'get'"
   :preserve-state="true"
   :preserve-scroll="true"
@@ -66,18 +67,16 @@ Si la détection automatique ne fonctionne pas, un bouton "Charger plus d'équip
 </WhenVisible>
 ```
 
-### URL de Chargement
+### Paramètres de Chargement
 
 ```javascript
-const loadMoreUrl = computed(() => {
+const loadMoreParams = computed(() => {
   const nextPage = props.equipments.current_page + 1;
-  const params = new URLSearchParams({
-    page: nextPage.toString(),
+  return {
+    page: nextPage,
     ...(props.startDate && { start_date: props.startDate }),
     ...(props.endDate && { end_date: props.endDate })
-  });
-  
-  return `${route('home')}?${params.toString()}`;
+  };
 });
 ```
 
