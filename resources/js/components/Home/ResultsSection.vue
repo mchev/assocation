@@ -43,15 +43,9 @@
         <h2 class="text-lg font-medium text-foreground">
           {{ equipments_pagination.total }} équipement{{ equipments_pagination.total > 1 ? 's' : '' }} trouvé{{ equipments_pagination.total > 1 ? 's' : '' }}
         </h2>
-        <div class="flex items-center space-x-4">
-          <p class="text-sm text-muted-foreground">
-            {{ equipments.length }} affiché{{ equipments.length > 1 ? 's' : '' }} sur {{ equipments_pagination.total }}
-          </p>
-          <!-- Debug info -->
-          <div v-if="equipments_pagination.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-            Page {{ equipments_pagination.current_page }}
-          </div>
-        </div>
+        <p class="text-sm text-muted-foreground">
+          {{ equipments.length }} affiché{{ equipments.length > 1 ? 's' : '' }} sur {{ equipments_pagination.total }}
+        </p>
       </div>
 
       <!-- Equipment Grid -->
@@ -131,13 +125,12 @@ const props = defineProps({
 const hasResults = computed(() => props.equipments.length > 0);
 
 const hasFilters = computed(() => {
-  const filters = props.filters;
-  return filters.search || 
-         (filters.categories && filters.categories.length > 0) || 
-         (filters.organizations && filters.organizations.length > 0) || 
-         filters.radius || 
-         filters.city || 
-         filters.postcode;
+  return props.filters.search || 
+         (props.filters.categories && props.filters.categories.length > 0) || 
+         (props.filters.organizations && props.filters.organizations.length > 0) || 
+         props.filters.radius || 
+         props.filters.city || 
+         props.filters.postcode;
 });
 
 </script>

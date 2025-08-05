@@ -180,13 +180,21 @@ const handleSearch = () => {
 
 // Handle city information
 const handleCity = (cityInfo) => {
-  form.city = cityInfo.name;
-  form.postcode = cityInfo.postcode;
-  form.coordinates = {
-    lat: cityInfo.lat,
-    lng: cityInfo.lng
-  };
-  form.radius = form.radius || 5;
+  if (!cityInfo) {
+    // Clear city information when city is cleared
+    form.city = null;
+    form.postcode = null;
+    form.coordinates = null;
+  } else {
+    // Set city information when city is selected
+    form.city = cityInfo.name;
+    form.postcode = cityInfo.postcode;
+    form.coordinates = {
+      lat: cityInfo.lat,
+      lng: cityInfo.lng
+    };
+    form.radius = form.radius || 5;
+  }
   handleSearch();
 };
 </script> 

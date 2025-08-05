@@ -34,6 +34,9 @@
           :isSearching="isSearching"
         />
       </section>
+
+      <!-- Back to Top Button -->
+      <BackToTop />
   </AppLayout>
 </template>
 
@@ -44,6 +47,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
+import BackToTop from '@/components/BackToTop.vue';
 
 defineProps({
   equipments: {
