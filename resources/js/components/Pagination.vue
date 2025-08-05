@@ -4,13 +4,13 @@
       <template v-for="(link, key) in links" :key="key">
         <div v-if="link.url === null" 
              class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded">
-             {{ link.label }}
+             {{ translateLabel(link.label) }}
         </div>
         <Link v-else
-              class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-gray-100 focus:border-primary focus:text-primary"
-              :class="{ 'bg-primary text-white': link.active }"
+              class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-gray-100 focus:border-primary focus:text-primary transition-colors"
+              :class="{ 'bg-primary text-white hover:bg-primary/90': link.active }"
               :href="link.url">
-              {{ link.label }}
+              {{ translateLabel(link.label) }}
             </Link>
       </template>
     </div>
@@ -26,4 +26,21 @@ defineProps({
     required: true,
   },
 });
+
+const translateLabel = (label) => {
+  const translations = {
+    '&laquo; Previous': '&laquo; Précédent',
+    'Next &raquo;': 'Suivant &raquo;',
+    'Previous': 'Précédent',
+    'Next': 'Suivant',
+    'First': 'Premier',
+    'Last': 'Dernier',
+    '« Previous': '« Précédent',
+    'Next »': 'Suivant »',
+    '‹ Previous': '‹ Précédent',
+    'Next ›': 'Suivant ›',
+  };
+  
+  return translations[label] || label;
+};
 </script> 
