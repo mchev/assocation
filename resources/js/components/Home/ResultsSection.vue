@@ -41,15 +41,15 @@
       <!-- Results Count -->
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-lg font-medium text-foreground">
-          {{ equipments.total }} équipement{{ equipments.total > 1 ? 's' : '' }} trouvé{{ equipments.total > 1 ? 's' : '' }}
+          {{ localEquipments.total }} équipement{{ localEquipments.total > 1 ? 's' : '' }} trouvé{{ localEquipments.total > 1 ? 's' : '' }}
         </h2>
         <div class="flex items-center space-x-4">
           <p class="text-sm text-muted-foreground">
-            {{ equipments.data.length }} affiché{{ equipments.data.length > 1 ? 's' : '' }} sur {{ equipments.total }}
+            {{ localEquipments.data.length }} affiché{{ localEquipments.data.length > 1 ? 's' : '' }} sur {{ localEquipments.total }}
           </p>
           <!-- Debug info -->
-          <div v-if="equipments.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-            Page {{ equipments.current_page }}
+          <div v-if="localEquipments.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+            Page {{ localEquipments.current_page }}
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
       >
         <EquipmentCard
-          v-for="(item, index) in equipments.data"
+          v-for="(item, index) in localEquipments.data"
           :key="`${item.id}-${item.updated_at}`"
           :equipment="item"
           :start-date="startDate"
@@ -71,10 +71,10 @@
 
       <!-- Infinite Load with WhenVisible -->
       <WhenVisible
-        v-if="equipments.has_more || equipments.next_page_url"
+        v-if="localEquipments.has_more || localEquipments.next_page_url"
         :params="{
           data: {
-            page: equipments.current_page + 1,
+            page: localEquipments.current_page + 1,
           },
           preserveState: true,
           preserveScroll: true,
@@ -111,7 +111,7 @@
 
       <!-- End of results message -->
       <div 
-        v-else-if="equipments.data.length > 0"
+        v-else-if="localEquipments.data.length > 0"
         class="mt-12 text-center"
       >
         <p class="text-sm text-muted-foreground">
@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { WhenVisible } from '@inertiajs/vue3';
 import EquipmentCard from './EquipmentCard.vue';
 import { SearchX, PackageSearch, Loader2 } from 'lucide-vue-next';
@@ -152,11 +152,32 @@ const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
 const showSuccessMessage = ref(false);
 
+// État local pour les équipements avec fusion
+const localEquipments = ref({
+  data: [...props.equipments.data],
+  current_page: props.equipments.current_page,
+  last_page: props.equipments.last_page,
+  total: props.equipments.total,
+  has_more: props.equipments.has_more,
+  next_page_url: props.equipments.next_page_url
+});
+
+// Surveiller les changements des props pour fusionner les données
+watch(() => props.equipments, (newEquipments) => {
+  if (newEquipments && newEquipments.data && newEquipments.current_page > 1) {
+    // Fusionner les nouveaux équipements avec les existants
+    localEquipments.value.data.push(...newEquipments.data);
+    localEquipments.value.current_page = newEquipments.current_page;
+    localEquipments.value.has_more = newEquipments.has_more;
+    localEquipments.value.next_page_url = newEquipments.next_page_url;
+  }
+}, { deep: true });
+
 // Debug: Vérifier que WhenVisible est bien importé
 onMounted(() => {
   console.log('WhenVisible component available:', !!WhenVisible);
-  console.log('Current equipments:', props.equipments);
-  console.log('Has more pages:', props.equipments.has_more || props.equipments.next_page_url);
+  console.log('Current equipments:', localEquipments.value);
+  console.log('Has more pages:', localEquipments.value.has_more || localEquipments.value.next_page_url);
 });
 </script>
 
