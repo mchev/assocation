@@ -71,7 +71,7 @@
 
       <!-- Infinite Load with WhenVisible -->
       <WhenVisible
-        v-if="localEquipments.has_more || localEquipments.next_page_url"
+        v-if="hasMorePages"
         :params="{
           data: {
             page: localEquipments.current_page + 1,
@@ -84,11 +84,6 @@
       >
         <template #default="{ loading }">
           <div class="flex flex-col items-center space-y-4">
-            <!-- Success message -->
-            <div v-if="showSuccessMessage" class="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-md border border-green-200">
-              ✓ Nouveaux équipements chargés avec succès
-            </div>
-            
             <!-- Loading spinner -->
             <div v-if="loading" class="flex items-center space-x-2">
               <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -148,11 +143,12 @@ const props = defineProps({
   }
 });
 
+// Computed properties
 const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
-const showSuccessMessage = ref(false);
+const hasMorePages = computed(() => props.equipments.has_more || props.equipments.next_page_url);
 
-// État local pour les équipements avec fusion
+// Reactive state
 const localEquipments = ref({
   data: [...props.equipments.data],
   current_page: props.equipments.current_page,
@@ -162,10 +158,9 @@ const localEquipments = ref({
   next_page_url: props.equipments.next_page_url
 });
 
-// Surveiller les changements des props pour fusionner les données
+// Watch for new equipment data and merge
 watch(() => props.equipments, (newEquipments) => {
-  if (newEquipments && newEquipments.data && newEquipments.current_page > 1) {
-    // Fusionner les nouveaux équipements avec les existants
+  if (newEquipments?.data && newEquipments.current_page > 1) {
     localEquipments.value.data.push(...newEquipments.data);
     localEquipments.value.current_page = newEquipments.current_page;
     localEquipments.value.has_more = newEquipments.has_more;
@@ -173,11 +168,13 @@ watch(() => props.equipments, (newEquipments) => {
   }
 }, { deep: true });
 
-// Debug: Vérifier que WhenVisible est bien importé
+// Debug logging (remove in production)
 onMounted(() => {
-  console.log('WhenVisible component available:', !!WhenVisible);
-  console.log('Current equipments:', localEquipments.value);
-  console.log('Has more pages:', localEquipments.value.has_more || localEquipments.value.next_page_url);
+  if (import.meta.env.DEV) {
+    console.log('WhenVisible component available:', !!WhenVisible);
+    console.log('Current equipments:', localEquipments.value);
+    console.log('Has more pages:', hasMorePages.value);
+  }
 });
 </script>
 

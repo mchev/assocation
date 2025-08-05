@@ -12,6 +12,7 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour 
 - **Animations** : Transitions fluides pour les nouveaux éléments qui apparaissent
 - **États de Chargement** : Indicateurs visuels pendant le chargement
 - **Gestion Full Page Load** : Support des rechargements de page avec maintien de la position de scroll
+- **Fusion Automatique** : Les nouveaux éléments s'ajoutent automatiquement à la liste existante
 
 ## Architecture
 
@@ -19,8 +20,9 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour 
 
 **HomeController.php**
 - Gestion intelligente des requêtes full page vs infinite scroll
-- Chargement de toutes les pages précédentes lors d'un rechargement
+- Méthode `getAllPagesUpTo()` pour charger toutes les pages précédentes lors d'un rechargement
 - Méthode `getFilteredEquipments()` optimisée pour la pagination
+- Code optimisé et nettoyé
 
 ### Frontend (Vue.js)
 
@@ -30,8 +32,9 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour 
 
 **ResultsSection.vue**
 - Utilisation du composant `WhenVisible` d'Inertia.js v2.0
-- Configuration avec `:params` au lieu de `:data`
-- Gestion automatique des états de chargement
+- État local réactif pour la fusion des données
+- Computed properties optimisées
+- Debug logging conditionnel (développement uniquement)
 
 ## Configuration
 
@@ -39,11 +42,13 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour 
 
 ```vue
 <WhenVisible
-  v-if="equipments.has_more || equipments.next_page_url"
+  v-if="hasMorePages"
   :params="{
     data: {
-      page: equipments.current_page + 1,
+      page: localEquipments.current_page + 1,
     },
+    preserveState: true,
+    preserveScroll: true,
     only: ['equipments'],
   }"
 >
@@ -60,21 +65,22 @@ Cette implémentation utilise le composant `WhenVisible` d'Inertia.js v2.0 pour 
 if (!request()->header('X-Inertia')) {
     // Full page load - fetch all pages up to current
     $currentPage = $request->input('page', 1);
-    $perPage = 10;
-    $allResults = collect();
-
-    for ($page = 1; $page <= $currentPage; $page++) {
-        $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
-        $allResults = $allResults->concat($pageResults->items());
-    }
-
-    $equipments = new \Illuminate\Pagination\LengthAwarePaginator(
-        $allResults,
-        $this->getFilteredEquipments($request, $locationPreferences)->total(),
-        $perPage,
-        $currentPage
-    );
+    $equipments = $this->getAllPagesUpTo($request, $locationPreferences, $currentPage);
 }
+```
+
+### Frontend Data Merging
+
+```javascript
+// Watch for new equipment data and merge
+watch(() => props.equipments, (newEquipments) => {
+  if (newEquipments?.data && newEquipments.current_page > 1) {
+    localEquipments.value.data.push(...newEquipments.data);
+    localEquipments.value.current_page = newEquipments.current_page;
+    localEquipments.value.has_more = newEquipments.has_more;
+    localEquipments.value.next_page_url = newEquipments.next_page_url;
+  }
+}, { deep: true });
 ```
 
 ## Avantages
@@ -85,6 +91,7 @@ if (!request()->header('X-Inertia')) {
 4. **Maintenabilité** : Code modulaire et réutilisable
 5. **SEO Friendly** : Support des rechargements de page
 6. **Intégration Native** : Utilisation des composants officiels d'Inertia.js v2.0
+7. **Code Optimisé** : Structure propre et maintenable
 
 ## Dependencies
 
@@ -101,6 +108,15 @@ Pour tester l'implémentation :
 4. Vérifier les indicateurs de chargement
 5. Tester le bouton de chargement manuel si nécessaire
 6. Recharger la page et vérifier que la position de scroll est maintenue
+7. Vérifier que les nouveaux éléments s'ajoutent à la liste existante
+
+## Optimisations Apportées
+
+- **Backend** : Méthodes extraites pour une meilleure lisibilité
+- **Frontend** : Computed properties optimisées
+- **Debug** : Logs conditionnels (développement uniquement)
+- **Template** : Structure simplifiée et nettoyée
+- **Performance** : Fusion efficace des données côté frontend
 
 ## Références
 

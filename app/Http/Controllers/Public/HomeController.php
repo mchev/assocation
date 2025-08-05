@@ -28,26 +28,7 @@ class HomeController extends Controller
         if (!request()->header('X-Inertia')) {
             // Full page load - fetch all pages up to current
             $currentPage = $request->input('page', 1);
-            $perPage = 10;
-            $allResults = collect();
-
-            for ($page = 1; $page <= $currentPage; $page++) {
-                $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
-                $allResults = $allResults->concat($pageResults->items());
-            }
-
-            $equipments = new \Illuminate\Pagination\LengthAwarePaginator(
-                $allResults,
-                $this->getFilteredEquipments($request, $locationPreferences)->total(),
-                $perPage,
-                $currentPage
-            );
-        } else {
-            // Infinite scroll request - return only new items for merging
-            $currentPage = $request->input('page', 1);
-            if ($currentPage > 1) {
-                $equipments = $this->getFilteredEquipments($request, $locationPreferences, $currentPage, 10);
-            }
+            $equipments = $this->getAllPagesUpTo($request, $locationPreferences, $currentPage);
         }
 
         return Inertia::render('Public/Home', [
@@ -135,5 +116,23 @@ class HomeController extends Controller
         }
 
         return $query->paginate($perPage);
+    }
+
+    private function getAllPagesUpTo(Request $request, $locationPreferences, int $currentPage): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $perPage = 10;
+        $allResults = collect();
+
+        for ($page = 1; $page <= $currentPage; $page++) {
+            $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
+            $allResults = $allResults->concat($pageResults->items());
+        }
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $allResults,
+            $this->getFilteredEquipments($request, $locationPreferences)->total(),
+            $perPage,
+            $currentPage
+        );
     }
 }
