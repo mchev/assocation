@@ -85,7 +85,7 @@
         <template #default="{ loading }">
           <div class="flex flex-col items-center space-y-4">
             <!-- Success message -->
-            <div v-if="showSuccessMessage" class="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-md">
+            <div v-if="showSuccessMessage" class="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-md border border-green-200">
               ✓ Nouveaux équipements chargés avec succès
             </div>
             
@@ -132,6 +132,8 @@ import { Button } from '@/components/ui/button';
 // Debug: Vérifier que WhenVisible est bien importé
 onMounted(() => {
   console.log('WhenVisible component available:', !!WhenVisible);
+  console.log('Current equipments:', props.equipments);
+  console.log('Has more pages:', props.equipments.has_more || props.equipments.next_page_url);
 });
 
 const props = defineProps({
@@ -152,8 +154,6 @@ const props = defineProps({
     default: false
   }
 });
-
-const emit = defineEmits(['load-more']);
 
 const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);

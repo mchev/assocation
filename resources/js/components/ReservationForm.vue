@@ -90,8 +90,8 @@ watch(dateRange, (newValue) => {
 
     if (!newValue.from || !newValue.to) return;
 
-    let start = newValue.from instanceof CalendarDate ? newValue.from.toDate(getLocalTimeZone()).toDateString() : newValue.from.toDateString();
-    let end = newValue.to instanceof CalendarDate ? newValue.to.toDate(getLocalTimeZone()).toDateString() : newValue.to.toDateString();
+    const start = newValue.from instanceof CalendarDate ? newValue.from.toDate(getLocalTimeZone()).toDateString() : newValue.from.toDateString();
+    const end = newValue.to instanceof CalendarDate ? newValue.to.toDate(getLocalTimeZone()).toDateString() : newValue.to.toDateString();
 
     axios.get(route('api.equipments.available-quantity', {
         equipment: props.equipment.id,

@@ -43,7 +43,7 @@ import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
 
-const props = defineProps({
+const { equipments, filters, stats } = defineProps({
   equipments: {
     type: Object,
     required: true

@@ -134,7 +134,7 @@ const selectSuggestion = (suggestion) => {
   selectedSuggestion.value = suggestion.name + ' (' + suggestion.postcode + ')';
   cityQuery.value = selectedSuggestion.value;
   error.value = '';
-  let cityInfos = {
+  const cityInfos = {
     name: suggestion.name,
     lat: suggestion.coordinates.lat,
     lng: suggestion.coordinates.lng,
