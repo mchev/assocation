@@ -22,6 +22,34 @@ class HomeController extends Controller
         $locationPreferences = $this->locationService->updateLocationPreferences($request)
             ?? $this->locationService->getLocationPreferences($request);
 
+        $equipments = $this->getFilteredEquipments($request, $locationPreferences);
+
+        return Inertia::render('Public/Home', [
+            'equipments' => $equipments,
+            'filters' => [
+                'search' => $request->search,
+                'categories' => $request->categories,
+                'organizations' => $request->organizations,
+                'coordinates' => $locationPreferences['coordinates'] ?? null,
+                'radius' => $locationPreferences['radius'] ?? null,
+                'city' => $locationPreferences['city'] ?? null,
+                'postcode' => $locationPreferences['postcode'] ?? null,
+            ],
+            'stats' => [
+                'categories' => Cache::remember('categories.tree', 3600, function () {
+                    return Category::with(['children' => function ($query) {
+                        $query->select('id', 'name', 'parent_id');
+                    }])
+                        ->whereNull('parent_id')
+                        ->select('id', 'name')
+                        ->get();
+                }),
+            ],
+        ]);
+    }
+
+    private function getFilteredEquipments(Request $request, $locationPreferences)
+    {
         $query = Equipment::query()
             ->select([
                 'id',
@@ -76,27 +104,6 @@ class HomeController extends Controller
             $q->whereIn('organization_id', $request->organizations);
         });
 
-        return Inertia::render('Public/Home', [
-            'equipments' => $query->paginate(12),
-            'filters' => [
-                'search' => $request->search,
-                'categories' => $request->categories,
-                'organizations' => $request->organizations,
-                'coordinates' => $locationPreferences['coordinates'] ?? null,
-                'radius' => $locationPreferences['radius'] ?? null,
-                'city' => $locationPreferences['city'] ?? null,
-                'postcode' => $locationPreferences['postcode'] ?? null,
-            ],
-            'stats' => [
-                'categories' => Cache::remember('categories.tree', 3600, function () {
-                    return Category::with(['children' => function ($query) {
-                        $query->select('id', 'name', 'parent_id');
-                    }])
-                        ->whereNull('parent_id')
-                        ->select('id', 'name')
-                        ->get();
-                }),
-            ],
-        ]);
+        return $query->paginate(10);
     }
 }

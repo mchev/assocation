@@ -43,9 +43,15 @@
         <h2 class="text-lg font-medium text-foreground">
           {{ equipments.total }} équipement{{ equipments.total > 1 ? 's' : '' }} trouvé{{ equipments.total > 1 ? 's' : '' }}
         </h2>
-        <p class="text-sm text-muted-foreground">
-          Page {{ equipments.current_page }} sur {{ equipments.last_page }}
-        </p>
+        <div class="flex items-center space-x-4">
+          <p class="text-sm text-muted-foreground">
+            {{ equipments.data.length }} affiché{{ equipments.data.length > 1 ? 's' : '' }} sur {{ equipments.total }}
+          </p>
+          <!-- Debug info -->
+          <div v-if="equipments.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+            Page {{ equipments.current_page }}
+          </div>
+        </div>
       </div>
 
       <!-- Equipment Grid -->
@@ -53,28 +59,80 @@
         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
       >
         <EquipmentCard
-          v-for="item in equipments.data"
-          :key="item.id"
+          v-for="(item, index) in equipments.data"
+          :key="`${item.id}-${item.updated_at}`"
           :equipment="item"
           :start-date="startDate"
           :end-date="endDate"
-          class="transition-all duration-300 ease-in-out"
+          class="transition-all duration-300 ease-in-out animate-fade-in"
+          :style="{ animationDelay: `${index * 50}ms` }"
         />
       </div>
 
-      <!-- Pagination -->
-      <div class="mt-12">
-        <Pagination :links="equipments.links" />
+      <!-- Infinite Load with WhenVisible -->
+      <WhenVisible
+        v-if="equipments.has_more || equipments.next_page_url"
+        :href="loadMoreUrl"
+        :method="'get'"
+        :preserve-state="true"
+        :preserve-scroll="true"
+        :only="['equipments']"
+        @before="onBeforeLoad"
+        @success="onLoadSuccess"
+        @error="onLoadError"
+        class="mt-12 flex justify-center"
+      >
+        <template #default="{ loading }">
+          <div class="flex flex-col items-center space-y-4">
+            <!-- Success message -->
+            <div v-if="showSuccessMessage" class="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-md">
+              ✓ Nouveaux équipements chargés avec succès
+            </div>
+            
+            <!-- Loading spinner -->
+            <div v-if="loading" class="flex items-center space-x-2">
+              <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <span class="text-sm text-muted-foreground">Chargement...</span>
+            </div>
+            
+            <!-- Load more button (fallback) -->
+            <Button 
+              v-else
+              variant="outline"
+              :disabled="loading"
+              class="px-6"
+            >
+              <Loader2 v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
+              Charger plus d'équipements
+            </Button>
+          </div>
+        </template>
+      </WhenVisible>
+
+      <!-- End of results message -->
+      <div 
+        v-else-if="equipments.data.length > 0"
+        class="mt-12 text-center"
+      >
+        <p class="text-sm text-muted-foreground">
+          Vous avez vu tous les équipements disponibles
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import Pagination from '@/components/Pagination.vue';
+import { computed, ref, onMounted } from 'vue';
+import { WhenVisible } from '@inertiajs/vue3';
 import EquipmentCard from './EquipmentCard.vue';
-import { SearchX, PackageSearch } from 'lucide-vue-next';
+import { SearchX, PackageSearch, Loader2 } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
+
+// Debug: Vérifier que WhenVisible est bien importé
+onMounted(() => {
+  console.log('WhenVisible component available:', !!WhenVisible);
+});
 
 const props = defineProps({
   equipments: {
@@ -95,6 +153,55 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['load-more']);
+
 const hasResults = computed(() => props.equipments.data.length > 0);
 const hasFilters = computed(() => props.startDate || props.endDate);
-</script> 
+const showSuccessMessage = ref(false);
+
+// URL pour charger plus d'équipements
+const loadMoreUrl = computed(() => {
+  const nextPage = props.equipments.current_page + 1;
+  const params = new URLSearchParams({
+    page: nextPage.toString(),
+    ...(props.startDate && { start_date: props.startDate }),
+    ...(props.endDate && { end_date: props.endDate })
+  });
+  
+  return `${route('home')}?${params.toString()}`;
+});
+
+// Callbacks pour WhenVisible
+const onBeforeLoad = () => {
+  console.log('WhenVisible: Chargement en cours...');
+};
+
+const onLoadSuccess = (event) => {
+  console.log('WhenVisible: Chargement réussi:', event);
+  showSuccessMessage.value = true;
+  setTimeout(() => {
+    showSuccessMessage.value = false;
+  }, 2000);
+};
+
+const onLoadError = (error) => {
+  console.error('WhenVisible: Erreur lors du chargement:', error);
+};
+</script>
+
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+</style> 
