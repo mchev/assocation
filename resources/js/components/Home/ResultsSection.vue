@@ -41,15 +41,15 @@
       <!-- Results Count -->
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-lg font-medium text-foreground">
-          {{ localEquipments.total }} équipement{{ localEquipments.total > 1 ? 's' : '' }} trouvé{{ localEquipments.total > 1 ? 's' : '' }}
+          {{ equipments_pagination.total }} équipement{{ equipments_pagination.total > 1 ? 's' : '' }} trouvé{{ equipments_pagination.total > 1 ? 's' : '' }}
         </h2>
         <div class="flex items-center space-x-4">
           <p class="text-sm text-muted-foreground">
-            {{ localEquipments.data.length }} affiché{{ localEquipments.data.length > 1 ? 's' : '' }} sur {{ localEquipments.total }}
+            {{ equipments.length }} affiché{{ equipments.length > 1 ? 's' : '' }} sur {{ equipments_pagination.total }}
           </p>
           <!-- Debug info -->
-          <div v-if="localEquipments.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-            Page {{ localEquipments.current_page }}
+          <div v-if="equipments_pagination.has_more" class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+            Page {{ equipments_pagination.current_page }}
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
       >
         <EquipmentCard
-          v-for="(item, index) in localEquipments.data"
+          v-for="(item, index) in equipments"
           :key="`${item.id}-${item.updated_at}`"
           :equipment="item"
           :start-date="startDate"
@@ -70,64 +70,47 @@
       </div>
 
       <!-- Infinite Load with WhenVisible -->
-      <WhenVisible
-        v-if="hasMorePages"
-        :params="{
-          data: {
-            page: localEquipments.current_page + 1,
-          },
-          preserveState: true,
-          preserveScroll: true,
-          only: ['equipments'],
-        }"
-        class="mt-12 flex justify-center"
-      >
-        <template #default="{ loading }">
-          <div class="flex flex-col items-center space-y-4">
-            <!-- Loading spinner -->
-            <div v-if="loading" class="flex items-center space-x-2">
+      <div class="mt-12 flex justify-center">
+        <WhenVisible
+          always
+          :params="{
+            data: {
+              page: equipments_pagination.current_page + 1,
+            },
+            only: ['equipments', 'equipments_pagination'],
+          }"
+        >
+          <template #fallback>
+            <div class="flex items-center space-x-2">
               <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
               <span class="text-sm text-muted-foreground">Chargement...</span>
             </div>
-            
-            <!-- Load more button (fallback) -->
-            <Button 
-              v-else
-              variant="outline"
-              :disabled="loading"
-              class="px-6"
-            >
-              <Loader2 v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
-              Charger plus d'équipements
-            </Button>
-          </div>
-        </template>
-      </WhenVisible>
-
-      <!-- End of results message -->
-      <div 
-        v-else-if="localEquipments.data.length > 0"
-        class="mt-12 text-center"
-      >
-        <p class="text-sm text-muted-foreground">
-          Vous avez vu tous les équipements disponibles
-        </p>
+          </template>
+        </WhenVisible>
       </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed } from 'vue';
 import { WhenVisible } from '@inertiajs/vue3';
 import EquipmentCard from './EquipmentCard.vue';
-import { SearchX, PackageSearch, Loader2 } from 'lucide-vue-next';
-import { Button } from '@/components/ui/button';
+import { SearchX, PackageSearch } from 'lucide-vue-next';
 
 const props = defineProps({
   equipments: {
     type: Object,
     required: true
+  },
+  equipments_pagination: {
+    type: Object,
+    required: true
+  },
+  filters: {
+    type: Object,
+    default: () => ({})
   },
   startDate: {
     type: String,
@@ -144,53 +127,16 @@ const props = defineProps({
 });
 
 // Computed properties
-const hasResults = computed(() => props.equipments.data.length > 0);
-const hasFilters = computed(() => props.startDate || props.endDate);
-const hasMorePages = computed(() => props.equipments.has_more || props.equipments.next_page_url);
+const hasResults = computed(() => props.equipments.length > 0);
 
-// Reactive state
-const localEquipments = ref({
-  data: [...props.equipments.data],
-  current_page: props.equipments.current_page,
-  last_page: props.equipments.last_page,
-  total: props.equipments.total,
-  has_more: props.equipments.has_more,
-  next_page_url: props.equipments.next_page_url
+const hasFilters = computed(() => {
+  const filters = props.filters;
+  return filters.search || 
+         (filters.categories && filters.categories.length > 0) || 
+         (filters.organizations && filters.organizations.length > 0) || 
+         filters.radius || 
+         filters.city || 
+         filters.postcode;
 });
 
-// Watch for new equipment data and merge
-watch(() => props.equipments, (newEquipments) => {
-  if (newEquipments?.data && newEquipments.current_page > 1) {
-    localEquipments.value.data.push(...newEquipments.data);
-    localEquipments.value.current_page = newEquipments.current_page;
-    localEquipments.value.has_more = newEquipments.has_more;
-    localEquipments.value.next_page_url = newEquipments.next_page_url;
-  }
-}, { deep: true });
-
-// Debug logging (remove in production)
-onMounted(() => {
-  if (import.meta.env.DEV) {
-    console.log('WhenVisible component available:', !!WhenVisible);
-    console.log('Current equipments:', localEquipments.value);
-    console.log('Has more pages:', hasMorePages.value);
-  }
-});
 </script>
-
-<style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-</style> 

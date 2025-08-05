@@ -23,10 +23,12 @@
       <!-- Results Section -->
       <section 
         class="relative py-12 bg-gradient-to-b from-background via-background/50 to-background"
-        :class="{ 'mt-8': equipments.data.length > 0 }"
+        :class="{ 'mt-8': equipments.length > 0 }"
       >
         <ResultsSection
           :equipments="equipments"
+          :equipments_pagination="equipments_pagination"
+          :filters="filters"
           :start-date="filters.start_date"
           :end-date="filters.end_date"
           :isSearching="isSearching"
@@ -43,8 +45,12 @@ import HeroSection from '@/components/Home/HeroSection.vue';
 import SearchSection from '@/components/Home/SearchSection.vue';
 import ResultsSection from '@/components/Home/ResultsSection.vue';
 
-const { equipments, filters, stats } = defineProps({
+defineProps({
   equipments: {
+    type: Object,
+    required: true
+  },
+  equipments_pagination: {
     type: Object,
     required: true
   },

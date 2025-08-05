@@ -52,60 +52,61 @@
           </div>
         </div>
 
-          <div class="px-6 pb-6">
-            <div class="">
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Filters Section -->
+        <div class="px-6 pb-6">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-                <!-- Radius Select -->
-                <div class="space-y-2">
-                  <Label for="radius" class="flex items-center gap-2">
-                    Rayon de recherche
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <HelpCircle class="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Distance maximale de recherche</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </Label>
-                  <Select v-model="form.radius">
-                    <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
-                      <SelectValue placeholder="Sélectionner un rayon" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5 km</SelectItem>
-                      <SelectItem value="10">10 km</SelectItem>
-                      <SelectItem value="25">25 km</SelectItem>
-                      <SelectItem value="50">50 km</SelectItem>
-                      <SelectItem value="100">100 km</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <!-- Category Select -->
-                <div class="space-y-2">
-                  <Label>Catégories</Label>
-                  <CategoryFilter
-                    v-model="form.categories"
-                  />
-                </div>
-
-                <!-- Organization Filter -->
-                <div class="space-y-2">
-                  <Label class="flex items-center gap-2">
-                    Filtrer par organisation
-                  </Label>
-                  <OrganizationFilter 
-                    v-model="form.organizations"
-                  />
-                </div>
-
-              </div>
+            <!-- Radius Select -->
+            <div class="space-y-2">
+              <Label for="radius" class="flex items-center gap-2">
+                Rayon de recherche
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <HelpCircle class="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Distance maximale de recherche</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
+              <Select v-model="form.radius" @update:model-value="handleSearch">
+                <SelectTrigger id="radius" class="w-full bg-white dark:bg-gray-800">
+                  <SelectValue placeholder="Sélectionner un rayon" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 km</SelectItem>
+                  <SelectItem value="10">10 km</SelectItem>
+                  <SelectItem value="25">25 km</SelectItem>
+                  <SelectItem value="50">50 km</SelectItem>
+                  <SelectItem value="100">100 km</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            <!-- Category Select -->
+            <div class="space-y-2">
+              <Label>Catégories</Label>
+              <CategoryFilter
+                v-model="form.categories"
+                @update:model-value="handleSearch"
+              />
+            </div>
+
+            <!-- Organization Filter -->
+            <div class="space-y-2">
+              <Label class="flex items-center gap-2">
+                Filtrer par organisation
+              </Label>
+              <OrganizationFilter 
+                v-model="form.organizations"
+                @update:model-value="handleSearch"
+              />
+            </div>
+
           </div>
+        </div>
       </div>
     </div>
   </div>
@@ -142,6 +143,7 @@ const emit = defineEmits(['searching']);
 
 const isSearching = ref(false);
 
+// Initialiser le formulaire avec les filtres des props
 const form = useForm({
   search: props.filters.search || '',
   radius: props.filters.radius || 50,
@@ -152,8 +154,9 @@ const form = useForm({
   postcode: props.filters.postcode || null
 });
 
+// Recherche instantanée pour tous les changements
 watch(
-  [() => form.organizations, () => form.categories, () => form.radius],
+  [() => form.search, () => form.radius, () => form.categories, () => form.organizations],
   () => {
     handleSearch();
   },
@@ -161,10 +164,9 @@ watch(
 );
 
 const handleSearch = () => {
-  if (!form.isDirty) return;
-
   isSearching.value = true;
   emit('searching', isSearching.value);
+  
   form.get(route('home'), {
     only: ['filters', 'equipments'],
     preserveScroll: true,

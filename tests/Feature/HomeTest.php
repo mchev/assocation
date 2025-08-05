@@ -25,6 +25,6 @@ test('user can view equipment list', function () {
 
     $response->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->has('equipments.data', 3)
+            ->has('equipments', 3)
         );
 });

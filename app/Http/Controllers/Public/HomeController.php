@@ -24,15 +24,28 @@ class HomeController extends Controller
 
         $equipments = $this->getFilteredEquipments($request, $locationPreferences);
 
-        // Handle full page load vs. infinite scroll request
-        if (!request()->header('X-Inertia')) {
-            // Full page load - fetch all pages up to current
-            $currentPage = $request->input('page', 1);
-            $equipments = $this->getAllPagesUpTo($request, $locationPreferences, $currentPage);
-        }
+        // Get current filters
+        $currentFilters = [
+            'search' => $request->search,
+            'categories' => $request->categories,
+            'organizations' => $request->organizations,
+            'radius' => $locationPreferences['radius'] ?? null,
+            'city' => $locationPreferences['city'] ?? null,
+            'postcode' => $locationPreferences['postcode'] ?? null,
+        ];
+
+        // Get previous filters from session
+        $previousFilters = $request->session()->get('previous_filters', []);
+
+        // Check if filters have actually changed
+        $hasFilterChanged = $this->filtersHaveChanged($currentFilters, $previousFilters);
+
+        // Store current filters for next comparison
+        $request->session()->put('previous_filters', $currentFilters);
 
         return Inertia::render('Public/Home', [
-            'equipments' => $equipments,
+            'equipments' => $hasFilterChanged ? $equipments->items() : Inertia::merge(fn () => $equipments->items()),
+            'equipments_pagination' => $equipments->toArray(),
             'filters' => [
                 'search' => $request->search,
                 'categories' => $request->categories,
@@ -53,6 +66,25 @@ class HomeController extends Controller
                 }),
             ],
         ]);
+    }
+
+    private function filtersHaveChanged(array $currentFilters, array $previousFilters): bool
+    {
+        // Normalize arrays for comparison
+        $normalizeArray = function ($value) {
+            if (is_array($value)) {
+                sort($value); // Sort to ensure consistent comparison
+
+                return $value;
+            }
+
+            return $value;
+        };
+
+        $current = array_map($normalizeArray, $currentFilters);
+        $previous = array_map($normalizeArray, $previousFilters);
+
+        return $current !== $previous;
     }
 
     private function getFilteredEquipments(Request $request, $locationPreferences, $page = null, $perPage = 10)
@@ -116,23 +148,5 @@ class HomeController extends Controller
         }
 
         return $query->paginate($perPage);
-    }
-
-    private function getAllPagesUpTo(Request $request, $locationPreferences, int $currentPage): \Illuminate\Pagination\LengthAwarePaginator
-    {
-        $perPage = 10;
-        $allResults = collect();
-
-        for ($page = 1; $page <= $currentPage; $page++) {
-            $pageResults = $this->getFilteredEquipments($request, $locationPreferences, $page, $perPage);
-            $allResults = $allResults->concat($pageResults->items());
-        }
-
-        return new \Illuminate\Pagination\LengthAwarePaginator(
-            $allResults,
-            $this->getFilteredEquipments($request, $locationPreferences)->total(),
-            $perPage,
-            $currentPage
-        );
     }
 }
