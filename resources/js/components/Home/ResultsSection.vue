@@ -72,6 +72,7 @@
       <!-- Infinite Load with WhenVisible -->
       <div class="mt-12 flex justify-center">
         <WhenVisible
+          v-if="equipments_pagination.last_page > equipments_pagination.current_page"
           always
           :params="{
             data: {
