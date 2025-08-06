@@ -75,7 +75,7 @@ class UpdateRequest extends FormRequest
             'depot_id.exists' => 'Le lieu de stockage sélectionné n\'existe pas.',
 
             // Step 3
-            'images.max' => 'Vous ne pouvez pas ajouter plus de 10 images.',
+            'images.max' => 'Vous ne pouvez pas ajouter plus de 3 images.',
             'images.*.image' => 'Le fichier doit être une image.',
             'images.*.mimes' => 'L\'image doit être au format JPG, JPEG ou PNG.',
             'images.*.max' => 'L\'image ne peut pas dépasser 5MB.',

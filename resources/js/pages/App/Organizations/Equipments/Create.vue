@@ -256,7 +256,7 @@
                   <Image class="w-5 h-5 mr-3 flex-shrink-0 text-muted-foreground/75" />
                   <div class="space-y-1">
                     <p class="text-muted-foreground/75">
-                      Ajoutez jusqu'à 10 photos de votre matériel. La première photo sera l'image principale.
+                      Ajoutez jusqu'à 3 photos de votre matériel. La première photo sera l'image principale.
                     </p>
                     <ul class="text-xs text-muted-foreground/75 list-disc list-inside">
                       <li>Formats acceptés : JPG, JPEG, PNG</li>
@@ -471,10 +471,6 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css
 const props = defineProps({
   organization: {
     type: Object,
-    required: true
-  },
-  categories: {
-    type: Array,
     required: true
   },
   depots: {

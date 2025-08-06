@@ -10,12 +10,13 @@ import {
   Plus,
   LayoutDashboard,
   Box,
-  Calendar,
   Menu,
   X,
   User,
   Settings,
-  LogOut
+  LogOut,
+  CalendarDays,
+  Clock
 } from 'lucide-vue-next'
 
 const page = usePage()
@@ -34,24 +35,24 @@ const navigationItems = computed(() => [
     show: !!user.value
   },
   {
-    name: 'Matériel',
-    href: route('app.organizations.equipments.index'),
-    active: route().current('app.organizations.equipments.index'),
-    icon: Box,
-    show: !!user.value
-  },
-  {
     name: 'Réservations',
     href: route('app.organizations.reservations.in.index'),
     active: route().current('app.organizations.reservations.in.index'),
-    icon: Calendar,
+    icon: CalendarDays,
     show: !!user.value
   },
   {
     name: 'Agenda',
     href: route('app.organizations.calendar'),
     active: route().current('app.organizations.calendar'),
-    icon: Calendar,
+    icon: Clock,
+    show: !!user.value
+  },
+  {
+    name: 'Matériel',
+    href: route('app.organizations.equipments.index'),
+    active: route().current('app.organizations.equipments.index'),
+    icon: Box,
     show: !!user.value
   }
 ])
@@ -84,16 +85,34 @@ const navigationItems = computed(() => [
               </Link>
             </Button>
 
-            <NavLink
+            <div
               v-for="item in navigationItems"
               v-show="item.show"
               :key="item.href"
-              :href="item.href"
-              :active="item.active"
-              :icon="item.icon"
+              class="flex items-center gap-2"
             >
-              {{ item.name }}
-            </NavLink>
+              <NavLink
+                :href="item.href"
+                :active="item.active"
+                :icon="item.icon"
+              >
+                {{ item.name }}
+              </NavLink>
+              
+              <!-- CTA Button for Matériel -->
+              <Button
+                v-if="item.name === 'Matériel'"
+                asChild
+                size="sm"
+                variant="secondary"
+                class="h-8 w-8 p-0 rounded-full"
+                title="Ajouter votre matériel"
+              >
+                <Link :href="route('app.organizations.equipments.create')">
+                  <Plus class="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 

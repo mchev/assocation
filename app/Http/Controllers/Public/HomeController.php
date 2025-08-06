@@ -90,12 +90,15 @@ class HomeController extends Controller
     private function getFilteredEquipments(Request $request, $locationPreferences, $page = null, $perPage = 10)
     {
         $query = Equipment::query()
+            ->where('is_available', true)
+            ->where('is_rentable', true)
             ->select([
                 'id',
                 'name',
                 'description',
                 'rental_price',
                 'is_available',
+                'is_rentable',
                 'category_id',
                 'organization_id',
                 'depot_id',
@@ -106,8 +109,7 @@ class HomeController extends Controller
                 'depot:id,city',
                 'images',
             ])
-            ->orderByDesc('updated_at')
-            ->where('is_available', true);
+            ->orderByDesc('updated_at');
 
         // Apply filters
         if ($request->filled('search')) {

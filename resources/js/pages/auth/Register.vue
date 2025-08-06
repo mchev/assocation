@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { LoaderCircle, ShieldCheck } from 'lucide-vue-next';
 
 defineProps<{
     error?: string;
@@ -137,6 +137,18 @@ const submit = () => {
                 <div class="text-center text-sm text-muted-foreground">
                     Vous avez déjà un compte ?
                     <TextLink :href="route('login')" :tabindex="6">Se connecter</TextLink>
+                </div>
+
+                <div class="text-center text-sm text-muted-foreground flex flex-col items-center gap-1 mt-4">
+                    <span class="inline-flex items-center justify-center gap-1">
+                        <ShieldCheck class="w-4 h-4 text-primary inline-block mr-1" aria-hidden="true" />
+                        <span>
+                            <strong class="font-medium">Vos données sont confidentielles</strong> et ne seront jamais revendues.
+                        </span>
+                    </span>
+                    <span>
+                        <span class="font-medium">Créer un compte</span> vous permet de suivre votre matériel et vos réservations en toute sécurité.
+                    </span>
                 </div>
             </div>
         </div>

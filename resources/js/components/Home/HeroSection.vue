@@ -85,25 +85,26 @@ const advantages = [
                                 </h1>
                                 
                                 <p class="text-base text-gray-500 max-w-xl mx-auto lg:mx-0 dark:text-gray-400">
-                                    <strong class="text-gray-900 dark:text-white">{{ appName }}</strong> facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
+                                    <strong class="text-gray-900 dark:text-white">{{ appName }}</strong> facilite la location de matériel entre associations et particuliers. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.
+                                    La création de votre inventaire ne vous engage pas à rendre votre matériel disponible publiquement sur la plateforme. Si vous choisissez de le proposer à la location, vous gardez toujours la liberté d’accepter ou de refuser chaque demande de réservation, sans avoir à fournir de justification.
                                 </p>
                             </div>
 
                             <div class="mt-6 flex flex-wrap items-center gap-3 justify-center lg:justify-start">
                                 <Link
-                                    :href="route('discover')"
+                                    :href="route('how-it-works')"
                                     class="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-violet-500 dark:from-violet-500 dark:to-blue-500 dark:hover:from-violet-600 dark:hover:to-blue-600"
                                 >
-                                    Découvrir la plateforme
+                                    Comment ça marche ?
                                     <ArrowRightIcon class="ml-2 h-4 w-4" />
                                 </Link>
                                 <Button 
                                     variant="outline"
                                     as="a"
-                                    :href="route('how-it-works')"
+                                    :href="route('discover')"
                                     class="text-sm border-violet-200 text-violet-700 hover:text-violet-500 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900"
                                 >
-                                    Comment ça marche ?
+                                    Découvrir la plateforme
                                 </Button>
                             </div>
                         </div>
