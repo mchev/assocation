@@ -36,7 +36,7 @@ class UpdateRequest extends FormRequest
 
             // Step 3: Photos
             'images' => ['nullable', 'array', 'max:3'],
-            'images.*' => ['image', 'mimes:jpeg,jpg,png', 'max:5120'], // 5MB max per image
+            'images.*' => ['image', 'mimes:jpeg,jpg,png', 'max:10240'], // 10MB max per image
             'removed_images' => ['nullable', 'array'],
             'removed_images.*' => ['integer', 'exists:equipment_images,id'],
 
@@ -78,7 +78,7 @@ class UpdateRequest extends FormRequest
             'images.max' => 'Vous ne pouvez pas ajouter plus de 3 images.',
             'images.*.image' => 'Le fichier doit être une image.',
             'images.*.mimes' => 'L\'image doit être au format JPG, JPEG ou PNG.',
-            'images.*.max' => 'L\'image ne peut pas dépasser 5MB.',
+            'images.*.max' => 'L\'image ne peut pas dépasser 10MB.',
 
             // Step 4
             'purchase_price.required' => 'Le prix d\'achat est requis.',

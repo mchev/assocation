@@ -260,11 +260,14 @@
                     </p>
                     <ul class="text-xs text-muted-foreground/75 list-disc list-inside">
                       <li>Formats acceptés : JPG, JPEG, PNG</li>
-                      <li>Taille maximale par image : 5 MB</li>
+                      <li>Taille maximale par image : 10 MB</li>
                       <li>Glissez-déposez pour réorganiser les photos</li>
                     </ul>
                   </div>
                 </div>
+
+                <!-- error message -->
+                <p v-if="form.errors.images" class="mt-2 text-sm text-destructive">{{ form.errors.images }}</p>
 
                 <file-pond
                   name="images"

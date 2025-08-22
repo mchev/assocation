@@ -290,7 +290,7 @@
                     </p>
                     <ul class="text-xs text-muted-foreground/75 list-disc list-inside">
                       <li>Formats acceptés : JPG, JPEG, PNG</li>
-                      <li>Taille maximale par image : 5 MB</li>
+                      <li>Taille maximale par image : 10 MB</li>
                     </ul>
                   </div>
                 </div>

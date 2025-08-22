@@ -1,0 +1,1 @@
+import{j as o}from"./Teleport-CeiFfp-J.js";import{k as a,q as u}from"./app-KK-F1Z1c.js";function I(t,e=Number.NEGATIVE_INFINITY,r=Number.POSITIVE_INFINITY){return Math.min(r,Math.max(e,t))}function i(t){const e=o({nonce:a()});return u(()=>{var r;return(t==null?void 0:t.value)||((r=e.nonce)==null?void 0:r.value)})}export{I as c,i as u};
