@@ -618,10 +618,6 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  categories: {
-    type: Array,
-    required: true
-  },
   depots: {
     type: Array,
     required: true
@@ -749,7 +745,7 @@ const submit = () => {
 }
 
 const deleteEquipment = () => {
-  deleteForm.delete(route('app.organizations.equipments.destroy', [props.organization, props.equipment]), {
+  deleteForm.delete(route('app.organizations.equipments.destroy', props.equipment), {
     onSuccess: () => {
       showDeleteDialog.value = false
     },
