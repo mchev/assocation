@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 import NavLink from '@/components/NavLink.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 import CartMenu from '@/components/CartMenu.vue'
+import OrganizationSwitcher from '@/components/OrganizationSwitcher.vue'
 import { Button } from '@/components/ui/button'
 import TopbarSearch from '@/components/TopbarSearch.vue'
 import { 
@@ -178,6 +179,18 @@ const navigationItems = computed(() => [
             <div class="text-sm font-medium text-gray-500">{{ user.email }}</div>
           </div>
         </div>
+        
+        <!-- Current Organization Display -->
+        <div v-if="user.current_organization" class="mt-3 pt-3 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="h-6 w-6 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-medium">
+                {{ user.current_organization.name.charAt(0).toUpperCase() }}
+              </div>
+              <span class="text-sm font-medium text-gray-800">{{ user.current_organization.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="pt-2 pb-3 space-y-1">
@@ -203,6 +216,16 @@ const navigationItems = computed(() => [
           <component :is="item.icon" class="h-5 w-5" />
           {{ item.name }}
         </a>
+      </div>
+
+      <!-- Organization Switcher for Mobile -->
+      <div v-if="user && user.organizations" class="pt-4 pb-3 border-t border-gray-200">
+        <div class="px-4 py-2">
+          <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider">
+            {{ user.organizations.length > 1 ? 'Changer d\'organisation' : 'Organisation' }}
+          </h3>
+        </div>
+        <OrganizationSwitcher />
       </div>
 
       <!-- Mobile auth navigation -->

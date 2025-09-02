@@ -23,7 +23,7 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'equipment_id' => ['required', 'exists:equipment,id'],
+            'equipment_id' => ['required', 'exists:equipments,id'],
             'start_date' => [
                 'required',
                 'date',

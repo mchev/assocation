@@ -126,7 +126,7 @@
                         <Badge variant="outline" class="shrink-0">
                           {{ item.quantity }}
                         </Badge>
-                        <span>{{ item.equipment.name }}</span>
+                        <span>{{ item.equipment?.name || 'Équipement supprimé' }}</span>
                       </div>
                     </div>
                   </div>
@@ -185,7 +185,7 @@
                         <Badge variant="outline" class="shrink-0">
                           {{ item.quantity }}
                         </Badge>
-                        <span>{{ item.equipment.name }}</span>
+                        <span>{{ item.equipment?.name || 'Équipement supprimé' }}</span>
                       </div>
                     </div>
                   </div>

@@ -16,6 +16,11 @@ class CalendarController extends Controller
         $user = $request->user();
         $organization = $user->currentOrganization;
 
+        if (!$organization) {
+            return redirect()->route('app.organizations.create')
+                ->with('error', 'Vous devez créer une organisation avant de pouvoir accéder au calendrier.');
+        }
+
         // Get only outgoing reservations (where we are lending equipment)
         $reservations = $organization->lentReservations()
             ->whereIn('status', [ReservationStatus::PENDING, ReservationStatus::CONFIRMED, ReservationStatus::COMPLETED])
@@ -28,7 +33,7 @@ class CalendarController extends Controller
             ->map(function ($reservation) {
                 return [
                     'id' => $reservation->id,
-                    'title' => $reservation->items->map(fn ($item) => $item->equipment->name)->join(', '),
+                    'title' => $reservation->items->map(fn ($item) => $item->equipment?->name ?? 'Équipement supprimé')->join(', '),
                     'start' => $reservation->start_date,
                     'end' => $reservation->end_date,
                     'status' => [
@@ -37,18 +42,18 @@ class CalendarController extends Controller
                         'color' => $reservation->status->color(),
                     ],
                     'borrower' => [
-                        'name' => $reservation->borrowerOrganization->name,
-                        'email' => $reservation->borrowerOrganization->email,
-                        'phone' => $reservation->borrowerOrganization->phone,
+                        'name' => $reservation->borrowerOrganization?->name ?? 'Organisation supprimée',
+                        'email' => $reservation->borrowerOrganization?->email,
+                        'phone' => $reservation->borrowerOrganization?->phone,
                         'contact' => [
-                            'name' => $reservation->user->name,
-                            'email' => $reservation->user->email,
-                            'phone' => $reservation->user->phone,
+                            'name' => $reservation->user?->name ?? 'Utilisateur supprimé',
+                            'email' => $reservation->user?->email,
+                            'phone' => $reservation->user?->phone,
                         ],
                     ],
                     'total' => $reservation->formatted_total,
                     'items' => $reservation->items->map(fn ($item) => [
-                        'equipment' => $item->equipment->name,
+                        'equipment' => $item->equipment?->name ?? 'Équipement supprimé',
                         'quantity' => $item->quantity,
                         'status' => [
                             'value' => $item->status->value,
@@ -75,6 +80,11 @@ class CalendarController extends Controller
     public function storeManualReservation(ManualReservationRequest $request)
     {
         $organization = $request->user()->currentOrganization;
+
+        if (!$organization) {
+            return redirect()->route('app.organizations.create')
+                ->with('error', 'Vous devez créer une organisation avant de pouvoir créer des réservations.');
+        }
 
         $validated = $request->validated();
 

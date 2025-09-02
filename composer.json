@@ -2,10 +2,16 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/vue-starter-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Plateforme de gestion de location et de réservation de matériel pour les organisations, clubs et associations.",
     "keywords": [
-        "laravel",
-        "framework"
+        "location",
+        "réservation",
+        "matériel",
+        "organisation",
+        "club",
+        "association",
+        "gestion",
+        "plateforme"
     ],
     "license": "MIT",
     "require": {
@@ -25,6 +31,7 @@
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
+        "laravel/boost": "^1.0",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",

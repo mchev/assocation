@@ -40,19 +40,22 @@ class Equipment extends Model
         'next_maintenance_date',
     ];
 
-    protected $casts = [
-        'purchase_price' => PriceCast::class,
-        'rental_price' => PriceCast::class,
-        'deposit_amount' => PriceCast::class,
-        'is_available' => 'boolean',
-        'requires_deposit' => 'boolean',
-        'is_rentable' => 'boolean',
-        'is_active' => 'boolean',
-        'specifications' => 'array',
-        'images' => 'array',
-        'last_maintenance_date' => 'date',
-        'next_maintenance_date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'purchase_price' => PriceCast::class,
+            'rental_price' => PriceCast::class,
+            'deposit_amount' => PriceCast::class,
+            'is_available' => 'boolean',
+            'requires_deposit' => 'boolean',
+            'is_rentable' => 'boolean',
+            'is_active' => 'boolean',
+            'specifications' => 'array',
+            'images' => 'array',
+            'last_maintenance_date' => 'date',
+            'next_maintenance_date' => 'date',
+        ];
+    }
 
     protected $table = 'equipments';
 

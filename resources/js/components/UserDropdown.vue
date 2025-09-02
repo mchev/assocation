@@ -1,48 +1,22 @@
 <script setup>
 import { computed } from 'vue'
-import { router, usePage, Link } from '@inertiajs/vue3'
+import { usePage, Link, router } from '@inertiajs/vue3'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup } from '@/components/ui/dropdown-menu'
 import { 
-    CheckIcon, 
-    ChevronDownIcon, 
-    PlusIcon,
+    ChevronDownIcon,
     Cog6ToothIcon,
     UserIcon,
     ArrowRightOnRectangleIcon,
     BuildingOfficeIcon
 } from '@heroicons/vue/24/outline'
+import OrganizationSwitcher from '@/components/OrganizationSwitcher.vue'
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
-const organizations = computed(() => page.props.auth.user?.organizations)
 const currentOrganization = computed(() => page.props.auth.user?.current_organization)
-
-const switchOrganization = (organization) => {
-    router.post(route('app.organizations.switch', organization), {}, {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-            window.location.reload()
-        }
-    })
-}
-
-const createOrganization = () => {
-    router.visit(route('app.organizations.create'))
-}
 
 const goToSettings = () => {
     router.visit(route('app.organizations.settings.edit'))
-}
-
-// Generate initials for organization avatar
-const getOrganizationInitials = (name) => {
-    return name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
 }
 </script>
 
@@ -77,25 +51,7 @@ const getOrganizationInitials = (name) => {
                 <span>Changer d'organisation</span>
             </DropdownMenuLabel>
             <DropdownMenuGroup class="max-h-[200px] overflow-y-auto">
-                <DropdownMenuItem
-                    v-for="org in organizations"
-                    :key="org.id"
-                    @click="switchOrganization(org)"
-                    :class="[
-                        'flex items-center gap-2 cursor-pointer',
-                        org.id === currentOrganization?.id ? 'bg-primary-50' : 'hover:bg-gray-50'
-                    ]"
-                >
-                    <!-- Organization Avatar -->
-                    <div class="flex-shrink-0 h-6 w-6 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-medium">
-                        {{ getOrganizationInitials(org.name) }}
-                    </div>
-                    <span class="flex-1 truncate">{{ org.name }}</span>
-                    <CheckIcon
-                        v-if="org.id === currentOrganization?.id"
-                        class="ml-auto h-4 w-4 text-primary-600"
-                    />
-                </DropdownMenuItem>
+                <OrganizationSwitcher />
             </DropdownMenuGroup>
 
             <!-- Organization Actions -->
@@ -103,10 +59,6 @@ const getOrganizationInitials = (name) => {
             <DropdownMenuItem v-if="currentOrganization" @click="goToSettings" class="cursor-pointer">
                 <Cog6ToothIcon class="mr-2 h-4 w-4" />
                 <span>Paramètres de l'organisation</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem @click="createOrganization" class="cursor-pointer">
-                <PlusIcon class="mr-2 h-4 w-4" />
-                <span>Créer une nouvelle organisation</span>
             </DropdownMenuItem>
 
             <!-- User Actions -->
