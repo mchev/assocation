@@ -63,7 +63,7 @@ class Equipment extends Model
 
     public function reservations()
     {
-        return $this->hasManyThrough(Reservation::class, ReservationItem::class, 'equipment_id', 'id', 'id');
+        return $this->hasManyThrough(Reservation::class, ReservationItem::class, 'equipment_id', 'id', 'id', 'reservation_id');
     }
 
     public function contracts()
@@ -119,7 +119,7 @@ class Equipment extends Model
         //     'status' => 'confirmed',
         // ]
 
-        $startOfMonth = Carbon::parse($year.'-'.$month.'-01')->startOfMonth();
+        $startOfMonth = Carbon::parse($year.'-'.$month.'-01')->startOfDay();
         $endOfMonth = Carbon::parse($year.'-'.$month.'-01')->endOfMonth();
 
         $reservations = $this->reservations()
@@ -130,16 +130,16 @@ class Equipment extends Model
             ->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where(function ($q) use ($startOfMonth, $endOfMonth) {
                     // Réservations qui commencent dans le mois
-                    $q->where('start_date', '>=', $startOfMonth)
-                        ->where('start_date', '<=', $endOfMonth);
+                    $q->where('start_date', '>=', $startOfMonth->format('Y-m-d'))
+                        ->where('start_date', '<=', $endOfMonth->format('Y-m-d'));
                 })->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
                     // Réservations qui se terminent dans le mois
-                    $q->where('end_date', '>=', $startOfMonth)
-                        ->where('end_date', '<=', $endOfMonth);
+                    $q->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
+                        ->where('end_date', '<=', $endOfMonth->format('Y-m-d'));
                 })->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
                     // Réservations qui englobent le mois
-                    $q->where('start_date', '<=', $startOfMonth)
-                        ->where('end_date', '>=', $endOfMonth);
+                    $q->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
+                        ->where('end_date', '>=', $endOfMonth->format('Y-m-d'));
                 });
             })
             ->get();

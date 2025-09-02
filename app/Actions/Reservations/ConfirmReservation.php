@@ -13,9 +13,8 @@ class ConfirmReservation
     public function handle(Reservation $reservation)
     {
         try {
-            $reservation->update([
-                'status' => ReservationStatus::CONFIRMED,
-            ]);
+            $reservation->status = ReservationStatus::CONFIRMED;
+            $reservation->save();
 
             foreach ($reservation->borrowerOrganization->users as $user) {
                 $user->notify(new ConfirmedReservationNotification($reservation));
