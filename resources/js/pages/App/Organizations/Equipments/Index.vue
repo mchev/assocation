@@ -192,7 +192,21 @@
             </div>
           </CardContent>
         </Card>
+
+        <!-- Pagination -->
+        <div v-if="equipments.links && equipments.links.length > 3" class="mt-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-muted-foreground">
+                Affichage de {{ equipments.from }} à {{ equipments.to }} sur {{ equipments.total }} résultats
+              </span>
+            </div>
+            <Pagination :links="equipments.links" />
+          </div>
+        </div>
+
       </div>
+
     </div>
   </AppLayout>
 </template>
@@ -201,6 +215,7 @@
 import { computed } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
+import Pagination from '@/components/Pagination.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

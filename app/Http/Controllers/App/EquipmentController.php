@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
 use App\Models\Equipment;
-use App\Models\Organization;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -106,7 +105,7 @@ class EquipmentController extends Controller
         $equipment = $storeEquipmentAction->execute($validated, $images);
 
         return redirect()
-            ->route('app.organizations.equipments.index', $organization)
+            ->route('app.organizations.equipments.index')
             ->with('success', 'L\'équipement a été ajouté avec succès.');
     }
 
@@ -133,7 +132,7 @@ class EquipmentController extends Controller
         ]);
     }
 
-    public function update(UpdateRequest $request, Organization $organization, Equipment $equipment)
+    public function update(UpdateRequest $request, Equipment $equipment)
     {
         $this->authorize('update', $equipment);
 
@@ -142,7 +141,7 @@ class EquipmentController extends Controller
 
         app(UpdateEquipmentAction::class)->execute($equipment, $validated, $images);
 
-        return redirect()->route('app.organizations.equipments.index', $organization)
+        return redirect()->route('app.organizations.equipments.index')
             ->with('success', 'Matériel modifié avec succès.');
     }
 

@@ -16,7 +16,7 @@ class CalendarController extends Controller
         $user = $request->user();
         $organization = $user->currentOrganization;
 
-        if (!$organization) {
+        if (! $organization) {
             return redirect()->route('app.organizations.create')
                 ->with('error', 'Vous devez créer une organisation avant de pouvoir accéder au calendrier.');
         }
@@ -81,7 +81,7 @@ class CalendarController extends Controller
     {
         $organization = $request->user()->currentOrganization;
 
-        if (!$organization) {
+        if (! $organization) {
             return redirect()->route('app.organizations.create')
                 ->with('error', 'Vous devez créer une organisation avant de pouvoir créer des réservations.');
         }
