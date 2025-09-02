@@ -1,1 +1,0 @@
-import{c as s}from"./DialogPortal-amfp2Mk_.js";import{j as t,c as r,o as l,d as n,B as p,w as c,m as d}from"./app-KK-F1Z1c.js";const _=t({__name:"DialogClose",props:{asChild:{type:Boolean},as:{}},setup(o){const e=o;return(a,i)=>(l(),r(n(s),p({"data-slot":"dialog-close"},e),{default:c(()=>[d(a.$slots,"default")]),_:3},16))}});export{_};

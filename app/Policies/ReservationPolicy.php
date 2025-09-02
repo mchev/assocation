@@ -25,8 +25,8 @@ class ReservationPolicy
     public function view(User $user, Reservation $reservation): bool
     {
         return $user->id === $reservation->user_id ||
-               $user->isAdminOf($reservation->organization) ||
-               $user->isMemberOf($reservation->organization);
+               ($reservation->lenderOrganization && ($user->isAdminOf($reservation->lenderOrganization) || $user->isMemberOf($reservation->lenderOrganization))) ||
+               ($reservation->borrowerOrganization && ($user->isAdminOf($reservation->borrowerOrganization) || $user->isMemberOf($reservation->borrowerOrganization)));
     }
 
     /**
@@ -43,7 +43,8 @@ class ReservationPolicy
     public function update(User $user, Reservation $reservation): bool
     {
         return $user->id === $reservation->user_id ||
-               $user->isAdminOf($reservation->organization);
+               ($reservation->lenderOrganization && $user->isAdminOf($reservation->lenderOrganization)) ||
+               ($reservation->borrowerOrganization && $user->isAdminOf($reservation->borrowerOrganization));
     }
 
     /**
@@ -52,7 +53,8 @@ class ReservationPolicy
     public function delete(User $user, Reservation $reservation): bool
     {
         return $user->id === $reservation->user_id ||
-               $user->isAdminOf($reservation->organization);
+               ($reservation->lenderOrganization && $user->isAdminOf($reservation->lenderOrganization)) ||
+               ($reservation->borrowerOrganization && $user->isAdminOf($reservation->borrowerOrganization));
     }
 
     /**
@@ -60,7 +62,8 @@ class ReservationPolicy
      */
     public function restore(User $user, Reservation $reservation): bool
     {
-        return $user->isAdminOf($reservation->organization);
+        return ($reservation->lenderOrganization && $user->isAdminOf($reservation->lenderOrganization)) ||
+               ($reservation->borrowerOrganization && $user->isAdminOf($reservation->borrowerOrganization));
     }
 
     /**
@@ -68,6 +71,7 @@ class ReservationPolicy
      */
     public function forceDelete(User $user, Reservation $reservation): bool
     {
-        return $user->isAdminOf($reservation->organization);
+        return ($reservation->lenderOrganization && $user->isAdminOf($reservation->lenderOrganization)) ||
+               ($reservation->borrowerOrganization && $user->isAdminOf($reservation->borrowerOrganization));
     }
 }
