@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Actions\Equipment\DeleteEquipmentAction;
 use App\Actions\Equipment\StoreEquipmentAction;
 use App\Actions\Equipment\UpdateEquipmentAction;
 use App\Http\Controllers\Controller;
@@ -145,20 +146,19 @@ class EquipmentController extends Controller
             ->with('success', 'Matériel modifié avec succès.');
     }
 
-    public function destroy(Organization $organization, Equipment $equipment)
+    public function destroy(Equipment $equipment)
     {
         $this->authorize('delete', $equipment);
 
-        // TODO: Check if the equipment is rented and alert users; improve this
-        $rented = $equipment->reservations()->where('end_date', '>=', now())->exists();
-        if ($rented) {
-            return redirect()->route('app.organizations.equipments.index', $organization)
-                ->with('error', 'Ce matériel est actuellement loué et ne peut être supprimé.');
+        try {
+            app(DeleteEquipmentAction::class)->execute($equipment);
+
+            return redirect()->route('app.organizations.equipments.index')
+                ->with('success', 'Matériel supprimé avec succès.');
+        } catch (\Exception $e) {
+            // Return to the edit page with the error message so user can see the context
+            return redirect()->route('app.organizations.equipments.edit', $equipment)
+                ->with('error', $e->getMessage());
         }
-
-        $equipment->delete();
-
-        return redirect()->route('app.organizations.equipments.index', $organization)
-            ->with('success', 'Matériel supprimé avec succès.');
     }
 }

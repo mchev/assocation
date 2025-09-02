@@ -21,6 +21,26 @@
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <!-- Flash Messages -->
+        <div v-if="$page.props.flash?.error" class="mb-6">
+          <div class="bg-destructive/15 border border-destructive/20 text-destructive px-4 py-3 rounded-lg flex items-center gap-3">
+            <AlertCircle class="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p class="font-medium">Impossible de supprimer l'équipement</p>
+              <p class="text-sm mt-1">{{ $page.props.flash.error }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div v-if="$page.props.flash?.success" class="mb-6">
+          <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-3">
+            <CheckCircle class="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p class="font-medium">Succès</p>
+              <p class="text-sm mt-1">{{ $page.props.flash.success }}</p>
+            </div>
+          </div>
+        </div>
         <!-- Floating Navigation -->
         <div class="hidden lg:block sticky top-4 z-30 float-right w-60 ml-8 bg-card rounded-lg border shadow-sm">
           <nav class="p-4">
@@ -48,6 +68,12 @@
                 <a href="#pricing" class="flex items-center text-muted-foreground hover:text-foreground">
                   <Euro class="w-4 h-4 mr-2" />
                   Tarification
+                </a>
+              </li>
+              <li>
+                <a href="#reservations" class="flex items-center text-muted-foreground hover:text-foreground">
+                  <CalendarPlus class="w-4 h-4 mr-2" />
+                  Réservations
                 </a>
               </li>
             </ul>
@@ -434,14 +460,51 @@
               </div>
             </section>
 
+            <!-- Reservations Information -->
+            <section id="reservations" class="p-6 space-y-8">
+              <div class="flex items-center gap-4 pb-4 border-b">
+                <CalendarPlus class="w-5 h-5 text-muted-foreground" />
+                <h3 class="text-lg font-medium">Réservations</h3>
+              </div>
+
+              <div class="bg-muted/50 rounded-lg p-4">
+                <p class="text-sm text-muted-foreground mb-3">
+                  <strong>Note :</strong> L'équipement ne peut pas être supprimé s'il a des réservations actives (en cours) ou des réservations confirmées à venir.
+                </p>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <span class="text-sm">Réservations en attente : Peuvent être annulées automatiquement</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span class="text-sm">Réservations confirmées : Empêchent la suppression</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             <!-- Form Actions -->
             <div class="flex items-center justify-between gap-x-6 p-6">
-              <Link
-                :href="route('app.organizations.equipments.index', organization)"
-                class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
-              >
-                Annuler
-              </Link>
+              <div class="flex items-center gap-4">
+                <Link
+                  :href="route('app.organizations.equipments.index', organization)"
+                  class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+                >
+                  Annuler
+                </Link>
+                
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  @click="showDeleteDialog = true"
+                  class="focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+                >
+                  <Trash2 class="w-4 h-4 mr-2" />
+                  Supprimer
+                </Button>
+              </div>
 
               <Button
                 type="submit"
@@ -455,6 +518,59 @@
               </Button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <div v-if="showDeleteDialog" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black/50" @click="showDeleteDialog = false"></div>
+      <div class="relative bg-card text-card-foreground rounded-lg border shadow-lg max-w-md w-full mx-4">
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
+              <Trash2 class="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold">Supprimer l'équipement</h3>
+              <p class="text-sm text-muted-foreground">Cette action est irréversible</p>
+            </div>
+          </div>
+          
+          <p class="text-sm text-muted-foreground mb-4">
+            Êtes-vous sûr de vouloir supprimer l'équipement <strong>{{ equipment.name }}</strong> ? 
+            Cette action supprimera définitivement l'équipement et toutes ses données associées.
+          </p>
+          
+          <div class="bg-muted/50 rounded-lg p-3 mb-6">
+            <p class="text-xs text-muted-foreground mb-2 font-medium">Ce qui se passera :</p>
+            <ul class="text-xs text-muted-foreground space-y-1">
+              <li>• L'équipement sera supprimé définitivement</li>
+              <li>• Toutes les photos seront supprimées</li>
+              <li>• Les réservations en attente seront annulées automatiquement</li>
+              <li>• Les réservations confirmées empêcheront la suppression</li>
+            </ul>
+          </div>
+          
+          <div class="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              @click="showDeleteDialog = false"
+              :disabled="deleteForm.processing"
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              @click="deleteEquipment"
+              :disabled="deleteForm.processing"
+            >
+              <Spinner v-if="deleteForm.processing" class="w-4 h-4 mr-2" />
+              {{ deleteForm.processing ? 'Suppression...' : 'Supprimer' }}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -487,7 +603,8 @@ import {
   ArrowUpRight,
   CalendarPlus,
   Upload,
-  X
+  X,
+  Trash2
 } from 'lucide-vue-next'
 import Spinner from '@/components/ui/spinner.vue'
 import { ref, computed } from 'vue'
@@ -538,6 +655,8 @@ const form = useForm({
 })
 
 const imagePreviewUrls = ref([])
+const showDeleteDialog = ref(false)
+
 const displayedExistingImages = computed(() => {
   return props.equipment.images?.filter(image => !form.removed_images.includes(image.id)) || []
 })
@@ -545,6 +664,11 @@ const displayedExistingImages = computed(() => {
 const isUploadDisabled = computed(() => {
   const totalImages = displayedExistingImages.value.length + form.images.length
   return totalImages >= 10
+})
+
+// Delete form
+const deleteForm = useForm({
+  _method: 'DELETE'
 })
 
 // Computed properties for organization and depot management
@@ -621,6 +745,17 @@ const submit = () => {
   form.post(route('app.organizations.equipments.update', props.equipment.id), {
     preserveScroll: true,
     forceFormData: true,
+  })
+}
+
+const deleteEquipment = () => {
+  deleteForm.delete(route('app.organizations.equipments.destroy', [props.organization, props.equipment]), {
+    onSuccess: () => {
+      showDeleteDialog.value = false
+    },
+    onError: (errors) => {
+      console.error('Erreur lors de la suppression:', errors)
+    }
   })
 }
 </script>
