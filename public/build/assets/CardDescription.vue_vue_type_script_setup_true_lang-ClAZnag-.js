@@ -1,0 +1,1 @@
+import{c as t}from"./index-DouTTK24.js";import{j as a,g as r,m as n,n as c,d as p,o as l}from"./app-B-9VkXFi.js";const f=a({__name:"CardDescription",props:{class:{}},setup(s){const e=s;return(o,m)=>(l(),r("p",{"data-slot":"card-description",class:c(p(t)("text-muted-foreground text-sm",e.class))},[n(o.$slots,"default")],2))}});export{f as _};

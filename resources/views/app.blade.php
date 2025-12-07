@@ -49,7 +49,7 @@
         <link href="https://fonts.bunny.net/css?family=abeezee:400" rel="stylesheet" />
 
         @production
-            <script defer src="https://stats.pegase.io/script.js" data-website-id="f0ba459b-ef50-4556-8c2e-971dc388b643"></script>
+            <script defer src="https://stats.pegase.io/script.js" data-website-id="db3c04f4-da94-4739-ae56-ca33add5ca61"></script>
         @endproduction
         
         @routes
