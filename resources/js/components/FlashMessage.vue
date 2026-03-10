@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { CheckCircle, XCircle, Info } from 'lucide-vue-next';
+import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-vue-next';
 
 const page = usePage();
 const messages = ref([]);
@@ -24,6 +24,9 @@ watch(() => page.props.flash, (flash) => {
     }
     if (flash.error) {
         addMessage('error', flash.error);
+    }
+    if (flash.warning) {
+        addMessage('warning', flash.warning);
     }
     if (flash.message) {
         addMessage('info', flash.message);
@@ -55,22 +58,25 @@ watch(() => page.props.errors, (errors) => {
             >
                 <div :class="[
                     'p-4',
-                    message.type === 'success' && 'bg-green-50',
-                    message.type === 'error' && 'bg-red-50',
-                    message.type === 'info' && 'bg-blue-50'
+                    message.type === 'success' && 'bg-green-50 dark:bg-green-950/30',
+                    message.type === 'error' && 'bg-red-50 dark:bg-red-950/30',
+                    message.type === 'warning' && 'bg-amber-50 dark:bg-amber-950/30',
+                    message.type === 'info' && 'bg-blue-50 dark:bg-blue-950/30'
                 ]">
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
                             <CheckCircle v-if="message.type === 'success'" class="h-5 w-5 text-green-400" />
                             <XCircle v-if="message.type === 'error'" class="h-5 w-5 text-red-400" />
+                            <AlertTriangle v-if="message.type === 'warning'" class="h-5 w-5 text-amber-500" />
                             <Info v-if="message.type === 'info'" class="h-5 w-5 text-blue-400" />
                         </div>
                         <div class="ml-3 w-0 flex-1 pt-0.5">
                             <p :class="[
                                 'text-sm font-medium',
-                                message.type === 'success' && 'text-green-800',
-                                message.type === 'error' && 'text-red-800',
-                                message.type === 'info' && 'text-blue-800'
+                                message.type === 'success' && 'text-green-800 dark:text-green-200',
+                                message.type === 'error' && 'text-red-800 dark:text-red-200',
+                                message.type === 'warning' && 'text-amber-800 dark:text-amber-200',
+                                message.type === 'info' && 'text-blue-800 dark:text-blue-200'
                             ]">
                                 {{ message.text }}
                             </p>

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\App;
 
 use App\Actions\Equipment\DeleteEquipmentAction;
+use App\Actions\Equipment\GenerateEquipmentImageFromAiAction;
 use App\Actions\Equipment\StoreEquipmentAction;
 use App\Actions\Equipment\UpdateEquipmentAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Equipment\StoreRequest;
 use App\Http\Requests\Equipment\UpdateRequest;
 use App\Models\Equipment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -93,20 +95,70 @@ class EquipmentController extends Controller
         ]);
     }
 
+    public function suggestImages(Request $request, GenerateEquipmentImageFromAiAction $action): JsonResponse
+    {
+        $this->authorize('create', [Equipment::class, $request->user()->currentOrganization]);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'brand' => ['nullable', 'string', 'max:255'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+        ]);
+
+        try {
+            $urls = $action->suggestImageUrls($validated);
+        } catch (\Throwable $e) {
+            return response()->json(['urls' => [], 'error' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['urls' => $urls]);
+    }
+
     public function store(StoreRequest $request, StoreEquipmentAction $storeEquipmentAction)
     {
         $organization = $request->user()->currentOrganization;
         $this->authorize('create', [Equipment::class, $organization]);
 
         $validated = $request->validated();
+        $findImageFromWeb = filter_var($validated['find_image_from_web'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $suggestedImageUrls = $validated['suggested_image_urls'] ?? [];
+        unset($validated['find_image_from_web'], $validated['suggested_image_urls']);
         $validated['organization_id'] = $organization->id;
         $images = $request->file('images', []);
 
         $equipment = $storeEquipmentAction->execute($validated, $images);
 
+        $generateAction = app(GenerateEquipmentImageFromAiAction::class);
+
+        if (! empty($suggestedImageUrls)) {
+            foreach (array_slice($suggestedImageUrls, 0, 3) as $url) {
+                if (is_string($url) && str_starts_with($url, 'http')) {
+                    try {
+                        $generateAction->attachImageFromUrl($equipment, $url);
+                    } catch (\Throwable) {
+                        // Skip failed URL, continue with others
+                    }
+                }
+            }
+        } elseif ($findImageFromWeb) {
+            try {
+                $generateAction->execute($equipment);
+            } catch (\Throwable $e) {
+                return redirect()
+                    ->route('app.organizations.equipments.index')
+                    ->with('success', 'L\'équipement a été ajouté avec succès.')
+                    ->with('warning', 'La recherche automatique de photo a échoué : '.$e->getMessage());
+            }
+        }
+
+        $message = (! empty($suggestedImageUrls) || $findImageFromWeb)
+            ? 'L\'équipement a été ajouté avec succès. Les photos ont été enregistrées.'
+            : 'L\'équipement a été ajouté avec succès.';
+
         return redirect()
             ->route('app.organizations.equipments.index')
-            ->with('success', 'L\'équipement a été ajouté avec succès.');
+            ->with('success', $message);
     }
 
     public function edit(Request $request, Equipment $equipment)

@@ -113,21 +113,86 @@ class GenerateEquipmentImageFromAiAction
         return $query;
     }
 
+    /**
+     * Suggest up to 3 image URLs from a search based on equipment data (name, description, brand, category).
+     * Used when creating equipment to let the user pick from suggestions.
+     *
+     * @param  array{name: string, description?: string, brand?: string, category_id?: int}  $data
+     * @return array<int, string> Up to 3 image URLs
+     */
+    public function suggestImageUrls(array $data): array
+    {
+        $equipment = new Equipment;
+        $equipment->name = $data['name'];
+        $equipment->description = $data['description'] ?? null;
+        $equipment->brand = $data['brand'] ?? null;
+        if (! empty($data['category_id'])) {
+            $category = \App\Models\Category::find($data['category_id']);
+            if ($category) {
+                $equipment->setRelation('category', $category);
+            }
+        }
+
+        $searchQuery = $this->getSearchQueryFromAi($equipment);
+
+        return $this->findBestImageUrls($searchQuery, 3);
+    }
+
+    /**
+     * Download image from URL, process and attach to equipment. Used when user selected suggested URLs.
+     */
+    public function attachImageFromUrl(Equipment $equipment, string $imageUrl): EquipmentImage
+    {
+        $imageContent = $this->downloadImage($imageUrl);
+        $filename = Str::uuid().'.webp';
+        $path = "equipments/{$equipment->id}/{$filename}";
+
+        $tempPath = sys_get_temp_dir().'/'.Str::uuid().'.bin';
+        file_put_contents($tempPath, $imageContent);
+
+        try {
+            $processedImage = $this->manager->read($tempPath)
+                ->scaleDown(width: 1024)
+                ->toWebp(80);
+
+            Storage::disk('s3')->put($path, $processedImage->toFilePointer(), 'public');
+
+            $nextOrder = (int) $equipment->images()->max('order') + 1;
+
+            return $equipment->images()->create([
+                'path' => $path,
+                'original_name' => 'recherche-web.jpg',
+                'mime_type' => 'image/webp',
+                'size' => $processedImage->size(),
+                'order' => $nextOrder,
+            ]);
+        } finally {
+            @unlink($tempPath);
+        }
+    }
+
     protected function findBestImageUrl(string $searchQuery): string
+    {
+        $urls = $this->findBestImageUrls($searchQuery, 1);
+        if (empty($urls)) {
+            throw new RuntimeException('Aucune image trouvée pour la requête: '.$searchQuery);
+        }
+
+        return $urls[0];
+    }
+
+    /**
+     * Return up to $count image URLs from SerpApi.
+     *
+     * @return array<int, string>
+     */
+    protected function findBestImageUrls(string $searchQuery, int $count = 3): array
     {
         $apiKey = config('services.serpapi.key');
         if (! $apiKey) {
             throw new RuntimeException('SERPAPI_API_KEY est requis dans .env (compte gratuit sur serpapi.com, 250 recherches/mois).');
         }
 
-        return $this->findBestImageUrlWithSerpApi($searchQuery, $apiKey);
-    }
-
-    /**
-     * SerpApi Google Images — 250 recherches/mois gratuites. serpapi.com
-     */
-    protected function findBestImageUrlWithSerpApi(string $searchQuery, string $apiKey): string
-    {
         $response = Http::timeout(20)
             ->get('https://serpapi.com/search', [
                 'engine' => 'google_images',
@@ -143,15 +208,19 @@ class GenerateEquipmentImageFromAiAction
 
         $data = $response->json();
         $results = $data['images_results'] ?? [];
+        $urls = [];
 
         foreach ($results as $item) {
+            if (count($urls) >= $count) {
+                break;
+            }
             $url = $item['original'] ?? null;
             if ($url && str_starts_with($url, 'http') && ! str_starts_with($url, 'x-raw-image')) {
-                return $url;
+                $urls[] = $url;
             }
         }
 
-        throw new RuntimeException('Aucune image trouvée pour la requête: '.$searchQuery);
+        return $urls;
     }
 
     protected function downloadImage(string $imageUrl): string

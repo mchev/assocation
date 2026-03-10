@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
     Route::prefix('equipments')->name('organizations.equipments.')->group(function () {
         Route::get('/', [EquipmentController::class, 'index'])->name('index');
         Route::get('/create', [EquipmentController::class, 'create'])->name('create');
+        Route::post('/suggest-images', [EquipmentController::class, 'suggestImages'])->name('suggest-images');
         Route::post('/', [EquipmentController::class, 'store'])->name('store');
         Route::get('/{equipment}/edit', [EquipmentController::class, 'edit'])->name('edit');
         Route::put('/{equipment}', [EquipmentController::class, 'update'])->name('update');

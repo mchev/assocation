@@ -78,8 +78,6 @@
           </div>
 
           <form @submit.prevent="submit" class="p-4 sm:p-6">
-            <p class="text-sm text-muted-foreground/75 mb-8">Les champs marqués d'un <span class="text-destructive">*</span> sont obligatoires</p>
-
             <!-- Étape 1: Informations générales -->
             <div 
               v-show="currentStepName === 'general'" 
@@ -91,7 +89,7 @@
                 <div class="grid gap-8 sm:grid-cols-2">
                   <div>
                     <Label required class="text-base flex items-center gap-1">
-                      Nom
+                      Nom / Modèle
                       <span class="text-destructive" aria-hidden="true">*</span>
                       <span class="sr-only">obligatoire</span>
                     </Label>
@@ -100,7 +98,7 @@
                       type="text" 
                       required 
                       autofocus
-                      placeholder="Ex: Perceuse Bosch Professional"
+                      placeholder="Ex: Console Yamaha C7"
                       class="mt-2"
                       aria-required="true"
                     />
@@ -114,7 +112,7 @@
                     <Input 
                       v-model="form.brand"
                       type="text" 
-                      placeholder="Ex: Bosch"
+                      placeholder="Ex: Yamaha"
                       class="mt-2"
                     />
                     <p v-if="form.errors.brand" class="mt-2 text-sm text-destructive">{{ form.errors.brand }}</p>
@@ -252,41 +250,96 @@
               :aria-labelledby="`step-${currentStepName}-trigger`"
             >
               <div class="space-y-4">
-                <div class="flex items-start p-4 text-sm bg-muted/20 rounded-lg border border-muted">
-                  <Image class="w-5 h-5 mr-3 flex-shrink-0 text-muted-foreground/75" />
-                  <div class="space-y-1">
-                    <p class="text-muted-foreground/75">
-                      Ajoutez jusqu'à 3 photos de votre matériel. La première photo sera l'image principale.
-                    </p>
-                    <ul class="text-xs text-muted-foreground/75 list-disc list-inside">
-                      <li>Formats acceptés : JPG, JPEG, PNG</li>
-                      <li>Taille maximale par image : 10 MB</li>
-                      <li>Glissez-déposez pour réorganiser les photos</li>
-                    </ul>
+                <!-- Suggestions (recherche en arrière-plan quand nom renseigné) -->
+                <div v-if="form.name?.trim()" class="space-y-3">
+                  <p class="text-sm font-medium flex items-center gap-1.5">
+                    <Sparkles class="h-4 w-4 text-primary" />
+                    Photos suggérées
+                  </p>
+                  <p v-if="suggestedUrls.length" class="text-xs text-muted-foreground">
+                    Cliquez sur les photos que vous souhaitez garder pour ce matériel (une à trois maximum).
+                  </p>
+                  <div v-if="suggestedLoading" class="flex items-center gap-2 py-6 rounded-lg border border-muted bg-muted/20">
+                    <Spinner class="h-5 w-5 text-muted-foreground" />
+                    <span class="text-sm text-muted-foreground">Recherche de photos en cours…</span>
                   </div>
+                  <p v-else-if="suggestedError" class="text-sm text-destructive">{{ suggestedError }}</p>
+                  <div v-else-if="suggestedUrls.length" class="grid grid-cols-3 gap-3">
+                    <button
+                      v-for="(url, index) in suggestedUrls"
+                      :key="index"
+                      type="button"
+                      class="relative aspect-square rounded-lg border-2 overflow-hidden transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      :class="form.selected_suggested_image_urls.includes(url) ? 'border-primary ring-2 ring-primary/20' : 'border-muted hover:border-muted-foreground/40'"
+                      @click="toggleSuggestedUrl(url)"
+                    >
+                      <img
+                        :src="url"
+                        :alt="`Suggestion ${index + 1}`"
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        @error="onSuggestedImageError(index)"
+                      />
+                      <div
+                        v-if="form.selected_suggested_image_urls.includes(url)"
+                        class="absolute inset-0 flex items-center justify-center bg-primary/20"
+                      >
+                        <CheckCircle class="h-10 w-10 text-primary" />
+                      </div>
+                    </button>
+                  </div>
+                  <p v-else-if="suggestedFetched && !suggestedLoading" class="text-sm text-muted-foreground py-2">
+                    Aucune suggestion trouvée. Vous pouvez uploader vos photos ci-dessous.
+                  </p>
                 </div>
+                <p v-else class="text-sm text-muted-foreground py-2">
+                  Renseignez le nom du matériel à l’étape 1 pour voir des photos suggérées, ou uploadez les vôtres.
+                </p>
 
-                <!-- error message -->
-                <p v-if="form.errors.images" class="mt-2 text-sm text-destructive">{{ form.errors.images }}</p>
-
-                <file-pond
-                  name="images"
-                  ref="pond"
-                  class-name="file-pond-custom"
-                  :allow-multiple="true"
-                  :allow-reorder="true"
-                  :instant-upload="false"
-                  :allow-image-preview="true"
-                  :image-preview-height="170"
-                  :label-idle="'Glissez vos photos ici ou <span class=\'filepond--label-action\'>parcourez</span>'"
-                  :accepted-file-types="['image/png', 'image/jpeg', 'image/jpg']"
-                  :max-files="10"
-                  :files="form.images"
-                  @init="handleFilePondInit"
-                  @addfile="handleFilePondAddFile"
-                  @removefile="handleFilePondRemoveFile"
-                  @reorderfiles="handleFilePondReorderFiles"
-                />
+                <!-- Ou uploader ses propres photos -->
+                <div class="pt-2 border-t border-muted">
+                  <button
+                    type="button"
+                    class="text-sm font-medium text-primary hover:underline flex items-center gap-1.5"
+                    @click="showUploadZone = true"
+                  >
+                    <Image class="h-4 w-4" />
+                    {{ showUploadZone ? 'Zone d’upload ci-dessous' : 'Ou uploader mes propres photos' }}
+                  </button>
+                  <template v-if="showUploadZone">
+                    <div class="mt-3 flex items-start p-4 text-sm bg-muted/20 rounded-lg border border-muted">
+                      <Image class="w-5 h-5 mr-3 shrink-0 text-muted-foreground/75" />
+                      <div class="space-y-1">
+                        <p class="text-muted-foreground/75">
+                          Jusqu'à 3 photos. La première sera l'image principale.
+                        </p>
+                        <ul class="text-xs text-muted-foreground/75 list-disc list-inside">
+                          <li>JPG, JPEG, PNG — max 10 MB par image</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <p v-if="form.errors.images" class="mt-2 text-sm text-destructive">{{ form.errors.images }}</p>
+                    <file-pond
+                      name="images"
+                      ref="pond"
+                      class-name="file-pond-custom mt-2"
+                      :allow-multiple="true"
+                      :allow-reorder="true"
+                      :instant-upload="false"
+                      :allow-image-preview="true"
+                      :image-preview-height="170"
+                      :label-idle="'Glissez vos photos ici ou <span class=\'filepond--label-action\'>parcourez</span>'"
+                      :accepted-file-types="['image/png', 'image/jpeg', 'image/jpg']"
+                      :max-files="3"
+                      :files="form.images"
+                      @init="handleFilePondInit"
+                      @addfile="handleFilePondAddFile"
+                      @removefile="handleFilePondRemoveFile"
+                      @reorderfiles="handleFilePondReorderFiles"
+                    />
+                  </template>
+                </div>
               </div>
             </div>
 
@@ -424,6 +477,7 @@
             </div>
           </form>
         </div>
+        <p class="text-sm text-muted-foreground/75 mt-4 text-center">Les champs marqués d'un <span class="text-destructive">*</span> sont obligatoires</p>
       </div>
     </div>
   </AppLayout>
@@ -463,7 +517,8 @@ import {
   Image
 } from 'lucide-vue-next'
 import Spinner from '@/components/ui/spinner.vue'
-import { ref, computed } from 'vue'
+import axios from 'axios'
+import { ref, computed, watch } from 'vue'
 import vueFilePond from 'vue-filepond'
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.esm.js'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.esm.js'
@@ -555,6 +610,60 @@ const form = useForm({
   is_rentable: true,
   specifications: {},
   images: [],
+  find_image_from_web: false,
+  selected_suggested_image_urls: [],
+})
+
+const suggestedUrls = ref([])
+const suggestedLoading = ref(false)
+const suggestedError = ref(null)
+const suggestedFetched = ref(false)
+const showUploadZone = ref(false)
+
+function toggleSuggestedUrl(url) {
+  const idx = form.selected_suggested_image_urls.indexOf(url)
+  if (idx !== -1) {
+    form.selected_suggested_image_urls.splice(idx, 1)
+  } else if (form.selected_suggested_image_urls.length < 3) {
+    form.selected_suggested_image_urls.push(url)
+  }
+}
+
+function onSuggestedImageError(index) {
+  const url = suggestedUrls.value[index]
+  if (url) {
+    suggestedUrls.value = suggestedUrls.value.filter((_, i) => i !== index)
+    form.selected_suggested_image_urls = form.selected_suggested_image_urls.filter(u => u !== url)
+  }
+}
+
+async function fetchSuggestedImages() {
+  if (!form.name?.trim()) return
+  suggestedLoading.value = true
+  suggestedError.value = null
+  suggestedFetched.value = true
+  try {
+    const { data } = await axios.post(route('app.organizations.equipments.suggest-images'), {
+      name: form.name,
+      description: form.description || undefined,
+      brand: form.brand || undefined,
+      category_id: form.category_id || undefined,
+    }, {
+      headers: { Accept: 'application/json' },
+    })
+    suggestedUrls.value = data.urls ?? []
+  } catch (err) {
+    suggestedError.value = err.response?.data?.error ?? err.message ?? 'Erreur lors de la recherche.'
+    suggestedUrls.value = []
+  } finally {
+    suggestedLoading.value = false
+  }
+}
+
+watch(currentStep, (step) => {
+  if (step === 2 && form.name?.trim()) {
+    fetchSuggestedImages()
+  }
 })
 
 // Handle FilePond events
@@ -604,7 +713,10 @@ const handlePriceInput = (e, field) => {
 
 const submit = () => {
   const data = { ...form };
-  
+  data.suggested_image_urls = Array.isArray(form.selected_suggested_image_urls)
+    ? form.selected_suggested_image_urls
+    : [];
+
   Object.keys(data).forEach(key => {
     if (key.endsWith('_price') || key.endsWith('_amount')) {
       if (data[key] === '' || data[key] === null) {
@@ -615,7 +727,6 @@ const submit = () => {
     }
   });
 
-  // Send raw values to server, Laravel will handle the conversion
   form
     .transform(() => data)
     .post(route('app.organizations.equipments.store', props.organization));

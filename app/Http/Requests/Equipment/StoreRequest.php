@@ -36,6 +36,9 @@ class StoreRequest extends FormRequest
             // Step 3: Photos
             'images' => ['nullable', 'array', 'max:3'],
             'images.*' => ['image', 'mimes:jpeg,jpg,png', 'max:10240'], // 10MB max per image
+            'find_image_from_web' => ['nullable', 'boolean'],
+            'suggested_image_urls' => ['nullable', 'array', 'max:3'],
+            'suggested_image_urls.*' => ['string', 'url'],
 
             // Step 4: Tarification
             'purchase_price' => ['required', 'numeric', 'min:0'],
