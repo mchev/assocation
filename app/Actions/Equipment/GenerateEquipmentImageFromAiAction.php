@@ -79,18 +79,20 @@ class GenerateEquipmentImageFromAiAction
 
     protected function getSearchQueryFromAi(Equipment $equipment): string
     {
-        $instructions = 'Tu es un assistant qui génères des requêtes de recherche pour trouver une photo produit réelle (site fabricant, revendeur, fiche produit). Réponds UNIQUEMENT avec une requête de recherche courte et précise, en anglais, sans guillemets. Exemple: pour "Console Soundcraft 8 pistes" → "Soundcraft 8 track mixer product photo".';
+        $instructions = 'Tu génères une requête de recherche pour trouver une photo produit réelle (fiche fabricant ou revendeur). Règles importantes : la requête doit TOUJOURS inclure la marque et le modèle quand ils sont fournis, pour que l\'image corresponde exactement au bon produit (ex: "Soundcraft Signature 8" et pas une autre console). Format : marque + modèle + type de produit. Réponds UNIQUEMENT avec une requête courte en anglais, sans guillemets.';
 
-        $context = $equipment->name;
+        $parts = [];
+        $parts[] = 'Nom / titre : '.$equipment->name;
         if ($equipment->brand) {
-            $context .= ' — Marque: '.$equipment->brand;
+            $parts[] = 'Marque : '.$equipment->brand;
         }
         if ($equipment->description) {
-            $context .= ' — '.Str::limit(strip_tags($equipment->description), 300);
+            $parts[] = 'Description : '.Str::limit(strip_tags($equipment->description), 300);
         }
         if ($equipment->category) {
-            $context .= ' — Catégorie: '.$equipment->category->name;
+            $parts[] = 'Catégorie : '.$equipment->category->name;
         }
+        $context = implode("\n", $parts);
 
         $agent = agent(
             instructions: $instructions,
@@ -101,7 +103,7 @@ class GenerateEquipmentImageFromAiAction
             ]
         );
 
-        $response = $agent->prompt("Génère une requête de recherche Google Images pour trouver une photo produit correspondant exactement à ce matériel:\n\n{$context}");
+        $response = $agent->prompt("Génère une requête de recherche Google Images pour trouver une photo produit correspondant exactement à ce matériel (marque et modèle obligatoires si indiqués) :\n\n{$context}");
 
         $query = trim($response['search_query'] ?? '');
         if ($query === '') {
