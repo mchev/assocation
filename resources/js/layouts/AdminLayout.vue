@@ -55,6 +55,10 @@ const pageTitle = computed(() => {
   if (url.startsWith(route('admin.newsletters.index'))) {
     return 'Newsletters'
   }
+
+  if (url.startsWith(route('admin.equipments.index'))) {
+    return 'Matériel'
+  }
   
   return 'Administration'
 })

@@ -48,4 +48,8 @@ return [
     'horizon' => [
         'email' => env('HORIZON_EMAIL'),
     ],
+
+    'serpapi' => [
+        'key' => env('SERPAPI_API_KEY'),
+    ],
 ];

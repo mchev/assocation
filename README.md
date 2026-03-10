@@ -30,7 +30,7 @@
 - **API REST** : Endpoints pour équipements, organisations, catégories, etc.
 - **Expérience utilisateur moderne** :
   - UI avec shadcn-vue, Tailwind, Lucide icons
-  - Vue 3 Composition API, <script setup>
+  - Vue 3 Composition API, ````<script setup>````
   - Responsive, dark mode, accessibilité
 
 ## 🛠️ Stack technique
@@ -77,12 +77,8 @@
  php artisan serve
 ```
 
-### Synchronisation HelloAsso (optionnel)
-Voir [docs/HELLOASSO_INTEGRATION.md](docs/HELLOASSO_INTEGRATION.md) pour la configuration OAuth et la synchronisation des organisations.
-
 ## 📚 Documentation
 - [docs/README.md](docs/README.md) — Documentation technique
-- [docs/HELLOASSO_INTEGRATION.md](docs/HELLOASSO_INTEGRATION.md) — Intégration HelloAsso
 - [docs/SITEMAP.md](docs/SITEMAP.md) — Système de sitemap SEO
 
 ## 🧑‍💻 Contribution
